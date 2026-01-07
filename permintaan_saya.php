@@ -8,7 +8,6 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
-// Ambil ID User yang sedang login
 $id_user = $_SESSION['user_id'];
 ?>
 
@@ -34,9 +33,7 @@ require 'layout/topbar.php';
                         <tr>
                             <th width="5%">No</th>
                             <th>Tanggal Ajuan</th>
-                            <th>Nama Barang</th>
-                            <th>Jumlah</th>
-                            <th>Keperluan</th>
+                            <th>Detail Barang</th>
                             <th class="text-center">Status & Aksi</th>
                             <th>Catatan Admin</th>
                         </tr>
@@ -44,31 +41,39 @@ require 'layout/topbar.php';
                     <tbody>
                         <?php
                         $no = 1;
-                        // Query Join ke tb_barang agar dapat nama barangnya
-                        // Filter WHERE user_id = '$id_user' agar hanya melihat data sendiri
-                        $query = "SELECT p.*, b.nama_barang, b.satuan 
-                                  FROM tb_permintaan p 
-                                  JOIN tb_barang_bergerak b ON p.barang_id = b.id 
+                        // Query Header Permintaan milik User ini
+                        $query = "SELECT p.* FROM tb_permintaan p 
                                   WHERE p.user_id = '$id_user' 
                                   ORDER BY p.tanggal_permintaan DESC";
                         
                         $result = mysqli_query($koneksi, $query);
                         
                         while ($row = mysqli_fetch_assoc($result)): 
+                            $id_req = $row['id'];
                         ?>
                         <tr>
                             <td><?= $no++; ?></td>
                             <td><?= date('d-m-Y', strtotime($row['tanggal_permintaan'])); ?></td>
-                            <td class="font-weight-bold"><?= $row['nama_barang']; ?></td>
-                            <td><?= $row['jumlah']; ?> <?= $row['satuan']; ?></td>
-                            <td><small><?= $row['keperluan']; ?></small></td>
+                            
+                            <td>
+                                <ul class="pl-3 mb-0">
+                                <?php 
+                                    $q_detail = mysqli_query($koneksi, "SELECT d.jumlah, d.satuan, b.nama_barang 
+                                                                        FROM tb_detail_permintaan d 
+                                                                        JOIN tb_barang_bergerak b ON d.barang_id = b.id 
+                                                                        WHERE d.permintaan_id = '$id_req'");
+                                    while($d = mysqli_fetch_assoc($q_detail)){
+                                        echo "<li>{$d['nama_barang']} (<b>{$d['jumlah']} {$d['satuan']}</b>)</li>";
+                                    }
+                                ?>
+                                </ul>
+                            </td>
                             
                             <td class="text-center">
                                 <?php 
                                 if($row['status'] == 'menunggu') {
                                     echo '<span class="badge badge-warning">Menunggu Konfirmasi</span>';
                                 } elseif($row['status'] == 'disetujui') {
-                                    // TAMPILAN JIKA DISETUJUI (Badge + Tombol Cetak)
                                     echo '<span class="badge badge-success"><i class="fas fa-check"></i> Disetujui</span>';
                                     echo '<br><small class="text-muted">'.date('d-m-Y', strtotime($row['tanggal_disetujui'])).'</small>';
                                     
@@ -77,7 +82,6 @@ require 'layout/topbar.php';
                                     echo '<i class="fas fa-print fa-sm text-white-50"></i> Cetak Surat';
                                     echo '</a>';
                                     echo '</div>';
-
                                 } elseif($row['status'] == 'ditolak') {
                                     echo '<span class="badge badge-danger"><i class="fas fa-times"></i> Ditolak</span>';
                                 }
@@ -100,6 +104,5 @@ require 'layout/topbar.php';
             </div>
         </div>
     </div>
-
 </div>
 <?php require 'layout/footer.php'; ?>

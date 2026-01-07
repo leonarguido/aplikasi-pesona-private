@@ -2,84 +2,90 @@
 session_start();
 require 'config/koneksi.php';
 
-// 1. Cek Akses (Hanya Admin & Super Admin)
+// 1. Cek Akses
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit;
 }
-if ($_SESSION['role'] == 'user') {
+if ($_SESSION['role'] == 'staff' || $_SESSION['role'] == 'user') {
     echo "<script>alert('Akses Ditolak!'); window.location='index.php';</script>";
     exit;
 }
 
 // ==========================================
-// LOGIKA PHP: PROSES PERSETUJUAN & PENOLAKAN
+// LOGIKA PROSES (BACKEND)
 // ==========================================
 
 // A. PROSES PERSETUJUAN (Approve)
 if (isset($_POST['setuju'])) {
     $id_permintaan   = $_POST['id_permintaan'];
-    $id_barang       = $_POST['id_barang'];
-    
-    // Ambil data jumlah
-    $jumlah_minta_awal = $_POST['jumlah_awal'];     // Jumlah asli permintaan user
-    $jumlah_disetujui  = $_POST['jumlah_disetujui']; // Jumlah baru keputusan admin
-    
     $catatan_admin   = mysqli_real_escape_string($koneksi, $_POST['catatan_admin']);
     $admin_id        = $_SESSION['user_id'];
     $tanggal_acc     = date('Y-m-d');
+    $qty_approved_array = $_POST['qty_approved']; 
+    
+    $error_msg = "";
+    $stok_aman = true;
 
-    // --- VALIDASI ---
-    // 1. Cek apakah jumlah disetujui lebih besar dari permintaan? (Tidak boleh)
-    if ($jumlah_disetujui > $jumlah_minta_awal) {
-        echo "<script>alert('Gagal! Jumlah disetujui tidak boleh melebihi permintaan awal ($jumlah_minta_awal).');</script>";
-    } 
-    // 2. Cek apakah jumlah disetujui LEBIH KECIL tapi Catatan KOSONG? (Wajib isi)
-    elseif ($jumlah_disetujui < $jumlah_minta_awal && empty($catatan_admin)) {
-        echo "<script>alert('Gagal! Karena Anda menyetujui jumlah yang lebih sedikit ($jumlah_disetujui dari $jumlah_minta_awal), Anda WAJIB mengisi kolom Catatan Admin sebagai penjelasan.');</script>";
-    } 
-    else {
-        // Cek Stok Gudang
-        $cek_stok = mysqli_query($koneksi, "SELECT stok FROM tb_barang_bergerak WHERE id = '$id_barang'");
-        $data_stok = mysqli_fetch_assoc($cek_stok);
+    // TAHAP 1: VALIDASI
+    foreach ($qty_approved_array as $id_detail => $jml_acc) {
+        $q_check = mysqli_query($koneksi, "SELECT d.jumlah AS jml_minta, b.stok, b.nama_barang 
+                                           FROM tb_detail_permintaan d 
+                                           JOIN tb_barang_bergerak b ON d.barang_id = b.id 
+                                           WHERE d.id = '$id_detail'");
+        $data = mysqli_fetch_assoc($q_check);
+        
+        if ($jml_acc > $data['jml_minta']) {
+            $error_msg = "Gagal! Jumlah disetujui untuk '{$data['nama_barang']}' melebihi permintaan.";
+            $stok_aman = false; break;
+        }
+        if ($jml_acc > $data['stok']) {
+            $error_msg = "Gagal! Stok '{$data['nama_barang']}' tidak cukup.";
+            $stok_aman = false; break;
+        }
+        if ($jml_acc <= 0) {
+            $error_msg = "Gagal! Jumlah minimal 1.";
+            $stok_aman = false; break;
+        }
+    }
 
-        if ($data_stok['stok'] < $jumlah_disetujui) {
-            echo "<script>alert('Gagal! Stok barang di gudang tidak mencukupi.');</script>";
+    // TAHAP 2: EKSEKUSI
+    if (!$stok_aman) {
+        echo "<script>alert('$error_msg');</script>";
+    } else {
+        foreach ($qty_approved_array as $id_detail => $jml_acc) {
+            mysqli_query($koneksi, "UPDATE tb_detail_permintaan SET jumlah = '$jml_acc' WHERE id = '$id_detail'");
+            $q_b = mysqli_query($koneksi, "SELECT barang_id FROM tb_detail_permintaan WHERE id = '$id_detail'");
+            $d_b = mysqli_fetch_assoc($q_b);
+            $id_barang = $d_b['barang_id'];
+            mysqli_query($koneksi, "UPDATE tb_barang_bergerak SET stok = stok - $jml_acc WHERE id = '$id_barang'");
+        }
+
+        $query_update = "UPDATE tb_permintaan SET 
+                         status = 'disetujui', 
+                         tanggal_disetujui = '$tanggal_acc', 
+                         admin_id = '$admin_id',
+                         catatan = '$catatan_admin'
+                         WHERE id = '$id_permintaan'";
+
+        if (mysqli_query($koneksi, $query_update)) {
+            echo "<script>alert('Permintaan berhasil DISETUJUI!'); window.location='persetujuan.php';</script>";
         } else {
-            // EKSEKUSI DATABASE
-            
-            // 1. Update Tabel Permintaan
-            // Kita update kolom 'jumlah' dengan angka yang DISETUJUI saja
-            $query_update = "UPDATE tb_permintaan SET 
-                             status = 'disetujui', 
-                             jumlah = '$jumlah_disetujui', 
-                             tanggal_disetujui = '$tanggal_acc', 
-                             admin_id = '$admin_id',
-                             catatan = '$catatan_admin'
-                             WHERE id = '$id_permintaan'";
-            
-            // 2. Kurangi Stok Barang sesuai jumlah yang DISETUJUI
-            $query_kurang_stok = "UPDATE tb_barang_bergerak SET stok = stok - $jumlah_disetujui WHERE id = '$id_barang'";
-
-            if (mysqli_query($koneksi, $query_update) && mysqli_query($koneksi, $query_kurang_stok)) {
-                echo "<script>alert('Permintaan berhasil DISETUJUI sebanyak $jumlah_disetujui item.'); window.location='persetujuan.php';</script>";
-            } else {
-                echo "<script>alert('Error Database: " . mysqli_error($koneksi) . "');</script>";
-            }
+            echo "<script>alert('Error: " . mysqli_error($koneksi) . "');</script>";
         }
     }
 }
 
-// B. PROSES PENOLAKAN (Reject)
+// B. PROSES PENOLAKAN
 if (isset($_POST['tolak'])) {
     $id_permintaan = $_POST['id_permintaan'];
-    $catatan       = mysqli_real_escape_string($koneksi, $_POST['catatan']); // Alasan penolakan
+    $catatan       = mysqli_real_escape_string($koneksi, $_POST['catatan']);
     $admin_id      = $_SESSION['user_id'];
     $tanggal_acc   = date('Y-m-d');
 
     $query = "UPDATE tb_permintaan SET 
               status = 'ditolak', 
-              tanggal_disetujui = '$tanggal_acc', 
+              tanggal_ditolak = '$tanggal_acc', 
               admin_id = '$admin_id',
               catatan = '$catatan' 
               WHERE id = '$id_permintaan'";
@@ -99,13 +105,11 @@ require 'layout/topbar.php';
 ?>
 
 <div class="container-fluid">
-
-    <h1 class="h3 mb-2 text-gray-800">Persetujuan Permintaan</h1>
-    <p class="mb-4">Kelola permintaan barang masuk dari user (Staff).</p>
-
+    <h1 class="h3 mb-4 text-gray-800">Konfirmasi Permintaan Masuk</h1>
+    
     <div class="card shadow mb-4">
         <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Permintaan Menunggu Konfirmasi (Pending)</h6>
+            <h6 class="m-0 font-weight-bold text-primary">Daftar Antrian Permintaan</h6>
         </div>
         <div class="card-body">
             <div class="table-responsive">
@@ -115,203 +119,135 @@ require 'layout/topbar.php';
                             <th>No</th>
                             <th>Tanggal</th>
                             <th>Pemohon</th>
-                            <th>Barang</th>
-                            <th>Jumlah</th>
-                            <th>Keperluan</th>
-                            <th>Stok Gudang</th>
+                            <th>Rincian Barang (Qty)</th>
                             <th width="15%">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php
                         $no = 1;
-                        // Query Join: tb_permintaan + tb_user + tb_barang_bergerak
-                        $query = "SELECT p.*, p.id AS id_permintaan, u.nama AS nama_pemohon, b.nama_barang, b.stok AS stok_gudang, b.satuan 
+                        $query = "SELECT p.id AS id_permintaan, p.tanggal_permintaan, u.nama AS nama_pemohon 
                                   FROM tb_permintaan p 
                                   JOIN tb_user u ON p.user_id = u.id 
-                                  JOIN tb_barang_bergerak b ON p.barang_id = b.id 
                                   WHERE p.status = 'menunggu' 
                                   ORDER BY p.tanggal_permintaan ASC";
                         
                         $result = mysqli_query($koneksi, $query);
                         
-                        // Pesan jika kosong
                         if(mysqli_num_rows($result) == 0) {
-                            echo "<tr><td colspan='8' class='text-center text-muted py-4'>Tidak ada permintaan baru saat ini.</td></tr>";
+                            echo "<tr><td colspan='5' class='text-center text-muted py-4'>Tidak ada permintaan baru.</td></tr>";
                         }
 
                         while ($row = mysqli_fetch_assoc($result)): 
+                            $id_req = $row['id_permintaan'];
                         ?>
                         <tr>
                             <td><?= $no++; ?></td>
                             <td><?= date('d-m-Y', strtotime($row['tanggal_permintaan'])); ?></td>
                             <td class="font-weight-bold"><?= $row['nama_pemohon']; ?></td>
-                            <td><?= $row['nama_barang']; ?></td>
-                            <td class="text-center font-weight-bold text-primary" style="font-size: 1.1rem;"><?= $row['jumlah']; ?> <?= $row['satuan']; ?></td>
-                            <td><small><?= $row['keperluan']; ?></small></td>
                             
-                            <td class="text-center">
-                                <?php if($row['stok_gudang'] >= $row['jumlah']): ?>
-                                    <span class="badge badge-success">Aman (<?= $row['stok_gudang']; ?>)</span>
-                                <?php else: ?>
-                                    <span class="badge badge-danger">Kurang (<?= $row['stok_gudang']; ?>)</span>
-                                <?php endif; ?>
+                            <td>
+                                <ul class="pl-3 mb-0" style="font-size: 0.9rem;">
+                                <?php 
+                                    $q_d = mysqli_query($koneksi, "SELECT d.jumlah, d.satuan, b.nama_barang, b.stok 
+                                                                   FROM tb_detail_permintaan d 
+                                                                   JOIN tb_barang_bergerak b ON d.barang_id = b.id 
+                                                                   WHERE d.permintaan_id = '$id_req'");
+                                    while($d = mysqli_fetch_assoc($q_d)){
+                                        $status_stok = ($d['stok'] >= $d['jumlah']) 
+                                            ? "<span class='badge badge-success badge-pill ml-1'>Aman ({$d['stok']})</span>" 
+                                            : "<span class='badge badge-danger badge-pill ml-1'>Kurang ({$d['stok']})</span>";
+                                        echo "<li class='mb-1'>{$d['nama_barang']} : <b>{$d['jumlah']} {$d['satuan']}</b> $status_stok</li>";
+                                    }
+                                ?>
+                                </ul>
                             </td>
 
                             <td class="text-center">
-                                <button class="btn btn-success btn-sm btn-circle" data-toggle="modal" data-target="#modalSetuju<?= $row['id_permintaan']; ?>" title="Setujui">
+                                <button class="btn btn-success btn-sm btn-circle" data-toggle="modal" data-target="#modalSetuju<?= $id_req; ?>" title="Setujui">
                                     <i class="fas fa-check"></i>
                                 </button>
-                                <button class="btn btn-danger btn-sm btn-circle" data-toggle="modal" data-target="#modalTolak<?= $row['id_permintaan']; ?>" title="Tolak">
+                                <button class="btn btn-danger btn-sm btn-circle" data-toggle="modal" data-target="#modalTolak<?= $id_req; ?>" title="Tolak">
                                     <i class="fas fa-times"></i>
                                 </button>
-                            </td>
-                        </tr>
 
-                        <div class="modal fade" id="modalSetuju<?= $row['id_permintaan']; ?>">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header bg-success text-white">
-                                        <h5 class="modal-title">Konfirmasi Persetujuan</h5>
-                                        <button class="close text-white" data-dismiss="modal">&times;</button>
-                                    </div>
-                                    <form method="POST">
-                                        <div class="modal-body">
-                                            <p>Anda akan menyetujui permintaan dari <strong><?= $row['nama_pemohon']; ?></strong>.</p>
-                                            
-                                            <div class="form-group row mb-2">
-                                                <label class="col-sm-4 col-form-label">Nama Barang</label>
-                                                <div class="col-sm-8">
-                                                    <input type="text" class="form-control-plaintext font-weight-bold" value="<?= $row['nama_barang']; ?>" readonly>
-                                                </div>
+                                <div class="modal fade text-left" id="modalSetuju<?= $id_req; ?>">
+                                    <div class="modal-dialog modal-lg">
+                                        <div class="modal-content">
+                                            <div class="modal-header bg-success text-white">
+                                                <h5 class="modal-title">Konfirmasi & Edit Jumlah</h5>
+                                                <button class="close text-white" data-dismiss="modal">&times;</button>
                                             </div>
-
-                                            <hr>
-
-                                            <div class="form-group">
-                                                <label class="font-weight-bold text-gray-800">Jumlah Disetujui</label>
-                                                <div class="input-group">
-                                                    <input type="number" name="jumlah_disetujui" class="form-control font-weight-bold" 
-                                                           value="<?= $row['jumlah']; ?>" 
-                                                           max="<?= $row['jumlah']; ?>" 
-                                                           min="1" required>
-                                                    <div class="input-group-append">
-                                                        <span class="input-group-text"><?= $row['satuan']; ?></span>
+                                            <form method="POST">
+                                                <div class="modal-body">
+                                                    <p>Permintaan dari: <strong><?= $row['nama_pemohon']; ?></strong></p>
+                                                    <div class="table-responsive">
+                                                        <table class="table table-sm table-bordered">
+                                                            <thead class="thead-light">
+                                                                <tr><th>Nama Barang</th><th>Stok</th><th width="30%">Disetujui</th></tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <?php 
+                                                                $q_modal = mysqli_query($koneksi, "SELECT d.id AS id_detail, d.jumlah, d.satuan, b.nama_barang, b.stok 
+                                                                                                   FROM tb_detail_permintaan d 
+                                                                                                   JOIN tb_barang_bergerak b ON d.barang_id = b.id 
+                                                                                                   WHERE d.permintaan_id = '$id_req'");
+                                                                while($dm = mysqli_fetch_assoc($q_modal)):
+                                                                ?>
+                                                                <tr>
+                                                                    <td><?= $dm['nama_barang']; ?></td>
+                                                                    <td><?= $dm['stok']; ?> <?= $dm['satuan']; ?></td>
+                                                                    <td>
+                                                                        <div class="input-group input-group-sm">
+                                                                            <input type="number" name="qty_approved[<?= $dm['id_detail']; ?>]" class="form-control font-weight-bold text-success" value="<?= $dm['jumlah']; ?>" max="<?= $dm['jumlah']; ?>" min="1" required>
+                                                                            <div class="input-group-append"><span class="input-group-text"><?= $dm['satuan']; ?></span></div>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                                <?php endwhile; ?>
+                                                            </tbody>
+                                                        </table>
                                                     </div>
+                                                    <hr>
+                                                    <div class="form-group">
+                                                        <label>Catatan Admin</label>
+                                                        <textarea name="catatan_admin" class="form-control" rows="2"></textarea>
+                                                    </div>
+                                                    <input type="hidden" name="id_permintaan" value="<?= $id_req; ?>">
                                                 </div>
-                                                <small class="text-muted mt-2 d-block">
-                                                    Permintaan Awal: <b><?= $row['jumlah']; ?></b>. <br>
-                                                    <span class="text-danger">*Anda boleh mengurangi jumlah ini (Persetujuan Parsial).</span>
-                                                </small>
-                                            </div>
-
-                                            <div class="form-group">
-                                                <label class="font-weight-bold text-gray-800">Catatan Admin</label>
-                                                <textarea name="catatan_admin" class="form-control" rows="3" placeholder="Tulis alasan jika jumlah yang disetujui lebih sedikit..."></textarea>
-                                                <small class="text-muted">*Wajib diisi jika jumlah disetujui < permintaan awal.</small>
-                                            </div>
-
-                                            <input type="hidden" name="id_permintaan" value="<?= $row['id_permintaan']; ?>">
-                                            <input type="hidden" name="id_barang" value="<?= $row['barang_id']; ?>">
-                                            <input type="hidden" name="jumlah_awal" value="<?= $row['jumlah']; ?>">
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                                                    <button type="submit" name="setuju" class="btn btn-success">Proses</button>
+                                                </div>
+                                            </form>
                                         </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                                            <button type="submit" name="setuju" class="btn btn-success">Proses Persetujuan</button>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="modal fade" id="modalTolak<?= $row['id_permintaan']; ?>">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header bg-danger text-white">
-                                        <h5 class="modal-title">Tolak Permintaan?</h5>
-                                        <button class="close text-white" data-dismiss="modal">&times;</button>
                                     </div>
-                                    <form method="POST">
-                                        <div class="modal-body">
-                                            <p>Anda akan menolak permintaan dari <strong><?= $row['nama_pemohon']; ?></strong>.</p>
-                                            
-                                            <div class="form-group">
-                                                <label class="font-weight-bold">Alasan Penolakan (Wajib):</label>
-                                                <textarea name="catatan" class="form-control" rows="3" required placeholder="Contoh: Stok habis, permintaan tidak relevan..."></textarea>
-                                            </div>
-                                            
-                                            <input type="hidden" name="id_permintaan" value="<?= $row['id_permintaan']; ?>">
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                                            <button type="submit" name="tolak" class="btn btn-danger">Tolak Permintaan</button>
-                                        </div>
-                                    </form>
                                 </div>
-                            </div>
-                        </div>
 
-                        <?php endwhile; ?>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-    
-    <div class="card shadow mb-4">
-        <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-secondary">Riwayat Persetujuan Terakhir</h6>
-        </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-sm table-bordered" width="100%" cellspacing="0">
-                    <thead class="thead-light">
-                        <tr>
-                            <th>Tanggal Proses</th>
-                            <th>Pemohon</th>
-                            <th>Barang</th>
-                            <th>Qty Akhir</th>
-                            <th>Status</th>
-                            <th>Admin</th>
-                            <th>Catatan</th>
-                            <th class="text-center">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php
-                        $query_hist = "SELECT p.*, u.nama AS nama_pemohon, b.nama_barang, a.nama AS nama_admin, b.satuan
-                                       FROM tb_permintaan p 
-                                       JOIN tb_user u ON p.user_id = u.id 
-                                       JOIN tb_barang_bergerak b ON p.barang_id = b.id
-                                       LEFT JOIN tb_user a ON p.admin_id = a.id
-                                       WHERE p.status != 'menunggu' 
-                                       ORDER BY p.tanggal_disetujui DESC LIMIT 5";
-                        $res_hist = mysqli_query($koneksi, $query_hist);
-                        while($hist = mysqli_fetch_assoc($res_hist)):
-                        ?>
-                        <tr>
-                            <td><?= date('d-m-Y', strtotime($hist['tanggal_disetujui'])); ?></td>
-                            <td><?= $hist['nama_pemohon']; ?></td>
-                            <td><?= $hist['nama_barang']; ?></td>
-                            <td class="font-weight-bold"><?= $hist['jumlah']; ?> <?= $hist['satuan']; ?></td>
-                            <td>
-                                <?php if($hist['status']=='disetujui'): ?>
-                                    <span class="badge badge-success">Disetujui</span>
-                                <?php else: ?>
-                                    <span class="badge badge-danger">Ditolak</span>
-                                <?php endif; ?>
-                            </td>
-                            <td><small><?= $hist['nama_admin']; ?></small></td>
-                            <td><small class="text-muted"><?= $hist['catatan']; ?></small></td>
-                            
-                            <td class="text-center">
-                                <?php if($hist['status']=='disetujui'): ?>
-                                    <a href="cetak_surat.php?id=<?= $hist['id']; ?>" target="_blank" class="btn btn-info btn-sm" title="Cetak Surat">
-                                        <i class="fas fa-print"></i>
-                                    </a>
-                                <?php else: ?>
-                                    <span class="text-muted">-</span>
-                                <?php endif; ?>
+                                <div class="modal fade text-left" id="modalTolak<?= $id_req; ?>">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header bg-danger text-white">
+                                                <h5 class="modal-title">Tolak Permintaan?</h5>
+                                                <button class="close text-white" data-dismiss="modal">&times;</button>
+                                            </div>
+                                            <form method="POST">
+                                                <div class="modal-body">
+                                                    <div class="form-group">
+                                                        <label>Alasan Penolakan:</label>
+                                                        <textarea name="catatan" class="form-control" required></textarea>
+                                                    </div>
+                                                    <input type="hidden" name="id_permintaan" value="<?= $id_req; ?>">
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                                                    <button type="submit" name="tolak" class="btn btn-danger">Tolak</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+
                             </td>
                         </tr>
                         <?php endwhile; ?>
@@ -320,6 +256,5 @@ require 'layout/topbar.php';
             </div>
         </div>
     </div>
-
 </div>
 <?php require 'layout/footer.php'; ?>

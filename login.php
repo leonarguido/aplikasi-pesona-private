@@ -95,11 +95,6 @@ if (isset($_POST['login'])) {
                                     Masuk
                                 </button>
                             </form>
-                            
-                            <hr>
-                            <div class="text-center">
-                                <small class="text-muted">Gunakan akun: <b>admin</b> / <b>admin123</b></small>
-                            </div>
                         </div>
                     </div>
                 </div>

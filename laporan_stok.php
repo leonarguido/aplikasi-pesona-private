@@ -1,0 +1,107 @@
+<?php
+session_start();
+require 'config/koneksi.php';
+
+// 1. Cek Akses (Hanya Pimpinan & Admin yang boleh lihat stok)
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit;
+}
+if ($_SESSION['role'] == 'user' || $_SESSION['role'] == 'staff') {
+    echo "<script>alert('Akses Ditolak!'); window.location='index.php';</script>";
+    exit;
+}
+?>
+
+<?php 
+require 'layout/header.php';
+require 'layout/sidebar.php';
+require 'layout/topbar.php'; 
+?>
+
+<div class="container-fluid">
+    
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Laporan Stok Barang Saat Ini</h1>
+        <button onclick="window.print()" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+            <i class="fas fa-print fa-sm text-white-50"></i> Cetak / Simpan PDF
+        </button>
+    </div>
+
+    <style>
+        @media print {
+            body * { visibility: hidden; }
+            #printableArea, #printableArea * { visibility: visible; }
+            #printableArea { position: absolute; left: 0; top: 0; width: 100%; }
+            .no-print { display: none; }
+        }
+    </style>
+
+    <div class="card shadow mb-4" id="printableArea">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Data Stok Per Tanggal: <?= date('d F Y'); ?></h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped" width="100%" cellspacing="0">
+                    <thead class="bg-dark text-white">
+                        <tr>
+                            <th width="5%" style="text-align:center;">No</th>
+                            <th width="15%">Kode Barang</th>
+                            <th>Nama Barang</th>
+                            <th width="15%" style="text-align:center;">Sisa Stok</th>
+                            <th width="10%" style="text-align:center;">Satuan</th>
+                            <th width="20%" class="no-print">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        $no = 1;
+                        // Ambil semua data barang diurutkan nama
+                        $query = mysqli_query($koneksi, "SELECT * FROM tb_barang_bergerak ORDER BY nama_barang ASC");
+                        
+                        while ($row = mysqli_fetch_assoc($query)): 
+                            // Logika Status Stok
+                            $status = "";
+                            $class_stok = "";
+                            if ($row['stok'] == 0) {
+                                $status = "<span class='badge badge-danger'>Habis</span>";
+                                $class_stok = "color: red; font-weight: bold;";
+                            } elseif ($row['stok'] < 10) { // Angka 10 bisa diubah sesuai kebijakan
+                                $status = "<span class='badge badge-warning'>Menipis</span>";
+                                $class_stok = "color: orange; font-weight: bold;";
+                            } else {
+                                $status = "<span class='badge badge-success'>Aman</span>";
+                                $class_stok = "color: green; font-weight: bold;";
+                            }
+                        ?>
+                        <tr>
+                            <td style="text-align:center;"><?= $no++; ?></td>
+                            <td><?= $row['kode_barang']; ?></td>
+                            <td><?= $row['nama_barang']; ?></td>
+                            <td style="text-align:center; font-size: 1.1em; <?= $class_stok; ?>">
+                                <?= $row['stok']; ?>
+                            </td>
+                            <td style="text-align:center;"><?= $row['satuan']; ?></td>
+                            <td class="no-print"><?= $status; ?></td>
+                        </tr>
+                        <?php endwhile; ?>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="row mt-5 d-none d-print-block">
+                <div class="col-4 offset-8 text-center">
+                    <p>Denpasar, <?= date('d F Y'); ?></p>
+                    <p>Mengetahui,</p>
+                    <br><br><br>
+                    <p><strong>( Pimpinan )</strong></p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<?php require 'layout/footer.php'; ?>

@@ -9,23 +9,24 @@ if (!isset($_SESSION['user_id']) || !isset($_GET['id'])) {
 
 $id_permintaan = $_GET['id'];
 
-// Ambil Data Lengkap (Permintaan + User Pemohon + User Admin + Barang)
-$query = "SELECT p.*, 
-          u_pemohon.nama AS nama_pemohon, u_pemohon.ttd AS ttd_pemohon,
-          u_admin.nama AS nama_admin, u_admin.ttd AS ttd_admin,
-          b.nama_barang, b.satuan, b.kode_barang
-          FROM tb_permintaan p
-          JOIN tb_user u_pemohon ON p.user_id = u_pemohon.id
-          JOIN tb_barang_bergerak b ON p.barang_id = b.id
-          LEFT JOIN tb_user u_admin ON p.admin_id = u_admin.id
-          WHERE p.id = '$id_permintaan'";
+// ============================================
+// QUERY 1: AMBIL DATA HEADER (User, Admin, Tgl)
+// ============================================
+// Perbaikan: Mengambil kolom 'paraf' tapi kita alias-kan jadi 'ttd_...' biar mudah
+$query_header = "SELECT p.*, 
+                 u_pemohon.nama AS nama_pemohon, u_pemohon.nip AS nip_pemohon, u_pemohon.paraf AS ttd_pemohon,
+                 u_admin.nama AS nama_admin, u_admin.nip AS nip_admin, u_admin.paraf AS ttd_admin
+                 FROM tb_permintaan p
+                 JOIN tb_user u_pemohon ON p.user_id = u_pemohon.id
+                 LEFT JOIN tb_user u_admin ON p.admin_id = u_admin.id
+                 WHERE p.id = '$id_permintaan'";
 
-$result = mysqli_query($koneksi, $query);
-$data   = mysqli_fetch_assoc($result);
+$result_header = mysqli_query($koneksi, $query_header);
+$data = mysqli_fetch_assoc($result_header);
 
 // Validasi: Hanya bisa dicetak jika sudah DISETUJUI
 if ($data['status'] != 'disetujui') {
-    echo "<script>alert('Surat belum bisa dicetak karena status belum disetujui!'); window.location='index.php';</script>";
+    echo "<script>alert('Surat belum bisa dicetak karena status belum disetujui!'); window.close();</script>";
     exit;
 }
 ?>
@@ -34,95 +35,147 @@ if ($data['status'] != 'disetujui') {
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Surat Bukti Permintaan Barang - <?= $data['kode_barang']; ?></title>
+    <title>Surat Permintaan Barang - #<?= $data['id']; ?></title>
     <style>
-        body { font-family: 'Times New Roman', serif; font-size: 12pt; margin: 0; padding: 20px; }
+        body { font-family: 'Times New Roman', serif; font-size: 12pt; margin: 0; padding: 20px; color: #000; }
         .container { width: 100%; max-width: 800px; margin: auto; }
-        .header { text-align: center; border-bottom: 3px double black; padding-bottom: 10px; margin-bottom: 20px; }
-        .header h2, .header h3 { margin: 0; }
-        .content { margin-bottom: 30px; }
-        .table-data { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        .table-data th, .table-data td { border: 1px solid black; padding: 8px; text-align: left; }
-        .ttd-wrapper { width: 100%; display: table; margin-top: 50px; }
-        .ttd-box { display: table-cell; width: 50%; text-align: center; vertical-align: bottom; }
-        .img-ttd { width: 150px; height: auto; display: block; margin: 10px auto; }
         
-        /* Tombol print hilang saat diprint */
+        /* KOP SURAT */
+        .header { text-align: center; border-bottom: 3px double black; padding-bottom: 10px; margin-bottom: 30px; }
+        .header h2 { margin: 0; font-size: 16pt; text-transform: uppercase; }
+        .header h3 { margin: 5px 0; font-size: 14pt; }
+        .header p { margin: 0; font-size: 11pt; }
+
+        /* ISI SURAT */
+        .content { margin-bottom: 30px; line-height: 1.5; }
+        
+        /* TABEL BARANG */
+        .table-data { width: 100%; border-collapse: collapse; margin-top: 15px; margin-bottom: 20px; }
+        .table-data th, .table-data td { border: 1px solid black; padding: 8px; text-align: left; vertical-align: top; }
+        .table-data th { background-color: #f0f0f0; text-align: center; }
+
+        /* TANDA TANGAN */
+        .ttd-wrapper { width: 100%; display: table; margin-top: 50px; }
+        .ttd-box { display: table-cell; width: 50%; text-align: center; vertical-align: top; }
+        .img-ttd { width: 120px; height: auto; display: block; margin: 10px auto; }
+        .space-ttd { height: 80px; } /* Spasi jika tidak ada TTD */
+
+        /* TOMBOL PRINT */
         @media print {
             .no-print { display: none; }
+        }
+        .btn-print {
+            background: #4e73df; color: white; border: none; padding: 10px 20px; 
+            border-radius: 5px; cursor: pointer; margin-bottom: 20px; font-weight: bold;
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <button onclick="window.print()" class="no-print" style="padding: 10px 20px; margin-bottom: 20px; cursor: pointer;">🖨️ Cetak Surat</button>
+    <button onclick="window.print()" class="no-print btn-print">🖨️ Cetak Surat</button>
 
     <div class="header">
-        <h2>APLIKASI PESONA</h2>
-        <h3>BUKTI SERAH TERIMA BARANG (ATK)</h3>
-        <small>Jl. Contoh Alamat Kantor No. 123, Kota Denpasar</small>
+        <h2>PEMERINTAH KOTA CONTOH</h2>
+        <h3>DINAS PERDAGANGAN DAN PERINDUSTRIAN</h3>
+        <p>Jl. Jendral Sudirman No. 123, Telp. (021) 1234567</p>
     </div>
 
     <div class="content">
-        <p>Pada hari ini, <strong><?= date('d F Y', strtotime($data['tanggal_disetujui'])); ?></strong>, telah disetujui permintaan barang dengan rincian sebagai berikut:</p>
+        <div style="text-align: right; margin-bottom: 20px;">
+            Denpasar, <?= date('d F Y', strtotime($data['tanggal_disetujui'])); ?>
+        </div>
 
-        <table style="width: 100%; margin-bottom: 20px;">
-            <tr><td width="20%">No. Transaksi</td><td>: #REQ-<?= sprintf("%04d", $data['id']); ?></td></tr>
-            <tr><td>Pemohon</td><td>: <strong><?= $data['nama_pemohon']; ?></strong></td></tr>
-            <tr><td>Tanggal Ajuan</td><td>: <?= date('d-m-Y', strtotime($data['tanggal_permintaan'])); ?></td></tr>
+        <p><strong>Nomor Transaksi :</strong> #REQ-<?= sprintf("%04d", $data['id']); ?></p>
+        <p><strong>Perihal :</strong> Bukti Serah Terima Barang (ATK)</p>
+        
+        <br>
+        <p>Yang bertanda tangan di bawah ini:</p>
+        <table style="width: 100%; margin-left: 20px; margin-bottom: 10px;">
+            <tr><td width="150">Nama</td><td>: <?= $data['nama_pemohon']; ?></td></tr>
+            <tr><td>NIP</td><td>: <?= !empty($data['nip_pemohon']) ? $data['nip_pemohon'] : '-'; ?></td></tr>
             <tr><td>Keperluan</td><td>: <?= $data['keperluan']; ?></td></tr>
         </table>
 
-        <p>Rincian Barang:</p>
+        <p>Telah menerima barang dengan rincian sebagai berikut:</p>
+
         <table class="table-data">
             <thead>
-                <tr style="background-color: #eee;">
-                    <th>Kode</th>
+                <tr>
+                    <th width="5%">No</th>
                     <th>Nama Barang</th>
-                    <th>Jumlah Disetujui</th>
-                    <th>Satuan</th>
-                    <th>Catatan Admin</th>
+                    <th width="15%">Jumlah</th>
+                    <th width="15%">Satuan</th>
+                    <th>Keterangan</th>
                 </tr>
             </thead>
             <tbody>
+                <?php
+                // QUERY 2: AMBIL DETAIL BARANG
+                $q_detail = mysqli_query($koneksi, "SELECT d.*, b.nama_barang, b.satuan, b.kode_barang 
+                                                    FROM tb_detail_permintaan d
+                                                    JOIN tb_barang_bergerak b ON d.barang_id = b.id
+                                                    WHERE d.permintaan_id = '$id_permintaan'");
+                $no = 1;
+                while($item = mysqli_fetch_assoc($q_detail)):
+                ?>
                 <tr>
-                    <td><?= $data['kode_barang']; ?></td>
-                    <td><?= $data['nama_barang']; ?></td>
-                    <td><?= $data['jumlah']; ?></td>
-                    <td><?= $data['satuan']; ?></td>
+                    <td style="text-align: center;"><?= $no++; ?></td>
+                    <td><?= $item['nama_barang']; ?> <br><small>Kode: <?= $item['kode_barang']; ?></small></td>
+                    <td style="text-align: center;"><?= $item['jumlah']; ?></td>
+                    <td style="text-align: center;"><?= $item['satuan']; ?></td>
                     <td><?= !empty($data['catatan']) ? $data['catatan'] : '-'; ?></td>
                 </tr>
+                <?php endwhile; ?>
             </tbody>
         </table>
 
-        <p>Demikian surat bukti permintaan barang ini dibuat untuk dipergunakan sebagaimana mestinya.</p>
+        <p>Demikian berita acara serah terima barang ini dibuat untuk dipergunakan sebagaimana mestinya.</p>
     </div>
 
     <div class="ttd-wrapper">
         <div class="ttd-box">
-            <p>Pemohon,</p>
-            <?php if(!empty($data['ttd_pemohon']) && file_exists('assets/img/ttd/'.$data['ttd_pemohon'])): ?>
-                <img src="assets/img/ttd/<?= $data['ttd_pemohon']; ?>" class="img-ttd">
+            <p>Yang Menerima,</p>
+            
+            <?php 
+            // Cek apakah file paraf ada di folder assets/img/ttd/
+            // Sesuaikan path folder jika berbeda
+            $path_ttd_pemohon = 'assets/img/ttd/' . $data['ttd_pemohon'];
+            
+            if(!empty($data['ttd_pemohon']) && file_exists($path_ttd_pemohon)): 
+            ?>
+                <img src="<?= $path_ttd_pemohon; ?>" class="img-ttd">
             <?php else: ?>
-                <br><br><br><br>
-                <small>(Belum Upload TTD)</small><br>
+                <div class="space-ttd"></div>
             <?php endif; ?>
-            <strong>( <?= $data['nama_pemohon']; ?> )</strong>
+
+            <strong>( <?= $data['nama_pemohon']; ?> )</strong><br>
+            NIP. <?= !empty($data['nip_pemohon']) ? $data['nip_pemohon'] : '-'; ?>
         </div>
 
         <div class="ttd-box">
-            <p>Disetujui Oleh,<br>Admin Gudang</p>
-            <?php if(!empty($data['ttd_admin']) && file_exists('assets/img/ttd/'.$data['ttd_admin'])): ?>
-                <img src="assets/img/ttd/<?= $data['ttd_admin']; ?>" class="img-ttd">
+            <p>Yang Menyerahkan,<br>Admin Gudang</p>
+            
+            <?php 
+            $path_ttd_admin = 'assets/img/ttd/' . $data['ttd_admin'];
+            
+            if(!empty($data['ttd_admin']) && file_exists($path_ttd_admin)): 
+            ?>
+                <img src="<?= $path_ttd_admin; ?>" class="img-ttd">
             <?php else: ?>
-                <br><br><br><br>
-                <small>(Belum Upload TTD)</small><br>
+                <div class="space-ttd"></div>
             <?php endif; ?>
-            <strong>( <?= $data['nama_admin']; ?> )</strong>
+
+            <strong>( <?= $data['nama_admin']; ?> )</strong><br>
+            NIP. <?= !empty($data['nip_admin']) ? $data['nip_admin'] : '-'; ?>
         </div>
     </div>
 </div>
+
+<script>
+    // Opsional: Otomatis print saat dibuka
+    // window.print();
+</script>
 
 </body>
 </html>
