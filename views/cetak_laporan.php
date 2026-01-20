@@ -1,23 +1,3 @@
-<?php
-session_start();
-require 'config/koneksi.php';
-
-// Cek Login
-if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
-    exit;
-}
-
-// Ambil Tanggal dari URL
-if (isset($_GET['tgl_mulai']) && isset($_GET['tgl_selesai'])) {
-    $tgl_mulai = $_GET['tgl_mulai'];
-    $tgl_selesai = $_GET['tgl_selesai'];
-} else {
-    echo "Tanggal belum dipilih.";
-    exit;
-}
-?>
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -133,12 +113,12 @@ if (isset($_GET['tgl_mulai']) && isset($_GET['tgl_selesai'])) {
     </div>
 </div>
 
-<script>
+<!-- <script>
     // Otomatis muncul print dialog saat dibuka
     window.onload = function() {
         window.print();
     }
-</script>
+</script> -->
 
 </body>
 </html>

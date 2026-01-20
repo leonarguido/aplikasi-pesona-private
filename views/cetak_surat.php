@@ -1,36 +1,3 @@
-<?php
-session_start();
-require 'config/koneksi.php';
-
-if (!isset($_SESSION['user_id']) || !isset($_GET['id'])) {
-    header("Location: index.php");
-    exit;
-}
-
-$id_permintaan = $_GET['id'];
-
-// ============================================
-// QUERY 1: AMBIL DATA HEADER (User, Admin, Tgl)
-// ============================================
-// Perbaikan: Mengambil kolom 'paraf' tapi kita alias-kan jadi 'ttd_...' biar mudah
-$query_header = "SELECT p.*, 
-                 u_pemohon.nama AS nama_pemohon, u_pemohon.nip AS nip_pemohon, u_pemohon.paraf AS ttd_pemohon,
-                 u_admin.nama AS nama_admin, u_admin.nip AS nip_admin, u_admin.paraf AS ttd_admin
-                 FROM tb_permintaan p
-                 JOIN tb_user u_pemohon ON p.user_id = u_pemohon.id
-                 LEFT JOIN tb_user u_admin ON p.admin_id = u_admin.id
-                 WHERE p.id = '$id_permintaan'";
-
-$result_header = mysqli_query($koneksi, $query_header);
-$data = mysqli_fetch_assoc($result_header);
-
-// Validasi: Hanya bisa dicetak jika sudah DISETUJUI
-if ($data['status'] != 'disetujui') {
-    echo "<script>alert('Surat belum bisa dicetak karena status belum disetujui!'); window.close();</script>";
-    exit;
-}
-?>
-
 <!DOCTYPE html>
 <html lang="id">
 <head>

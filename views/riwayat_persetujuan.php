@@ -26,7 +26,7 @@ require 'layout/topbar.php';
         </div>
         <div class="card-body">
             <div class="table-responsive">
-                <table class="table table-bordered" width="100%" cellspacing="0" id="dataTable">
+                <table class="table table-bordered" width="100%" cellspacing="0" id="myTable">
                     <thead class="thead-light">
                         <tr>
                             <th>Tanggal</th>
@@ -92,10 +92,34 @@ require 'layout/topbar.php';
                         </tr>
                         <?php endwhile; ?>
                     </tbody>
-                </table>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<?php require 'layout/footer.php'; ?>
+    <?php require '../views/layout/footer.php'; ?>
+
+    <script>
+        $(document).ready(function() {
+            $('#myTable').DataTable({
+                dom: 'Bfrtip',
+                buttons: [
+                    'copy', 'csv', 'excel', 'pdf', 'print'
+                ]
+            });
+        });
+if (window.innerHeight <= 700) {
+        document.getElementById('accordionSidebar')
+            .style.height = '100vh';
+        }
+    </script>
+</body>
+
+</html>

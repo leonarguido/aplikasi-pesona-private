@@ -48,13 +48,22 @@ if (isset($_POST['upload_ttd'])) {
 $data = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT * FROM tb_user WHERE id = '$id_user'"));
 ?>
 
-<?php 
-require 'layout/header.php';
-require 'layout/sidebar.php';
-require 'layout/topbar.php'; 
-?>
+<!DOCTYPE html>
+<html lang="en">
 
-<div class="container-fluid">
+<head>
+    <?php require 'layout/header.php'; ?>
+</head>
+
+<body id="page-top">
+    <div id="content-wrapper" class="d-flex flex-column">
+        <div id="content" class="row">
+            <div class="col-md-2">
+                <?php require 'layout/sidebar.php'; ?>
+            </div>
+            <div class="col-md-10">
+                <?php require 'layout/topbar.php'; ?>
+                <div class="container-fluid mt-4">
     <h1 class="h3 mb-4 text-gray-800">Profil Saya</h1>
 
     <div class="row">
@@ -93,4 +102,22 @@ require 'layout/topbar.php';
     </div>
 </div>
 
-<?php require 'layout/footer.php'; ?>
+    <?php require '../views/layout/footer.php'; ?>
+
+    <script>
+        $(document).ready(function() {
+            $('#myTable').DataTable({
+                dom: 'Bfrtip',
+                buttons: [
+                    'copy', 'csv', 'excel', 'pdf', 'print'
+                ]
+            });
+        });
+if (window.innerHeight <= 700) {
+        document.getElementById('accordionSidebar')
+            .style.height = '100vh';
+        }
+    </script>
+</body>
+
+</html>
