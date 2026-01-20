@@ -2,6 +2,7 @@
 session_start();
 require 'config/koneksi.php';
 
+// 1. Cek Login
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit;
@@ -13,7 +14,7 @@ if (!isset($_SESSION['keranjang'])) {
 }
 
 // ==========================================
-// LOGIKA 1: TAMBAH KE KERANJANG (SESSION)
+// LOGIKA: TAMBAH KE KERANJANG
 // ==========================================
 if (isset($_POST['tambah_keranjang'])) {
     $id_barang   = $_POST['id_barang'];
@@ -22,13 +23,12 @@ if (isset($_POST['tambah_keranjang'])) {
     $satuan      = $_POST['satuan'];
     $stok_max    = $_POST['stok_max'];
 
-    // Cek apakah barang sudah ada di keranjang?
+    // Cek apakah barang sudah ada?
     $sudah_ada = false;
     foreach ($_SESSION['keranjang'] as $key => $item) {
         if ($item['id'] == $id_barang) {
-            // Kalau sudah ada, update jumlahnya
             $_SESSION['keranjang'][$key]['jumlah'] += $jumlah;
-            // Validasi jangan sampai melebihi stok
+            // Validasi max stok
             if ($_SESSION['keranjang'][$key]['jumlah'] > $stok_max) {
                 $_SESSION['keranjang'][$key]['jumlah'] = $stok_max;
             }
@@ -37,7 +37,7 @@ if (isset($_POST['tambah_keranjang'])) {
         }
     }
 
-    // Jika belum ada, masukkan baru
+    // Jika baru, masukkan
     if (!$sudah_ada) {
         $_SESSION['keranjang'][] = [
             'id' => $id_barang,
@@ -55,32 +55,37 @@ if (isset($_POST['tambah_keranjang'])) {
 <?php 
 require 'layout/header.php';
 require 'layout/sidebar.php';
+
+// =============================================================
+// SET JUDUL KE TOPBAR (Agar muncul di bagian atas putih)
+// =============================================================
+$judul_halaman = "Daftar Barang";
+// $deskripsi_halaman = "Pilih barang yang ingin Anda ajukan."; // Opsional
+
 require 'layout/topbar.php'; 
 
-// Hitung jumlah item di keranjang untuk badge
+// Hitung jumlah keranjang untuk badge
 $jml_item_keranjang = count($_SESSION['keranjang']);
 ?>
 
 <div class="container-fluid">
-    <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">Daftar Barang</h1>
-        
-        <a href="keranjang.php" class="d-none d-sm-inline-block btn btn-lg btn-success shadow-sm">
-            <i class="fas fa-shopping-cart fa-sm text-white-50"></i> Lihat Keranjang 
-            <span class="badge badge-light text-danger font-weight-bold"><?= $jml_item_keranjang; ?></span>
-        </a>
-    </div>
 
     <div class="card shadow mb-4">
-        <div class="card-header py-3">
+        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
             <h6 class="m-0 font-weight-bold text-primary">Daftar Barang Tersedia</h6>
+            
+            <a href="keranjang.php" class="btn btn-success btn-sm shadow-sm">
+                <i class="fas fa-shopping-cart fa-sm"></i> Lihat Keranjang 
+                <span class="badge badge-light text-danger ml-1 font-weight-bold"><?= $jml_item_keranjang; ?></span>
+            </a>
         </div>
+
         <div class="card-body">
             <div class="table-responsive">
                 <table class="table table-bordered table-hover" id="dataTable" width="100%" cellspacing="0">
                     <thead class="thead-light">
                         <tr>
-                            <th>No</th>
+                            <th width="5%">No</th>
                             <th>Kode</th>
                             <th>Nama Barang</th>
                             <th>Stok</th>
@@ -115,7 +120,7 @@ $jml_item_keranjang = count($_SESSION['keranjang']);
                             </td>
                         </tr>
 
-                        <div class="modal fade" id="modalAdd<?= $row['id']; ?>">
+                        <div class="modal fade text-left" id="modalAdd<?= $row['id']; ?>" tabindex="-1">
                             <div class="modal-dialog">
                                 <div class="modal-content">
                                     <div class="modal-header bg-primary text-white">
@@ -140,7 +145,7 @@ $jml_item_keranjang = count($_SESSION['keranjang']);
                                         </div>
                                         <div class="modal-footer">
                                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                                            <button type="submit" name="tambah_keranjang" class="btn btn-primary">Simpan ke Keranjang</button>
+                                            <button type="submit" name="tambah_keranjang" class="btn btn-primary">Simpan</button>
                                         </div>
                                     </form>
                                 </div>
@@ -154,4 +159,28 @@ $jml_item_keranjang = count($_SESSION['keranjang']);
         </div>
     </div>
 </div>
+
 <?php require 'layout/footer.php'; ?>
+
+<script>
+    $(document).ready(function() {
+        if (!$.fn.DataTable.isDataTable('#dataTable')) {
+            $('#dataTable').DataTable({
+                "language": {
+                    "search": "Cari Barang:",
+                    "lengthMenu": "Tampilkan _MENU_ data per halaman",
+                    "zeroRecords": "Data tidak ditemukan",
+                    "info": "Halaman _PAGE_ dari _PAGES_",
+                    "infoEmpty": "Tidak ada data",
+                    "infoFiltered": "(difilter dari _MAX_ total data)",
+                    "paginate": {
+                        "first": "Awal",
+                        "last": "Akhir",
+                        "next": "Lanjut",
+                        "previous": "Kembali"
+                    }
+                }
+            });
+        }
+    });
+</script>
