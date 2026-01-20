@@ -142,7 +142,7 @@ class PermintaanController
         }
     }
 
-    // B. PROSES PENOLAKAN
+    // B. PROSES PENOLAKA
     public function proses_penolakan()
     {
         session_start();
