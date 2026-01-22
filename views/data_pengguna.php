@@ -19,7 +19,7 @@
                     <p class="mb-4">Manajemen akun untuk Admin, Pimpinan, dan Staff.</p>
 
                     <div class="card shadow mb-4">
-                        <div class="card-header py-3">
+                        <div class="card-header py-3 border-bottom-primary">
                             <button class="btn btn-primary" data-toggle="modal" data-target="#modalTambah">
                                 <i class="fas fa-plus"></i> Tambah User Baru
                             </button>
