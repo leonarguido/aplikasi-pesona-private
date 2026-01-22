@@ -7,8 +7,8 @@ if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit;
 }
-// Ijinkan akses jika session role ada (tanpa cek ketat dulu untuk debug)
-// Sebaiknya tetap strict:
+
+// Cek Role Super Admin
 if (!isset($_SESSION['role']) || ($_SESSION['role'] != 'super_admin' && $_SESSION['role'] != 'super admin')) {
     echo "<script>alert('Akses Ditolak! Anda bukan Super Admin.'); window.location='index.php';</script>";
     exit;
@@ -20,11 +20,13 @@ if (!isset($_SESSION['role']) || ($_SESSION['role'] != 'super_admin' && $_SESSIO
 
 // A. TAMBAH USER BARU
 if (isset($_POST['tambah_user'])) {
+    // Baris debug dihapus agar data bisa tersimpan
+    
     $nama     = mysqli_real_escape_string($koneksi, $_POST['nama']);
     $nip      = mysqli_real_escape_string($koneksi, $_POST['nip']);
     $username = mysqli_real_escape_string($koneksi, $_POST['username']);
     $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-    $role     = $_POST['role']; // Ambil value dari select option
+    $role     = $_POST['role']; // Sekarang value-nya akan 'staff', 'admin gudang', dll
 
     // Upload Tanda Tangan
     $paraf_name = null;
@@ -115,6 +117,9 @@ if (isset($_GET['hapus'])) {
 <?php 
 require 'layout/header.php';
 require 'layout/sidebar.php';
+
+// Set Judul Halaman di Topbar
+$judul_halaman = "Kelola Pengguna";
 require 'layout/topbar.php'; 
 ?>
 
@@ -127,7 +132,7 @@ require 'layout/topbar.php';
     </div>
 
     <div class="card shadow mb-4">
-        <div class="card-header py-3">
+        <div class="card-header py-3 border-bottom-primary">
             <h6 class="m-0 font-weight-bold text-primary">Daftar Pengguna (User & Admin)</h6>
         </div>
         <div class="card-body">
@@ -212,12 +217,12 @@ require 'layout/topbar.php';
                                             <div class="form-group">
                                                 <label>Role / Jabatan</label>
                                                 <select name="role" class="form-control" required>
-                                                    <option value="user" <?= $row['role']=='user'?'selected':''; ?>>User / Staff</option>
+                                                    <option value="staff" <?= ($row['role']=='staff' || $row['role']=='user') ? 'selected':''; ?>>User / Staff</option>
                                                     
                                                     <option value="admin gudang" <?= ($row['role']=='admin'||$row['role']=='admin gudang')?'selected':''; ?>>Admin Gudang</option>
                                                     
                                                     <option value="pimpinan" <?= ($row['role']=='pimpinan'||$row['role']=='Pimpinan')?'selected':''; ?>>Pimpinan</option>
-                                                    <option value="super_admin" <?= ($row['role']=='super_admin'||$row['role']=='super admin')?'selected':''; ?>>Super Admin</option>
+                                                    <option value="super admin" <?= ($row['role']=='super_admin'||$row['role']=='super admin')?'selected':''; ?>>Super Admin</option>
                                                 </select>
                                             </div>
                                             <div class="form-group">
@@ -269,12 +274,11 @@ require 'layout/topbar.php';
                     <div class="form-group">
                         <label>Role / Jabatan</label>
                         <select name="role" class="form-control" required>
-                            <option value="user">User / Staff</option>
+                            <option value="staff">User / Staff</option>
                             
                             <option value="admin gudang">Admin Gudang</option>
-                            
                             <option value="pimpinan">Pimpinan</option>
-                            <option value="super_admin">Super Admin</option>
+                            <option value="super admin">Super Admin</option>
                         </select>
                     </div>
                     

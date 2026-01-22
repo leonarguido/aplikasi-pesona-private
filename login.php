@@ -25,11 +25,10 @@ if (isset($_POST['login'])) {
             // SET SESSION
             $_SESSION['user_id']   = $data['id'];
             $_SESSION['username']  = $data['username'];
-            $_SESSION['full_name'] = $data['nama']; // Kolom 'nama'
+            $_SESSION['full_name'] = $data['nama']; 
             
-            // MAPPING ROLE (Database Mentor -> Sistem Kita)
+            // MAPPING ROLE
             $role_db = $data['role'];
-            
             if ($role_db == 'super admin') {
                 $_SESSION['role'] = 'super_admin';
             } elseif ($role_db == 'admin gudang') {
@@ -37,7 +36,7 @@ if (isset($_POST['login'])) {
             } elseif ($role_db == 'staff') {
                 $_SESSION['role'] = 'user'; 
             } else {
-                $_SESSION['role'] = $role_db; // 'pimpinan'
+                $_SESSION['role'] = $role_db;
             }
 
             // Login Sukses
@@ -55,53 +54,131 @@ if (isset($_POST['login'])) {
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Login - Aplikasi Pesona</title>
+    
     <link href="assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
     <link href="assets/css/sb-admin-2.min.css" rel="stylesheet">
+
+    <style>
+        /* Membuat body memenuhi layar dan konten di tengah */
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #4e73df; /* Warna Primary SB Admin */
+            background-image: linear-gradient(180deg, #4e73df 10%, #224abe 100%);
+            background-size: cover;
+        }
+
+        /* Styling Kartu Login */
+        .card-login {
+            width: 100%;
+            max-width: 450px; /* Lebar maksimal agar tidak terlalu lebar di layar besar */
+            border-radius: 15px; /* Sudut membulat modern */
+            border: none;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2); /* Bayangan halus */
+        }
+
+        /* Styling Input Form */
+        .form-control {
+            height: 50px;
+            border-radius: 10px; /* Sedikit membulat, bukan pill */
+            padding: 10px 20px;
+            font-size: 1rem;
+        }
+
+        /* Styling Input Group untuk Password */
+        .input-group-text {
+            border-radius: 0 10px 10px 0;
+            background-color: white;
+            border-left: none;
+        }
+        
+        #passwordInput {
+            border-radius: 10px 0 0 10px;
+            border-right: none;
+        }
+
+        #passwordInput:focus + .input-group-append .input-group-text {
+            border-color: #bac8f3; /* Warna border saat fokus */
+        }
+
+        /* Styling Tombol */
+        .btn-login {
+            height: 50px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            background-color: #4e73df;
+            border: none;
+            transition: 0.3s;
+        }
+        
+        .btn-login:hover {
+            background-color: #2e59d9;
+            transform: translateY(-2px); /* Efek naik sedikit saat hover */
+        }
+
+        .login-title {
+            color: #444;
+            font-weight: 300;
+            font-size: 1.5rem;
+        }
+    </style>
 </head>
-<body class="bg-gradient-primary">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-xl-6 col-lg-12 col-md-9">
-                <div class="card o-hidden border-0 shadow-lg my-5">
-                    <div class="card-body p-0">
-                        <div class="p-5">
-                            <div class="text-center">
-                                <h1 class="h4 text-gray-900 mb-4">Login Logistik</h1>
-                            </div>
-                            
-                            <?php if (isset($error)) : ?>
-                                <div class="alert alert-danger text-center" role="alert">
-                                    Username atau Password salah!
-                                </div>
-                            <?php endif; ?>
 
-                            <form class="user" method="POST">
-                                <div class="form-group">
-                                    <input type="text" name="username" class="form-control form-control-user" placeholder="Masukkan Username..." required>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <div class="input-group">
-                                        <input type="password" name="password" class="form-control" id="passwordInput" placeholder="Password" style="border-top-left-radius: 10rem; border-bottom-left-radius: 10rem; height: 3.1rem; padding: 1.5rem 1rem;" required>
-                                        <div class="input-group-append">
-                                            <span class="input-group-text bg-white border-left-0" style="border-top-right-radius: 10rem; border-bottom-right-radius: 10rem; cursor: pointer;" onclick="togglePassword()">
-                                                <i class="fas fa-eye text-gray-500" id="toggleIcon"></i>
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
+<body>
 
-                                <button type="submit" name="login" class="btn btn-primary btn-user btn-block">
-                                    Masuk
-                                </button>
-                            </form>
+    <div class="card card-login bg-white">
+        <div class="card-body p-5">
+            
+            <div class="text-center mb-5">
+                <h1 class="login-title">Login Aplikasi Pesona</h1>
+                <p class="text-muted small">Silakan masukkan username dan password</p>
+            </div>
+
+            <?php if (isset($error)) : ?>
+                <div class="alert alert-danger text-center shadow-sm" role="alert" style="border-radius: 10px;">
+                    <i class="fas fa-exclamation-circle mr-1"></i> Username atau Password salah!
+                </div>
+            <?php endif; ?>
+
+            <form class="user" method="POST">
+                
+                <div class="form-group mb-4">
+                    <input type="text" name="username" class="form-control" placeholder="Masukkan Username..." required autofocus>
+                </div>
+                
+                <div class="form-group mb-4">
+                    <div class="input-group">
+                        <input type="password" name="password" class="form-control" id="passwordInput" placeholder="Password" required>
+                        <div class="input-group-append">
+                            <span class="input-group-text cursor-pointer" onclick="togglePassword()" style="cursor: pointer;">
+                                <i class="fas fa-eye text-gray-400" id="toggleIcon"></i>
+                            </span>
                         </div>
                     </div>
                 </div>
+
+                <button type="submit" name="login" class="btn btn-primary btn-block btn-login shadow-sm">
+                    Masuk
+                </button>
+                
+            </form>
+
+            <div class="text-center mt-4">
+                <small class="text-gray-500">Copyright &copy; Aplikasi Pesona 2026</small>
             </div>
+
         </div>
     </div>
-    
+
+    <script src="assets/vendor/jquery/jquery.min.js"></script>
+    <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/vendor/jquery-easing/jquery.easing.min.js"></script>
+    <script src="assets/js/sb-admin-2.min.js"></script>
+
     <script>
     function togglePassword() {
         var input = document.getElementById("passwordInput");
@@ -110,18 +187,14 @@ if (isset($_POST['login'])) {
         if (input.type === "password") {
             input.type = "text";
             icon.classList.remove("fa-eye");
-            icon.classList.add("fa-eye-slash"); // Ganti icon jadi mata dicoret
+            icon.classList.add("fa-eye-slash");
         } else {
             input.type = "password";
             icon.classList.remove("fa-eye-slash");
-            icon.classList.add("fa-eye"); // Ganti icon jadi mata biasa
+            icon.classList.add("fa-eye");
         }
     }
     </script>
 
-    <script src="assets/vendor/jquery/jquery.min.js"></script>
-    <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <script src="assets/vendor/jquery-easing/jquery.easing.min.js"></script>
-    <script src="assets/js/sb-admin-2.min.js"></script>
 </body>
 </html>

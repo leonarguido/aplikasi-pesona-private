@@ -16,7 +16,7 @@ $id_user = $_SESSION['user_id'];
 if (isset($_GET['batal_id'])) {
     $id_batal = $_GET['batal_id'];
     
-    // Cek keamanan: Pastikan permintaan milik user ini dan status 'menunggu'
+    // Cek keamanan
     $cek = mysqli_query($koneksi, "SELECT status FROM tb_permintaan WHERE id='$id_batal' AND user_id='$id_user'");
     $d = mysqli_fetch_assoc($cek);
 
@@ -51,9 +51,10 @@ require 'layout/header.php';
 require 'layout/sidebar.php';
 
 // ==========================================================
-// SET JUDUL HALAMAN (Agar muncul di Topbar/Header Atas)
+// SET JUDUL KE TOPBAR
 // ==========================================================
 $judul_halaman     = "Riwayat Permintaan Saya";
+$deskripsi_halaman = "Daftar status permintaan barang yang pernah Anda ajukan.";
 
 require 'layout/topbar.php'; 
 ?>
@@ -61,8 +62,8 @@ require 'layout/topbar.php';
 <div class="container-fluid">
 
     <div class="card shadow mb-4">
-        <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Log Permintaan</h6>
+        <div class="card-header py-3 border-bottom-primary">
+            <h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-file-alt"></i> Log Permintaan Anda</h6>
         </div>
         <div class="card-body">
             <div class="table-responsive">
@@ -70,10 +71,11 @@ require 'layout/topbar.php';
                     <thead class="thead-light">
                         <tr>
                             <th width="5%">No</th>
-                            <th>Tanggal Ajuan</th>
+                            <th width="15%">Tanggal</th>
                             <th>Detail Barang</th>
-                            <th class="text-center" width="20%">Status & Aksi</th>
                             <th>Catatan Admin</th>
+                            <th class="text-center" width="10%">Status</th>
+                            <th class="text-center" width="15%">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -90,33 +92,54 @@ require 'layout/topbar.php';
                         ?>
                         <tr>
                             <td><?= $no++; ?></td>
-                            <td><?= date('d-m-Y', strtotime($row['tanggal_permintaan'])); ?></td>
+                            <td>
+                                <i class="far fa-calendar-alt text-gray-400"></i> <?= date('d-m-Y', strtotime($row['tanggal_permintaan'])); ?>
+                            </td>
                             
                             <td>
-                                <ul class="pl-3 mb-0">
+                                <ul class="pl-3 mb-0" style="font-size: 0.9rem;">
                                 <?php 
                                     $q_detail = mysqli_query($koneksi, "SELECT d.jumlah, d.satuan, b.nama_barang 
                                                                         FROM tb_detail_permintaan d 
                                                                         JOIN tb_barang_bergerak b ON d.barang_id = b.id 
                                                                         WHERE d.permintaan_id = '$id_req'");
                                     while($d = mysqli_fetch_assoc($q_detail)){
-                                        echo "<li>{$d['nama_barang']} (<b>{$d['jumlah']} {$d['satuan']}</b>)</li>";
+                                        echo "<li class='mb-1'>{$d['nama_barang']} (<b>{$d['jumlah']} {$d['satuan']}</b>)</li>";
                                     }
                                 ?>
                                 </ul>
                             </td>
+
+                            <td class="align-middle">
+                                <?php if(!empty($row['catatan'])): ?>
+                                    <span class="text-dark small font-weight-bold"><?= $row['catatan']; ?></span>
+                                <?php else: ?>
+                                    <span class="text-muted small">-</span>
+                                <?php endif; ?>
+                            </td>
                             
-                            <td class="text-center">
+                            <td class="text-center align-middle">
+                                <?php if($row['status'] == 'menunggu'): ?>
+                                    <span class="badge badge-warning px-2 py-1">Menunggu</span>
+                                <?php elseif($row['status'] == 'disetujui'): ?>
+                                    <span class="badge badge-success px-2 py-1">Disetujui</span>
+                                    <div class="small text-muted mt-1" style="font-size: 0.75rem;">
+                                        <?= date('d-m-Y', strtotime($row['tanggal_disetujui'])); ?>
+                                    </div>
+                                <?php elseif($row['status'] == 'ditolak'): ?>
+                                    <span class="badge badge-danger px-2 py-1">Ditolak</span>
+                                <?php endif; ?>
+                            </td>
+
+                            <td class="text-center align-middle">
                                 <?php if($row['status'] == 'menunggu'): ?>
                                     
-                                    <span class="badge badge-warning mb-2">Menunggu Konfirmasi</span>
-                                    <br>
                                     <div class="btn-group btn-group-sm" role="group">
-                                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalEdit<?= $id_req; ?>">
-                                            <i class="fas fa-edit"></i> Edit
+                                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalEdit<?= $id_req; ?>" title="Edit Jumlah">
+                                            <i class="fas fa-edit"></i>
                                         </button>
-                                        <a href="permintaan_saya.php?batal_id=<?= $id_req; ?>" class="btn btn-danger" onclick="return confirm('Yakin ingin membatalkan?')">
-                                            <i class="fas fa-trash"></i> Batal
+                                        <a href="permintaan_saya.php?batal_id=<?= $id_req; ?>" class="btn btn-danger" onclick="return confirm('Yakin ingin membatalkan?')" title="Batalkan">
+                                            <i class="fas fa-trash"></i>
                                         </a>
                                     </div>
 
@@ -130,7 +153,7 @@ require 'layout/topbar.php';
                                                 <form method="POST">
                                                     <div class="modal-body">
                                                         <input type="hidden" name="id_permintaan" value="<?= $id_req; ?>">
-                                                        <p class="small text-muted">Silakan ubah jumlah barang:</p>
+                                                        <p class="small text-muted">Silakan ubah jumlah barang jika diperlukan:</p>
                                                         
                                                         <table class="table table-sm table-bordered">
                                                             <thead class="thead-light">
@@ -142,7 +165,6 @@ require 'layout/topbar.php';
                                                             </thead>
                                                             <tbody>
                                                                 <?php 
-                                                                // Query ulang detail untuk ditampilkan di dalam Modal
                                                                 $q_edit = mysqli_query($koneksi, "SELECT d.id AS id_detail, d.jumlah, d.satuan, b.nama_barang, b.stok AS stok_gudang 
                                                                                                   FROM tb_detail_permintaan d 
                                                                                                   JOIN tb_barang_bergerak b ON d.barang_id = b.id 
@@ -150,12 +172,15 @@ require 'layout/topbar.php';
                                                                 while($edit = mysqli_fetch_assoc($q_edit)):
                                                                 ?>
                                                                 <tr>
-                                                                    <td><?= $edit['nama_barang']; ?> <br><small class="text-success">Stok: <?= $edit['stok_gudang']; ?></small></td>
+                                                                    <td>
+                                                                        <?= $edit['nama_barang']; ?>
+                                                                        <br><small class="text-success">Sisa Stok Gudang: <?= $edit['stok_gudang']; ?></small>
+                                                                    </td>
                                                                     <td>
                                                                         <input type="hidden" name="id_detail[]" value="<?= $edit['id_detail']; ?>">
                                                                         <input type="number" name="jumlah[]" class="form-control form-control-sm" value="<?= $edit['jumlah']; ?>" min="1" max="<?= $edit['stok_gudang']; ?>" required>
                                                                     </td>
-                                                                    <td><?= $edit['satuan']; ?></td>
+                                                                    <td class="align-middle"><?= $edit['satuan']; ?></td>
                                                                 </tr>
                                                                 <?php endwhile; ?>
                                                             </tbody>
@@ -170,26 +195,15 @@ require 'layout/topbar.php';
                                         </div>
                                     </div>
                                     <?php elseif($row['status'] == 'disetujui'): ?>
-                                    <span class="badge badge-success"><i class="fas fa-check"></i> Disetujui</span>
-                                    <br><small class="text-muted"><?= date('d-m-Y', strtotime($row['tanggal_disetujui'])); ?></small>
-                                    <div class="mt-2">
-                                        <a href="cetak_surat.php?id=<?= $row['id']; ?>" target="_blank" class="btn btn-primary btn-sm shadow-sm"><i class="fas fa-print fa-sm text-white-50"></i> Cetak Surat</a>
-                                    </div>
+                                    <a href="cetak_surat.php?id=<?= $row['id']; ?>" target="_blank" class="btn btn-info btn-sm shadow-sm">
+                                        <i class="fas fa-print"></i> Cetak
+                                    </a>
 
-                                <?php elseif($row['status'] == 'ditolak'): ?>
-                                    <span class="badge badge-danger"><i class="fas fa-times"></i> Ditolak</span>
-                                <?php endif; ?>
-                            </td>
-
-                            <td>
-                                <?php if(!empty($row['catatan'])): ?>
-                                    <div class="alert alert-danger py-1 px-2 m-0" style="font-size: 0.85rem;">
-                                        <strong>Info:</strong> <?= $row['catatan']; ?>
-                                    </div>
                                 <?php else: ?>
-                                    <span class="text-muted text-center d-block">-</span>
+                                    <button class="btn btn-secondary btn-sm" disabled><i class="fas fa-ban"></i></button>
                                 <?php endif; ?>
                             </td>
+
                         </tr>
                         <?php endwhile; ?>
                     </tbody>
@@ -199,3 +213,27 @@ require 'layout/topbar.php';
     </div>
 </div>
 <?php require 'layout/footer.php'; ?>
+
+<script>
+    $(document).ready(function() {
+        if (!$.fn.DataTable.isDataTable('#dataTable')) {
+            $('#dataTable').DataTable({
+                "language": {
+                    "search": "Cari Riwayat:",
+                    "lengthMenu": "Tampilkan _MENU_ data",
+                    "zeroRecords": "Data tidak ditemukan",
+                    "info": "Halaman _PAGE_ dari _PAGES_",
+                    "infoEmpty": "Tidak ada data",
+                    "infoFiltered": "(difilter dari _MAX_ total data)",
+                    "paginate": {
+                        "first": "Awal",
+                        "last": "Akhir",
+                        "next": "Lanjut",
+                        "previous": "Kembali"
+                    }
+                },
+                "ordering": false 
+            });
+        }
+    });
+</script>

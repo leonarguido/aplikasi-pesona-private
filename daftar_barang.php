@@ -57,10 +57,10 @@ require 'layout/header.php';
 require 'layout/sidebar.php';
 
 // =============================================================
-// SET JUDUL KE TOPBAR (Agar muncul di bagian atas putih)
+// SET JUDUL KE TOPBAR
 // =============================================================
 $judul_halaman = "Daftar Barang";
-// $deskripsi_halaman = "Pilih barang yang ingin Anda ajukan."; // Opsional
+$deskripsi_halaman = "Pilih barang yang ingin Anda ajukan.";
 
 require 'layout/topbar.php'; 
 
@@ -71,15 +71,15 @@ $jml_item_keranjang = count($_SESSION['keranjang']);
 <div class="container-fluid">
 
     <div class="card shadow mb-4">
-        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-            <h6 class="m-0 font-weight-bold text-primary">Daftar Barang Tersedia</h6>
+        
+        <div class="card-header py-3 border-bottom-primary d-flex flex-row align-items-center justify-content-between">
+            <h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-boxes"></i> Daftar Barang Tersedia</h6>
             
             <a href="keranjang.php" class="btn btn-success btn-sm shadow-sm">
                 <i class="fas fa-shopping-cart fa-sm"></i> Lihat Keranjang 
                 <span class="badge badge-light text-danger ml-1 font-weight-bold"><?= $jml_item_keranjang; ?></span>
             </a>
         </div>
-
         <div class="card-body">
             <div class="table-responsive">
                 <table class="table table-bordered table-hover" id="dataTable" width="100%" cellspacing="0">
@@ -104,8 +104,8 @@ $jml_item_keranjang = count($_SESSION['keranjang']);
                         <tr>
                             <td><?= $no++; ?></td>
                             <td><?= $row['kode_barang']; ?></td>
-                            <td class="font-weight-bold"><?= $row['nama_barang']; ?></td>
-                            <td class="<?= $row['stok'] == 0 ? 'text-danger' : 'text-success'; ?>">
+                            <td class="font-weight-bold text-primary"><?= $row['nama_barang']; ?></td>
+                            <td class="<?= $row['stok'] == 0 ? 'text-danger font-weight-bold' : 'text-success font-weight-bold'; ?>">
                                 <?= $row['stok']; ?>
                             </td>
                             <td><?= $row['satuan']; ?></td>
@@ -168,7 +168,7 @@ $jml_item_keranjang = count($_SESSION['keranjang']);
             $('#dataTable').DataTable({
                 "language": {
                     "search": "Cari Barang:",
-                    "lengthMenu": "Tampilkan _MENU_ data per halaman",
+                    "lengthMenu": "Tampilkan _MENU_ data",
                     "zeroRecords": "Data tidak ditemukan",
                     "info": "Halaman _PAGE_ dari _PAGES_",
                     "infoEmpty": "Tidak ada data",
