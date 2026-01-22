@@ -1,6 +1,5 @@
-<div id="content-wrapper" class="d-flex flex-column">
-    <div id="content">
-        <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+
+        <nav class="navbar navbar-expand navbar-light bg-white topbar static-top shadow">
 
             <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
                 <i class="fa fa-bars"></i>
@@ -35,7 +34,7 @@
                             
                             (<?= isset($_SESSION['role']) ? ucfirst($_SESSION['role']) : 'Guest'; ?>)
                         </span>
-                        <img class="img-profile rounded-circle" src="assets/img/undraw_profile.svg">
+                        <img class="img-profile rounded-circle" src="<?= ASSETS_URL ?>img/undraw_profile.svg">
                     </a>
                     <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
                         aria-labelledby="userDropdown">
@@ -49,3 +48,4 @@
             </ul>
 
         </nav>
+        <!-- End of Topbar -->

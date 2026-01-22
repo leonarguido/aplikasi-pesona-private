@@ -1,12 +1,17 @@
 <?php
 session_start();
+<<<<<<< HEAD
 require 'config/koneksi.php';
 
 // 1. Cek Login
+=======
+// Cek Login
+>>>>>>> 01cdf0ab3db84c2185f41d76f0a621ae8a07aef3
 if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
+    header("Location: /aplikasi-pesona-private/routes/web.php?method=login");
     exit;
 }
+<<<<<<< HEAD
 
 require 'layout/header.php';
 require 'layout/sidebar.php';
@@ -20,10 +25,14 @@ require 'layout/topbar.php';
 // Ambil Role & ID User
 $role    = $_SESSION['role'];
 $id_user = $_SESSION['user_id'];
+=======
+>>>>>>> 01cdf0ab3db84c2185f41d76f0a621ae8a07aef3
 ?>
 
-<div class="container-fluid">
+<!DOCTYPE html>
+<html lang="en">
 
+<<<<<<< HEAD
     <?php if ($role == 'admin' || $role == 'super_admin'): ?>
 
         <?php
@@ -103,6 +112,39 @@ $id_user = $_SESSION['user_id'];
                                 <div class="h5 mb-0 font-weight-bold text-gray-800"><?= $total_tipis; ?> Barang</div>
                             </div>
                             <div class="col-auto"><i class="fas fa-exclamation-triangle fa-2x text-gray-300"></i></div>
+=======
+<head>
+    <?php require 'views/layout/header.php'; ?>
+</head>
+
+<body id="page-top">
+    <div id="content-wrapper" class="d-flex flex-column">
+        <div id="content" class="row">
+            <div class="col-md-2">
+                <?php require 'views/layout/sidebar.php'; ?>
+            </div>
+            <div class="col-md-10">
+                <?php
+                require 'views/layout/topbar.php';
+                $judul_halaman = "Dashboard";
+                ?>
+                <div class="container-fluid mt-4">
+
+                    <h1 class="h3 mb-4 text-gray-800">Dashboard</h1>
+
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="card shadow mb-4">
+                                <div class="card-header py-3">
+                                    <h6 class="m-0 font-weight-bold text-primary">Selamat Datang, <?= $_SESSION['full_name']; ?></h6>
+                                </div>
+                                <div class="card-body">
+                                    <p>Anda login sebagai: <strong><?= ucfirst($_SESSION['role']); ?></strong></p>
+                                    <hr>
+                                    <p class="mb-0">Silakan pilih menu di samping untuk memulai.</p>
+                                </div>
+                            </div>
+>>>>>>> 01cdf0ab3db84c2185f41d76f0a621ae8a07aef3
                         </div>
                     </div>
                 </div>
@@ -266,4 +308,18 @@ $id_user = $_SESSION['user_id'];
     <?php endif; ?>
     </div>
 
+<<<<<<< HEAD
 <?php require 'layout/footer.php'; ?>
+=======
+    <?php require 'views/layout/footer.php'; ?>
+
+    <script>
+        if (window.innerHeight <= 700) {
+            document.getElementById('accordionSidebar')
+                .style.height = '100vh';
+        }
+    </script>
+</body>
+
+</html>
+>>>>>>> 01cdf0ab3db84c2185f41d76f0a621ae8a07aef3

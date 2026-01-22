@@ -25,7 +25,7 @@ if (isset($_SESSION['user_id'])) {
     } else {
         echo "<li style='color: red;'>❌ Teks role TIDAK DIKENALI. Ini penyebab menu hilang!</li>";
     }
-    
+        
     // Cek spasi tersembunyi
     if (strlen($role) != strlen(trim($role))) {
         echo "<li style='color: red;'>❌ BAHAYA: Ada SPASI tersembunyi di awal/akhir role Anda! Gunakan fungsi trim().</li>";
