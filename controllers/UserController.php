@@ -29,25 +29,41 @@ class UserController
     {
         require __DIR__ . '/../config/koneksi.php';
 
-        if (isset($_POST['tambah'])) {
+        if (isset($_POST['tambah_user'])) {
             $nama     = mysqli_real_escape_string($koneksi, $_POST['nama']);
+            $nip      = mysqli_real_escape_string($koneksi, $_POST['nip']);
             $username = mysqli_real_escape_string($koneksi, $_POST['username']);
-            $role     = $_POST['role'];
-            $nip      = $_POST['nip'];
-            // Password default user baru: '123456' (bisa diganti user nanti)
-            $password = password_hash("123456", PASSWORD_DEFAULT);
+            $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+            $role     = $_POST['role']; // Ambil value dari select option
 
-            // Cek Username Kembar
-            $cek = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE username = '$username'");
-            if (mysqli_num_rows($cek) > 0) {
-                echo "<script>alert('Username sudah digunakan!');</script>";
-            } else {
-                $query = "INSERT INTO tb_user (nama, nip, username, password, role) VALUES ('$nama', '$nip', '$username', '$password', '$role')";
-                if (mysqli_query($koneksi, $query)) {
-                    echo "<script>alert('User berhasil ditambahkan! Password default: 123456'); window.location='" . $this->base_url . "data_pengguna';</script>";
-                } else {
-                    echo "<script>alert('Gagal: " . mysqli_error($koneksi) . "');</script>";
+            // Upload Tanda Tangan
+            $paraf_name = null;
+            if (!empty($_FILES['paraf']['name'])) {
+                $filename   = $_FILES['paraf']['name'];
+                $filesize   = $_FILES['paraf']['size'];
+                $ext        = pathinfo($filename, PATHINFO_EXTENSION);
+                $allowed    = ['png', 'jpg', 'jpeg'];
+
+                if (!in_array(strtolower($ext), $allowed)) {
+                    echo "<script>alert('Format TTD harus PNG, JPG, atau JPEG!'); window.location='" . $this->base_url . "data_pengguna';</script>";
+                    exit;
                 }
+                if ($filesize > 2000000) {
+                    echo "<script>alert('Ukuran file TTD terlalu besar (Max 2MB)!'); window.location='" . $this->base_url . "data_pengguna';</script>";
+                    exit;
+                }
+
+                $paraf_name = date('Ymd_His') . '_' . uniqid() . '.' . $ext;
+                move_uploaded_file($_FILES['paraf']['tmp_name'], 'assets/img/ttd/' . $paraf_name);
+            }
+
+            $q = "INSERT INTO tb_user (nama, nip, username, password, role, paraf) 
+          VALUES ('$nama', '$nip', '$username', '$password', '$role', '$paraf_name')";
+
+            if (mysqli_query($koneksi, $q)) {
+                echo "<script>alert('User Berhasil Ditambahkan!'); window.location='" . $this->base_url . "data_pengguna';</script>";
+            } else {
+                echo "<script>alert('Gagal menambah user: " . mysqli_error($koneksi) . "');</script>";
             }
         }
     }
@@ -56,23 +72,42 @@ class UserController
     public function edit_data_pengguna()
     {
         require __DIR__ . '/../config/koneksi.php';
+        // var_dump($_POST);
+        // exit;
 
-        if (isset($_POST['edit'])) {
-            $id       = $_POST['id'];
+        if (isset($_POST['edit_user'])) {
+            $id       = $_POST['id_user'];
             $nama     = mysqli_real_escape_string($koneksi, $_POST['nama']);
+            $nip      = mysqli_real_escape_string($koneksi, $_POST['nip']);
+            $username = mysqli_real_escape_string($koneksi, $_POST['username']);
             $role     = $_POST['role'];
-            $nip      = $_POST['nip'];
 
-            // Jika password diisi, update password. Jika kosong, biarkan password lama.
+            // Password Logic
             if (!empty($_POST['password'])) {
                 $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-                $query = "UPDATE tb_user SET nama='$nama', nip='$nip', role='$role', password='$password' WHERE id='$id'";
+                $q_pass = ", password='$password'";
             } else {
-                $query = "UPDATE tb_user SET nama='$nama', nip='$nip', role='$role' WHERE id='$id'";
+                $q_pass = "";
             }
 
-            if (mysqli_query($koneksi, $query)) {
-                echo "<script>alert('Data pengguna berhasil diupdate!'); window.location='" . $this->base_url . "data_pengguna';</script>";
+            // TTD Logic
+            $q_ttd = "";
+            if (!empty($_FILES['paraf']['name'])) {
+                $filename   = $_FILES['paraf']['name'];
+                $ext        = pathinfo($filename, PATHINFO_EXTENSION);
+                $paraf_name = date('Ymd_His') . '_' . uniqid() . '.' . $ext;
+                move_uploaded_file($_FILES['paraf']['tmp_name'], 'assets/img/ttd/' . $paraf_name);
+                $q_ttd = ", paraf='$paraf_name'";
+            }
+
+            $q = "UPDATE tb_user SET 
+          nama='$nama', nip='$nip', username='$username', role='$role' $q_pass $q_ttd
+          WHERE id='$id'";
+
+            if (mysqli_query($koneksi, $q)) {
+                echo "<script>alert('Data User Diupdate!'); window.location='" . $this->base_url . "data_pengguna';</script>";
+            } else {
+                echo "<script>alert('Gagal update!');</script>";
             }
         }
     }
@@ -85,14 +120,17 @@ class UserController
 
         if (isset($_GET['hapus'])) {
             $id = $_GET['hapus'];
-            // Cegah hapus diri sendiri
-            if ($id == $_SESSION['user_id']) {
-                echo "<script>alert('Anda tidak bisa menghapus akun sendiri!'); window.location='" . $this->base_url . "data_pengguna';</script>";
+            $q_img = mysqli_query($koneksi, "SELECT paraf FROM tb_user WHERE id='$id'");
+            $row_img = mysqli_fetch_assoc($q_img);
+            if ($row_img['paraf'] != null && file_exists('assets/img/ttd/' . $row_img['paraf'])) {
+                unlink('assets/img/ttd/' . $row_img['paraf']);
+            }
+
+            $q = "DELETE FROM tb_user WHERE id='$id'";
+            if (mysqli_query($koneksi, $q)) {
+                echo "<script>alert('User Dihapus!'); window.location='" . $this->base_url . "data_pengguna';</script>";
             } else {
-                $query = "DELETE FROM tb_user WHERE id = '$id'";
-                if (mysqli_query($koneksi, $query)) {
-                    echo "<script>alert('User berhasil dihapus!'); window.location='" . $this->base_url . "data_pengguna';</script>";
-                }
+                echo "<script>alert('Gagal hapus!');</script>";
             }
         }
     }

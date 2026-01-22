@@ -30,6 +30,7 @@ class AutentikasiController
                     $_SESSION['user_id']   = $data['id'];
                     $_SESSION['username']  = $data['username'];
                     $_SESSION['full_name'] = $data['nama']; // Kolom 'nama'
+                    $_SESSION['nama'] = $data['nama']; // Kolom 'nama'
 
                     // MAPPING ROLE (Database Mentor -> Sistem Kita)
                     $role_db = $data['role'];

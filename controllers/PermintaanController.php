@@ -19,6 +19,48 @@ class PermintaanController
         require_once '../views/permintaan_saya.php';
     }
 
+    // A. PROSES BATALKAN PERMINTAAN SAYA
+    public function batalkan_permintaan_saya()
+    {
+        session_start();
+        require __DIR__ . '/../config/koneksi.php';
+
+        if (isset($_GET['batal_id'])) {
+            $id_batal = $_GET['batal_id'];
+            $id_user = $_SESSION['user_id'];
+            // Cek keamanan: Pastikan permintaan milik user ini dan status 'menunggu'
+            $cek = mysqli_query($koneksi, "SELECT status FROM tb_permintaan WHERE id='$id_batal' AND user_id='$id_user'");
+            $d = mysqli_fetch_assoc($cek);
+
+            if ($d && $d['status'] == 'menunggu') {
+                mysqli_query($koneksi, "DELETE FROM tb_detail_permintaan WHERE permintaan_id='$id_batal'");
+                mysqli_query($koneksi, "DELETE FROM tb_permintaan WHERE id='$id_batal'");
+                echo "<script>alert('Permintaan berhasil dibatalkan.'); window.location='" . $this->base_url . "permintaan_saya';</script>";
+            } else {
+                echo "<script>alert('Gagal! Permintaan tidak bisa dibatalkan.'); window.location='" . $this->base_url . "permintaan_saya';</script>";
+            }
+        }
+    }
+
+    // B. PROSES EDIT PERMINTAAN SAYA
+    public function edit_permintaan_saya()
+    {
+        require __DIR__ . '/../config/koneksi.php';
+
+        if (isset($_POST['update_permintaan'])) {
+            $id_details = $_POST['id_detail']; // Array ID Detail
+            $jumlahs    = $_POST['jumlah'];    // Array Jumlah Baru
+
+            for ($i = 0; $i < count($id_details); $i++) {
+                $curr_id  = $id_details[$i];
+                $curr_jml = $jumlahs[$i];
+                mysqli_query($koneksi, "UPDATE tb_detail_permintaan SET jumlah='$curr_jml' WHERE id='$curr_id'");
+            }
+
+            echo "<script>alert('Perubahan jumlah berhasil disimpan!'); window.location='" . $this->base_url . "permintaan_saya';</script>";
+        }
+    }
+
     // A. PROSES CETAK SURAT PERMINTAAN
     public function cetak_surat()
     {

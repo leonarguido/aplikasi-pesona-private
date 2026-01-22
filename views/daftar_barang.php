@@ -6,7 +6,10 @@
 </head>
 
 <body id="page-top">
-    <?php $jml_item_keranjang = count($_SESSION['keranjang']); ?>
+    <?php 
+    $judul_halaman = "Daftar Barang";
+    $jml_item_keranjang = count($_SESSION['keranjang']); 
+    ?>
     <div id="content-wrapper" class="d-flex flex-column">
         <div id="content" class="row">
             <div class="col-md-2">
@@ -15,25 +18,23 @@
             <div class="col-md-10">
                 <?php require 'layout/topbar.php'; ?>
                 <div class="container-fluid mt-4">
-                    <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                        <h1 class="h3 mb-0 text-gray-800">Daftar Barang</h1>
-
-                        <a href="<?= BASE_URL ?>keranjang" class="d-none d-sm-inline-block btn btn-lg btn-success shadow-sm">
-                            <i class="fas fa-shopping-cart fa-sm text-white-50"></i> Lihat Keranjang
-                            <span class="badge badge-light text-danger font-weight-bold"><?= $jml_item_keranjang; ?></span>
-                        </a>
-                    </div>
 
                     <div class="card shadow mb-4">
-                        <div class="card-header py-3">
+                        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                             <h6 class="m-0 font-weight-bold text-primary">Daftar Barang Tersedia</h6>
+
+                            <a href="<?= BASE_URL ?>keranjang" class="btn btn-success btn-sm shadow-sm">
+                                <i class="fas fa-shopping-cart fa-sm"></i> Lihat Keranjang
+                                <span class="badge badge-light text-danger ml-1 font-weight-bold"><?= $jml_item_keranjang; ?></span>
+                            </a>
                         </div>
+
                         <div class="card-body">
                             <div class="table-responsive">
-                                <table class="table table-bordered table-hover" id="myTable" width="100%" cellspacing="0">
+                                <table class="table table-bordered table-hover" id="dataTable" width="100%" cellspacing="0">
                                     <thead class="thead-light">
                                         <tr>
-                                            <th>No</th>
+                                            <th width="5%">No</th>
                                             <th>Kode</th>
                                             <th>Nama Barang</th>
                                             <th>Stok</th>
@@ -68,7 +69,7 @@
                                                 </td>
                                             </tr>
 
-                                            <div class="modal fade" id="modalAdd<?= $row['id']; ?>">
+                                            <div class="modal fade text-left" id="modalAdd<?= $row['id']; ?>" tabindex="-1">
                                                 <div class="modal-dialog">
                                                     <div class="modal-content">
                                                         <div class="modal-header bg-primary text-white">
@@ -93,7 +94,7 @@
                                                             </div>
                                                             <div class="modal-footer">
                                                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                                                                <button type="submit" name="tambah_keranjang" class="btn btn-primary">Simpan ke Keranjang</button>
+                                                                <button type="submit" name="tambah_keranjang" class="btn btn-primary">Simpan</button>
                                                             </div>
                                                         </form>
                                                     </div>
@@ -121,6 +122,26 @@
                     'copy', 'csv', 'excel', 'pdf', 'print'
                 ]
             });
+        });
+        $(document).ready(function() {
+            if (!$.fn.DataTable.isDataTable('#dataTable')) {
+                $('#dataTable').DataTable({
+                    "language": {
+                        "search": "Cari Barang:",
+                        "lengthMenu": "Tampilkan _MENU_ data per halaman",
+                        "zeroRecords": "Data tidak ditemukan",
+                        "info": "Halaman _PAGE_ dari _PAGES_",
+                        "infoEmpty": "Tidak ada data",
+                        "infoFiltered": "(difilter dari _MAX_ total data)",
+                        "paginate": {
+                            "first": "Awal",
+                            "last": "Akhir",
+                            "next": "Lanjut",
+                            "previous": "Kembali"
+                        }
+                    }
+                });
+            }
         });
         if (window.innerHeight <= 700) {
             document.getElementById('accordionSidebar')

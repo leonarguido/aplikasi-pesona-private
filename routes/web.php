@@ -93,6 +93,12 @@ if (isset($_GET['method'])) {
         case 'permintaan_saya':
             $permintaan->permintaan_saya_page();
             break;
+        case 'batalkan_permintaan_saya':
+            $permintaan->batalkan_permintaan_saya();
+            break;
+        case 'edit_permintaan_saya':
+            $permintaan->edit_permintaan_saya();
+            break;
         case 'persetujuan':
             $permintaan->persetujuan_page();
             break;
