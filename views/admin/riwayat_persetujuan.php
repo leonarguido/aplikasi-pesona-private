@@ -60,13 +60,13 @@
                                                 <td>
                                                     <ul class="pl-3 mb-0" style="font-size: 0.9rem;">
                                                         <?php
-                                                        $q_detail_hist = mysqli_query($koneksi, "SELECT d.jumlah, d.satuan, b.nama_barang 
+                                                        $q_detail_hist = mysqli_query($koneksi, "SELECT d.jumlah, d.satuan, b.nama_barang, b.satuan, b.merk_barang
                                                                              FROM tb_detail_permintaan d 
                                                                              JOIN tb_barang_bergerak b ON d.barang_id = b.id 
                                                                              WHERE d.permintaan_id = '$id_hist'");
 
                                                         while ($dh = mysqli_fetch_assoc($q_detail_hist)) {
-                                                            echo "<li class='mb-1'>{$dh['nama_barang']} : <b>{$dh['jumlah']} {$dh['satuan']}</b></li>";
+                                                            echo "<li class='mb-1'>{$dh['nama_barang']} ({$dh['merk_barang']}) : <b>{$dh['jumlah']} {$dh['satuan']}</b></li>";
                                                         }
                                                         ?>
                                                     </ul>

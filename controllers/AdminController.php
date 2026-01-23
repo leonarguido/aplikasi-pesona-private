@@ -30,6 +30,7 @@ class AdminController
 
         if (isset($_POST['tambah'])) {
             $kode   = $_POST['kode_barang'];
+            $merk   = $_POST['merk_barang'];
             $nama   = $_POST['nama_barang'];
             $satuan = $_POST['satuan'];
             $desc   = $_POST['keterangan'];
@@ -39,8 +40,8 @@ class AdminController
             if (mysqli_num_rows($cek) > 0) {
                 echo "<script>alert('Kode Barang sudah ada!'); window.location='" . $this->base_url . "data_barang';</script>";
             } else {
-                $query = "INSERT INTO tb_barang_bergerak (kode_barang, nama_barang, satuan, keterangan, stok) 
-                  VALUES ('$kode', '$nama', '$satuan', '$desc', '$stok')";
+                $query = "INSERT INTO tb_barang_bergerak (kode_barang, merk_barang, nama_barang, satuan, keterangan, stok) 
+                  VALUES ('$kode', '$merk', '$nama', '$satuan', '$desc', '$stok')";
                 if (mysqli_query($koneksi, $query)) {
                     echo "<script>alert('Barang berhasil ditambahkan!'); window.location='" . $this->base_url . "data_barang';</script>";
                 } else {
@@ -58,12 +59,13 @@ class AdminController
 
         if (isset($_POST['edit'])) {
             $id     = $_POST['id'];
+            $merk   = $_POST['merk_barang'];
             $nama   = $_POST['nama_barang'];
             $satuan = $_POST['satuan'];
             $desc   = $_POST['keterangan'];
             $stok   = $_POST['stok'];
 
-            $query = "UPDATE tb_barang_bergerak SET nama_barang='$nama', satuan='$satuan', keterangan='$desc', stok='$stok' WHERE id='$id'";
+            $query = "UPDATE tb_barang_bergerak SET merk_barang='$merk', nama_barang='$nama', satuan='$satuan', keterangan='$desc', stok='$stok' WHERE id='$id'";
             if (mysqli_query($koneksi, $query)) {
                 echo "<script>alert('Data berhasil diupdate!'); window.location='" . $this->base_url . "data_barang';</script>";
             }
@@ -114,20 +116,21 @@ class AdminController
 
                     while (($data = fgetcsv($file, 10000, ",")) !== FALSE) {
                         // Mapping Data dari Excel/CSV ke Variabel
-                        // Kolom 0: Kode, 1: Nama, 2: Satuan, 3: Stok, 4: Ket
+                        // Kolom 0: Kode,  1: Nama, 2: Merk, 3: Satuan, 4: Stok, 5: Ket
                         $kode   = mysqli_real_escape_string($koneksi, $data[0]);
                         $nama   = mysqli_real_escape_string($koneksi, $data[1]);
-                        $satuan = mysqli_real_escape_string($koneksi, $data[2]);
-                        $stok   = (int) $data[3];
-                        $desc   = mysqli_real_escape_string($koneksi, $data[4]);
+                        $merk   = mysqli_real_escape_string($koneksi, $data[2]);
+                        $satuan = mysqli_real_escape_string($koneksi, $data[3]);
+                        $stok   = (int) $data[4];
+                        $desc   = mysqli_real_escape_string($koneksi, $data[5]);
 
                         // Cek Duplikat Kode Barang
                         $cek = mysqli_query($koneksi, "SELECT kode_barang FROM tb_barang_bergerak WHERE kode_barang = '$kode'");
 
                         if (mysqli_num_rows($cek) == 0 && !empty($kode)) {
                             // Jika kode belum ada, Insert Baru
-                            $query = "INSERT INTO tb_barang_bergerak (kode_barang, nama_barang, satuan, stok, keterangan) 
-                              VALUES ('$kode', '$nama', '$satuan', '$stok', '$desc')";
+                            $query = "INSERT INTO tb_barang_bergerak (kode_barang, merk_barang, nama_barang, satuan, stok, keterangan) 
+                              VALUES ('$kode', '$merk', '$nama', '$satuan', '$stok', '$desc')";
                             mysqli_query($koneksi, $query);
                             $count++;
                         }

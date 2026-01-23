@@ -53,11 +53,12 @@
                                     <thead class="bg-dark text-white">
                                         <tr>
                                             <th width="5%" style="text-align:center;">No</th>
-                                            <th width="15%">Kode Barang</th>
+                                            <th width="10%">Kode Barang</th>
+                                            <th width="10%">Merk Barang</th>
                                             <th>Nama Barang</th>
                                             <th width="15%" style="text-align:center;">Sisa Stok</th>
                                             <th width="10%" style="text-align:center;">Satuan</th>
-                                            <th width="20%" class="no-print">Status</th>
+                                            <th width="15%" class="no-print">Status</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -84,6 +85,7 @@
                                             <tr>
                                                 <td style="text-align:center;"><?= $no++; ?></td>
                                                 <td><?= $row['kode_barang']; ?></td>
+                                                <td><?= $row['merk_barang']; ?></td>
                                                 <td><?= $row['nama_barang']; ?></td>
                                                 <td style="text-align:center; font-size: 1.1em; <?= $class_stok; ?>">
                                                     <?= $row['stok']; ?>

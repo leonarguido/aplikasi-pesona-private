@@ -60,7 +60,7 @@
                                                 <td>
                                                     <ul class="pl-3 mb-0" style="font-size: 0.9rem;">
                                                         <?php
-                                                        $q_d = mysqli_query($koneksi, "SELECT d.jumlah, d.satuan, b.nama_barang, b.stok 
+                                                        $q_d = mysqli_query($koneksi, "SELECT d.jumlah, d.satuan, b.nama_barang, b.stok, b.merk_barang
                                                                    FROM tb_detail_permintaan d 
                                                                    JOIN tb_barang_bergerak b ON d.barang_id = b.id 
                                                                    WHERE d.permintaan_id = '$id_req'");
@@ -69,7 +69,7 @@
                                                                 ? "<span class='badge badge-success badge-pill ml-1' style='font-size:0.7rem'>Stok: {$d['stok']}</span>"
                                                                 : "<span class='badge badge-danger badge-pill ml-1' style='font-size:0.7rem'>Stok Kritis: {$d['stok']}</span>";
 
-                                                            echo "<li class='mb-2'>{$d['nama_barang']} : <b>{$d['jumlah']} {$d['satuan']}</b> $status_stok</li>";
+                                                            echo "<li class='mb-2'>{$d['nama_barang']} ({$d['merk_barang']}) : <b>{$d['jumlah']} {$d['satuan']}</b> $status_stok</li>";
                                                         }
                                                         ?>
                                                     </ul>
@@ -126,14 +126,14 @@
                                                 </thead>
                                                 <tbody>
                                                     <?php
-                                                    $q_modal = mysqli_query($koneksi, "SELECT d.id AS id_detail, d.jumlah, d.satuan, b.nama_barang, b.stok 
+                                                    $q_modal = mysqli_query($koneksi, "SELECT d.id AS id_detail, d.jumlah, d.satuan, b.nama_barang, b.stok, b.merk_barang
                                                                    FROM tb_detail_permintaan d 
                                                                    JOIN tb_barang_bergerak b ON d.barang_id = b.id 
                                                                    WHERE d.permintaan_id = '$id_req'");
                                                     while ($dm = mysqli_fetch_assoc($q_modal)):
                                                     ?>
                                                         <tr>
-                                                            <td class="align-middle"><?= $dm['nama_barang']; ?></td>
+                                                            <td class="align-middle"><?= $dm['nama_barang']; ?> (<?= $dm['merk_barang']; ?>)</td>
                                                             <td class="align-middle text-center <?= ($dm['stok'] < $dm['jumlah']) ? 'text-danger font-weight-bold' : 'text-success'; ?>">
                                                                 <?= $dm['stok']; ?> <?= $dm['satuan']; ?>
                                                             </td>

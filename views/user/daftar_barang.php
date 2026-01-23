@@ -35,6 +35,7 @@
                                             <tr>
                                                 <th width="5%">No</th>
                                                 <th>Kode</th>
+                                                <th>Merk Barang</th>
                                                 <th>Nama Barang</th>
                                                 <th>Stok</th>
                                                 <th>Satuan</th>
@@ -52,6 +53,7 @@
                                                 <tr>
                                                     <td><?= $no++; ?></td>
                                                     <td><?= $row['kode_barang']; ?></td>
+                                                    <td><?= $row['merk_barang']; ?></td>
                                                     <td class="font-weight-bold"><?= $row['nama_barang']; ?></td>
                                                     <td class="<?= $row['stok'] == 0 ? 'text-danger' : 'text-success'; ?>">
                                                         <?= $row['stok']; ?>
@@ -88,6 +90,7 @@
 
                                                                     <input type="hidden" name="id_barang" value="<?= $row['id']; ?>">
                                                                     <input type="hidden" name="nama_barang" value="<?= $row['nama_barang']; ?>">
+                                                                    <input type="hidden" name="merk_barang" value="<?= $row['merk_barang']; ?>">
                                                                     <input type="hidden" name="satuan" value="<?= $row['satuan']; ?>">
                                                                     <input type="hidden" name="stok_max" value="<?= $row['stok']; ?>">
                                                                 </div>

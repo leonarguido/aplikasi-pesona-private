@@ -37,7 +37,8 @@
                                         <tr>
                                             <th width="5%">No</th>
                                             <th>Kode</th>
-                                            <th>Nama Barang</th>
+                                            <th>Merk Barang</th>
+                                            <th>Nama Barang</th>                                            
                                             <th>Satuan</th>
                                             <th class="text-center">Stok</th>
                                             <th>Keterangan</th>
@@ -55,6 +56,7 @@
                                             <tr>
                                                 <td><?= $no++; ?></td>
                                                 <td><span class="badge badge-secondary"><?= $row['kode_barang']; ?></span></td>
+                                                <td class="font-weight-bold"><?= $row['merk_barang']; ?></td>
                                                 <td class="font-weight-bold"><?= $row['nama_barang']; ?></td>
                                                 <td><?= $row['satuan']; ?></td>
                                                 <td class="text-center">
@@ -91,6 +93,10 @@
                                                                 <div class="form-group">
                                                                     <label>Nama Barang</label>
                                                                     <input type="text" name="nama_barang" class="form-control" value="<?= $row['nama_barang']; ?>" required>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label>Merk Barang</label>
+                                                                    <input type="text" name="merk_barang" class="form-control" value="<?= $row['merk_barang']; ?>" required>
                                                                 </div>
                                                                 <div class="form-group">
                                                                     <label>Satuan</label>
@@ -180,6 +186,10 @@
                         <div class="form-group">
                             <label>Nama Barang</label>
                             <input type="text" name="nama_barang" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Merk Barang</label>
+                            <input type="text" name="merk_barang" class="form-control" placeholder="Cth: Bola Dunia, Snowman, Sidu, Toshiba, dll" required>
                         </div>
                         <div class="form-group">
                             <label>Satuan</label>

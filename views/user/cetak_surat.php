@@ -79,7 +79,7 @@
             <tbody>
                 <?php
                 // QUERY 2: AMBIL DETAIL BARANG
-                $q_detail = mysqli_query($koneksi, "SELECT d.*, b.nama_barang, b.satuan, b.kode_barang 
+                $q_detail = mysqli_query($koneksi, "SELECT d.*, b.nama_barang, b.satuan, b.kode_barang, b.merk_barang 
                                                     FROM tb_detail_permintaan d
                                                     JOIN tb_barang_bergerak b ON d.barang_id = b.id
                                                     WHERE d.permintaan_id = '$id_permintaan'");
@@ -88,7 +88,7 @@
                 ?>
                 <tr>
                     <td style="text-align: center;"><?= $no++; ?></td>
-                    <td><?= $item['nama_barang']; ?> <br><small>Kode: <?= $item['kode_barang']; ?></small></td>
+                    <td><?= $item['nama_barang']; ?> (<?= $item['merk_barang']; ?>) <br><small>Kode: <?= $item['kode_barang']; ?></small></td>
                     <td style="text-align: center;"><?= $item['jumlah']; ?></td>
                     <td style="text-align: center;"><?= $item['satuan']; ?></td>
                     <td><?= !empty($data['catatan']) ? $data['catatan'] : '-'; ?></td>

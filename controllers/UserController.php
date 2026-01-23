@@ -31,6 +31,7 @@ class UserController
         if (isset($_POST['tambah_keranjang'])) {
             $id_barang   = $_POST['id_barang'];
             $nama_barang = $_POST['nama_barang'];
+            $merk_barang = $_POST['merk_barang'];
             $jumlah      = $_POST['jumlah'];
             $satuan      = $_POST['satuan'];
             $stok_max    = $_POST['stok_max'];
@@ -55,6 +56,7 @@ class UserController
                 $_SESSION['keranjang'][] = [
                     'id' => $id_barang,
                     'nama' => $nama_barang,
+                    'merk' => $merk_barang,
                     'jumlah' => $jumlah,
                     'satuan' => $satuan,
                     'stok_max' => $stok_max
