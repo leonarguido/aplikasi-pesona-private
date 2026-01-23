@@ -36,7 +36,7 @@ class AdminController
             $desc   = $_POST['keterangan'];
             $stok   = $_POST['stok'];
 
-            $cek = mysqli_query($koneksi, "SELECT * FROM tb_barang_bergerak WHERE kode_barang = '$kode'");
+            $cek = mysqli_query($koneksi, "SELECT * FROM tb_barang_bergerak WHERE is_deleted=0 AND kode_barang = '$kode'");
             if (mysqli_num_rows($cek) > 0) {
                 echo "<script>alert('Kode Barang sudah ada!'); window.location='" . $this->base_url . "data_barang';</script>";
             } else {
@@ -79,7 +79,7 @@ class AdminController
 
         if (isset($_GET['id'])) {
             $id = $_GET['id'];
-            $query = "DELETE FROM tb_barang_bergerak WHERE id = '$id'";
+            $query = "UPDATE tb_barang_bergerak SET is_deleted=1 WHERE id = '$id'";
             if (mysqli_query($koneksi, $query)) {
                 echo "<script>alert('Barang berhasil dihapus!'); window.location='" . $this->base_url . "data_barang';</script>";
             }

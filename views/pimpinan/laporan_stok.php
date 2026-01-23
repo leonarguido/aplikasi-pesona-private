@@ -65,7 +65,7 @@
                                         <?php
                                         $no = 1;
                                         // Ambil semua data barang diurutkan nama
-                                        $query = mysqli_query($koneksi, "SELECT * FROM tb_barang_bergerak ORDER BY nama_barang ASC");
+                                        $query = mysqli_query($koneksi, "SELECT * FROM tb_barang_bergerak WHERE is_deleted=0 ORDER BY nama_barang ASC");
 
                                         while ($row = mysqli_fetch_assoc($query)):
                                             // Logika Status Stok
