@@ -1,23 +1,14 @@
 <?php
 session_start();
-<<<<<<< HEAD
 require 'config/koneksi.php';
 
 // 1. Cek Login
-=======
-// Cek Login
->>>>>>> 01cdf0ab3db84c2185f41d76f0a621ae8a07aef3
 if (!isset($_SESSION['user_id'])) {
     header("Location: /aplikasi-pesona-private/routes/web.php?method=login");
     exit;
 }
 
-require 'layout/header.php';
-require 'layout/sidebar.php';
-
-// =============================================================
-// SET JUDUL HALAMAN
-// =============================================================
+// Set Judul Halaman
 $judul_halaman = "Dashboard";
 
 // Ambil Role & ID User
@@ -28,7 +19,6 @@ $id_user = $_SESSION['user_id'];
 <!DOCTYPE html>
 <html lang="en">
 
-<<<<<<<<< Temporary merge branch 1
 <head>
     <?php require 'views/layout/header.php'; ?>
 </head>
@@ -40,28 +30,10 @@ $id_user = $_SESSION['user_id'];
                 <?php require 'views/layout/sidebar.php'; ?>
             </div>
             <div class="col-md-10">
-                <?php
-                require 'views/layout/topbar.php';
-                $judul_halaman = "Dashboard";
-                ?>
+                <?php require 'views/layout/topbar.php'; ?>
+
                 <div class="container-fluid mt-4">
-
-                    <h1 class="h3 mb-4 text-gray-800">Dashboard</h1>
-
-                    <div class="row">
-                        <div class="col-lg-12">
-                            <div class="card shadow mb-4">
-                                <div class="card-header py-3">
-                                    <h6 class="m-0 font-weight-bold text-primary">Selamat Datang, <?= $_SESSION['full_name']; ?></h6>
-                                </div>
-                                <div class="card-body">
-                                    <p>Anda login sebagai: <strong><?= ucfirst($_SESSION['role']); ?></strong></p>
-                                    <hr>
-                                    <p class="mb-0">Silakan pilih menu di samping untuk memulai.</p>
-                                </div>
-                            </div>
-=========
-    <?php if ($role == 'admin' || $role == 'super_admin'): ?>
+                    <?php if ($role == 'admin' || $role == 'super_admin'): ?>
 
                         <?php
                         // --- LOGIKA HITUNG DATA GUDANG (HANYA DIJALANKAN JIKA ADMIN) ---
@@ -131,20 +103,20 @@ $id_user = $_SESSION['user_id'];
                                 </div>
                             </div>
 
-            <div class="col-xl-3 col-md-6 mb-4">
-                <div class="card border-left-danger shadow h-100 py-2">
-                    <div class="card-body">
-                        <div class="row no-gutters align-items-center">
-                            <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Stok Menipis (≤ <?= $ambang_batas; ?>)</div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800"><?= $total_tipis; ?> Barang</div>
+                            <div class="col-xl-3 col-md-6 mb-4">
+                                <div class="card border-left-danger shadow h-100 py-2">
+                                    <div class="card-body">
+                                        <div class="row no-gutters align-items-center">
+                                            <div class="col mr-2">
+                                                <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Stok Menipis (≤ <?= $ambang_batas; ?>)</div>
+                                                <div class="h5 mb-0 font-weight-bold text-gray-800"><?= $total_tipis; ?> Barang</div>
+                                            </div>
+                                            <div class="col-auto"><i class="fas fa-exclamation-triangle fa-2x text-gray-300"></i></div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="col-auto"><i class="fas fa-exclamation-triangle fa-2x text-gray-300"></i></div>
                         </div>
-                    </div>
-                </div>
-            </div>
-        </div>
 
                         <div class="row">
                             <div class="col-lg-6 mb-4">
@@ -307,4 +279,15 @@ $id_user = $_SESSION['user_id'];
         </div>
     </div>
 
-<?php require 'layout/footer.php'; ?>
+
+    <?php require 'views/layout/footer.php'; ?>
+
+    <script>
+        if (window.innerHeight <= 700) {
+            document.getElementById('accordionSidebar')
+                .style.height = '100vh';
+        }
+    </script>
+</body>
+
+</html>

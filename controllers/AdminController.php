@@ -84,7 +84,13 @@ class AdminController
         }
     }
 
-    // D. PROSES INPUT DATA DARI EXCEL/CSV
+    // D. DOWNLOAD TEMPLATE EXCEL/CSV
+    public function template_barang()
+    {
+        require_once '../views/admin/template_barang.php';
+    }
+
+    // E. PROSES INPUT DATA DARI EXCEL/CSV
     public function import_excel_data_barang()
     {
         require __DIR__ . '/../config/koneksi.php';

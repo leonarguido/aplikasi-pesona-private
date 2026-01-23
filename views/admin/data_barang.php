@@ -134,23 +134,20 @@
     <div class="modal fade" id="importModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Import Data Barang (Excel/CSV)</h5>
-                    <button class="close" data-dismiss="modal">&times;</button>
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title">Import Data Barang</h5>
+                    <button class="close text-white" data-dismiss="modal">&times;</button>
                 </div>
-                <form method="POST" enctype="multipart/form-data">
+                <form method="POST" enctype="multipart/form-data" action="<?= BASE_URL ?>import_excel_data_barang">
                     <div class="modal-body">
                         <div class="alert alert-info">
-                            <strong>Tutorial / Cara Penggunaan:</strong>
-                            <ol class="pl-3 mb-0">
-                                <li>Download template Excel terlebih dahulu: <br>
-                                    <a href="template_barang.php" class="btn btn-sm btn-success mt-1"><i class="fas fa-download"></i> Download Template</a>
-                                </li>
-                                <li>Buka file tersebut, isi data barang sesuai kolom.</li>
-                                <li><strong>JANGAN</strong> mengubah judul kolom (Baris 1).</li>
-                                <li>Simpan file (Save As) dengan format <strong>.CSV (Comma delimited)</strong>.</li>
-                                <li>Upload file .csv tersebut di bawah ini.</li>
+                            <strong>Cara Penggunaan:</strong>
+                            <ol class="pl-3 mb-0 small">
+                                <li>Download template Excel (CSV).</li>
+                                <li>Isi data tanpa mengubah judul kolom.</li>
+                                <li>Simpan sebagai <strong>.CSV</strong>.</li>
                             </ol>
+                            <a href="<?= BASE_URL ?>template_barang" class="btn btn-sm btn-light mt-2 text-success font-weight-bold"><i class="fas fa-download"></i> Download Template</a>
                         </div>
 
                         <div class="form-group">
@@ -160,7 +157,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                        <button type="submit" name="import_excel" class="btn btn-primary">Upload & Import</button>
+                        <button type="submit" name="import_excel" class="btn btn-success">Upload</button>
                     </div>
                 </form>
             </div>
@@ -215,25 +212,25 @@
 
     <script>
         $(document).ready(function() {
-        if (!$.fn.DataTable.isDataTable('#dataTable')) {
-            $('#dataTable').DataTable({
-                "language": {
-                    "search": "Cari Barang:",
-                    "lengthMenu": "Tampilkan _MENU_ antrian",
-                    "zeroRecords": "Tidak ada barang yang cocok",
-                    "info": "Menampilkan _PAGE_ dari _PAGES_",
-                    "infoEmpty": "Tidak ada data",
-                    "infoFiltered": "(difilter dari _MAX_ total data)",
-                    "paginate": {
-                        "first": "Awal",
-                        "last": "Akhir",
-                        "next": "Lanjut",
-                        "previous": "Kembali"
+            if (!$.fn.DataTable.isDataTable('#dataTable')) {
+                $('#dataTable').DataTable({
+                    "language": {
+                        "search": "Cari Barang:",
+                        "lengthMenu": "Tampilkan _MENU_ antrian",
+                        "zeroRecords": "Tidak ada barang yang cocok",
+                        "info": "Menampilkan _PAGE_ dari _PAGES_",
+                        "infoEmpty": "Tidak ada data",
+                        "infoFiltered": "(difilter dari _MAX_ total data)",
+                        "paginate": {
+                            "first": "Awal",
+                            "last": "Akhir",
+                            "next": "Lanjut",
+                            "previous": "Kembali"
+                        }
                     }
-                }
-            });
-        }
-    });
+                });
+            }
+        });
         if (window.innerHeight <= 700) {
             document.getElementById('accordionSidebar')
                 .style.height = '100vh';

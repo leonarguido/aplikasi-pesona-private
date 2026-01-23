@@ -43,6 +43,9 @@ if (isset($_GET['method'])) {
         case 'data_barang':
             $admin->data_barang_page();
             break;
+        case 'template_barang':
+            $admin->template_barang();
+            break;
         case 'import_excel_data_barang':
             $admin->import_excel_data_barang();
             break;
