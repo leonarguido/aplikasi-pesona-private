@@ -1,41 +1,20 @@
-<?php
-session_start();
-require 'config/koneksi.php';
-
-// 1. Cek Akses (Hanya Pimpinan & Admin yang boleh lihat stok)
-if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
-    exit;
-}
-if ($_SESSION['role'] == 'user' || $_SESSION['role'] == 'staff') {
-    echo "<script>alert('Akses Ditolak!'); window.location='index.php';</script>";
-    exit;
-}
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-    <?php require 'layout/header.php'; ?>
+    <?php require __DIR__ . '/../layout/header.php'; ?>
+    <?php $judul_halaman = "Laporan Stok Barang"; ?>
 </head>
 
 <body id="page-top">
     <div id="content-wrapper" class="d-flex flex-column">
         <div id="content" class="row">
             <div class="col-md-2">
-                <?php require 'layout/sidebar.php'; ?>
+                <?php require __DIR__ . '/../layout/sidebar.php'; ?>
             </div>
             <div class="col-md-10">
-                <?php require 'layout/topbar.php'; ?>
+                <?php require __DIR__ . '/../layout/topbar.php'; ?>
                 <div class="container-fluid mt-4">
-
-                    <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                        <h1 class="h3 mb-0 text-gray-800">Laporan Stok Barang Saat Ini</h1>
-                        <button onclick="window.print()" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
-                            <i class="fas fa-print fa-sm text-white-50"></i> Cetak / Simpan PDF
-                        </button>
-                    </div>
 
                     <style>
                         @media print {
@@ -62,12 +41,15 @@ if ($_SESSION['role'] == 'user' || $_SESSION['role'] == 'staff') {
                     </style>
 
                     <div class="card shadow mb-4" id="printableArea">
-                        <div class="card-header py-3">
+                        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                             <h6 class="m-0 font-weight-bold text-primary">Data Stok Per Tanggal: <?= date('d F Y'); ?></h6>
+                            <button onclick="window.print()" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+                                <i class="fas fa-print fa-sm text-white-50"></i> Cetak / Simpan PDF
+                            </button>
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
-                                <table class="table table-bordered table-striped" width="100%" cellspacing="0">
+                                <table class="table table-bordered table-striped" id="dataTable" width="100%" cellspacing="0">
                                     <thead class="bg-dark text-white">
                                         <tr>
                                             <th width="5%" style="text-align:center;">No</th>
@@ -135,12 +117,24 @@ if ($_SESSION['role'] == 'user' || $_SESSION['role'] == 'staff') {
 
     <script>
         $(document).ready(function() {
-            $('#myTable').DataTable({
-                dom: 'Bfrtip',
-                buttons: [
-                    'copy', 'csv', 'excel', 'pdf', 'print'
-                ]
-            });
+            if (!$.fn.DataTable.isDataTable('#dataTable')) {
+                $('#dataTable').DataTable({
+                    "language": {
+                        "search": "Cari Stok:",
+                        "lengthMenu": "Tampilkan _MENU_ antrian",
+                        "zeroRecords": "Tidak ada stok yang cocok",
+                        "info": "Menampilkan _PAGE_ dari _PAGES_",
+                        "infoEmpty": "Tidak ada data",
+                        "infoFiltered": "(difilter dari _MAX_ total data)",
+                        "paginate": {
+                            "first": "Awal",
+                            "last": "Akhir",
+                            "next": "Lanjut",
+                            "previous": "Kembali"
+                        }
+                    }
+                });
+            }
         });
         if (window.innerHeight <= 700) {
             document.getElementById('accordionSidebar')

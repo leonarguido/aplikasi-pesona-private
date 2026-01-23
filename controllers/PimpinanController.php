@@ -1,6 +1,6 @@
 <?php
 
-class LaporanController
+class PimpinanController
 {
     protected $base_url = '/aplikasi-pesona-private/routes/web.php/?method=';
 
@@ -19,7 +19,25 @@ class LaporanController
             exit;
         }
 
-        require_once '../views/laporan.php';
+        require_once '../views/pimpinan/laporan.php';
+    }
+
+    public function laporan_stok_page()
+    {
+        session_start();
+        require __DIR__ . '/../config/koneksi.php';
+
+        // 1. Cek Akses (Hanya Pimpinan & Admin yang boleh lihat stok)
+        if (!isset($_SESSION['user_id'])) {
+            header("Location: login.php");
+            exit;
+        }
+        if ($_SESSION['role'] == 'user' || $_SESSION['role'] == 'staff') {
+            echo "<script>alert('Akses Ditolak!'); window.location='index.php';</script>";
+            exit;
+        }
+
+        require_once '../views/pimpinan/laporan_stok.php';
     }
 
     public function cetak_laporan()
@@ -42,6 +60,7 @@ class LaporanController
             exit;
         }
 
-        require_once '../views/cetak_laporan.php';
+        require_once '../views/pimpinan/cetak_laporan.php';
     }
 }
+?>

@@ -4,7 +4,7 @@ class AutentikasiController
 {
     public function login()
     {
-        require_once __DIR__ . '/../views/login.php';
+        require_once __DIR__ . '/../views/autentikasi/login.php';
     }
 
     public function autentikasi()
@@ -54,12 +54,12 @@ class AutentikasiController
                 $error = true;
             }
             // Jika autentikasi gagal, tampilkan halaman login dengan error
-            require_once __DIR__ . '/../views/login.php';
+            require_once __DIR__ . '/../views/autentikasi/login.php';
         }
     }
 
     public function logout()
     {
-        require_once __DIR__ . '/../views/logout.php';
+        require_once __DIR__ . '/../views/autentikasi/logout.php';
     }
 }

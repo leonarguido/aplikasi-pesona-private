@@ -2,7 +2,8 @@
 <html lang="en">
 
 <head>
-    <?php require 'layout/header.php'; ?>
+    <?php require __DIR__ . '/../layout/header.php'; ?>
+    <?php $judul_halaman = "Permintaan Saya"; ?>
 </head>
 
 <body id="page-top">
@@ -10,14 +11,14 @@
     <div id="content-wrapper" class="d-flex flex-column">
         <div id="content" class="row">
             <div class="col-md-2">
-                <?php require 'layout/sidebar.php'; ?>
+                <?php require __DIR__ . '/../layout/sidebar.php'; ?>
             </div>
             <div class="col-md-10">
-                <?php require 'layout/topbar.php'; ?>
+                <?php require __DIR__ . '/../layout/topbar.php'; ?>
                 <div class="container-fluid mt-4">
 
-                    <h1 class="h3 mb-2 text-gray-800">Riwayat Permintaan Saya</h1>
-                    <p class="mb-4">Berikut adalah daftar status permintaan barang yang pernah Anda ajukan.</p>
+                    <!-- <h1 class="h3 mb-2 text-gray-800">Riwayat Permintaan Saya</h1>
+                    <p class="mb-4">Berikut adalah daftar status permintaan barang yang pernah Anda ajukan.</p> -->
 
                     <div class="card shadow mb-4">
                         <div class="card-header py-3 border-bottom-primary">
@@ -178,13 +179,25 @@
 
     <script>
         $(document).ready(function() {
-            $('#myTable').DataTable({
-                dom: 'Bfrtip',
-                buttons: [
-                    'copy', 'csv', 'excel', 'pdf', 'print'
-                ]
+        if (!$.fn.DataTable.isDataTable('#dataTable')) {
+            $('#dataTable').DataTable({
+                "language": {
+                    "search": "Cari Permintaan:",
+                    "lengthMenu": "Tampilkan _MENU_ antrian",
+                    "zeroRecords": "Tidak ada permintaan yang cocok",
+                    "info": "Menampilkan _PAGE_ dari _PAGES_",
+                    "infoEmpty": "Tidak ada data",
+                    "infoFiltered": "(difilter dari _MAX_ total data)",
+                    "paginate": {
+                        "first": "Awal",
+                        "last": "Akhir",
+                        "next": "Lanjut",
+                        "previous": "Kembali"
+                    }
+                }
             });
-        });
+        }
+    });
         if (window.innerHeight <= 700) {
             document.getElementById('accordionSidebar')
                 .style.height = '100vh';

@@ -2,21 +2,22 @@
 <html lang="en">
 
 <head>
-    <?php require 'layout/header.php'; ?>
+    <?php require __DIR__ . '/../layout/header.php'; ?>
+    <?php $judul_halaman = "Data Barang"; ?>
 </head>
 
 <body id="page-top">
     <div id="content-wrapper" class="d-flex flex-column">
         <div id="content" class="row">
             <div class="col-md-2">
-                <?php require 'layout/sidebar.php'; ?>
+                <?php require __DIR__ . '/../layout/sidebar.php'; ?>
             </div>
             <div class="col-md-10">
-                <?php require 'layout/topbar.php'; ?>
+                <?php require __DIR__ . '/../layout/topbar.php'; ?>
                 <div class="container-fluid mt-4">
 
-                    <h1 class="h3 mb-2 text-gray-800">Data Barang Bergerak</h1>
-                    <p class="mb-4">Kelola stok barang, tambah manual, atau import via Excel.</p>
+                    <!-- <h1 class="h3 mb-2 text-gray-800">Data Barang Bergerak</h1>
+                    <p class="mb-4">Kelola stok barang, tambah manual, atau import via Excel.</p> -->
 
                     <div class="card shadow mb-4">
                         <div class="card-header py-3 d-flex justify-content-between align-items-center">
@@ -31,7 +32,7 @@
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
-                                <table class="table table-bordered table-hover" id="myTable" width="100%" cellspacing="0">
+                                <table class="table table-bordered table-hover" id="dataTable" width="100%" cellspacing="0">
                                     <thead class="thead-light">
                                         <tr>
                                             <th width="5%">No</th>
@@ -214,13 +215,25 @@
 
     <script>
         $(document).ready(function() {
-            $('#myTable').DataTable({
-                dom: 'Bfrtip',
-                buttons: [
-                    'copy', 'csv', 'excel', 'pdf', 'print'
-                ]
+        if (!$.fn.DataTable.isDataTable('#dataTable')) {
+            $('#dataTable').DataTable({
+                "language": {
+                    "search": "Cari Barang:",
+                    "lengthMenu": "Tampilkan _MENU_ antrian",
+                    "zeroRecords": "Tidak ada barang yang cocok",
+                    "info": "Menampilkan _PAGE_ dari _PAGES_",
+                    "infoEmpty": "Tidak ada data",
+                    "infoFiltered": "(difilter dari _MAX_ total data)",
+                    "paginate": {
+                        "first": "Awal",
+                        "last": "Akhir",
+                        "next": "Lanjut",
+                        "previous": "Kembali"
+                    }
+                }
             });
-        });
+        }
+    });
         if (window.innerHeight <= 700) {
             document.getElementById('accordionSidebar')
                 .style.height = '100vh';

@@ -4,139 +4,246 @@ class UserController
 {
     protected $base_url = '/aplikasi-pesona-private/routes/web.php/?method=';
 
-    public function data_pengguna_page()
+    // MASUK HALAMAN DAFTAR BARANG
+    public function daftar_barang_page()
     {
         session_start();
         require __DIR__ . '/../config/koneksi.php';
 
-        // 1. Cek Login & Akses
         if (!isset($_SESSION['user_id'])) {
             header("Location: login.php");
             exit;
         }
 
-        // Hanya Super Admin yang boleh akses halaman ini
-        if ($_SESSION['role'] != 'super_admin') {
-            echo "<script>alert('Akses Ditolak!'); window.location='index.php';</script>";
-            exit;
+        // Inisialisasi Keranjang jika belum ada
+        if (!isset($_SESSION['keranjang'])) {
+            $_SESSION['keranjang'] = [];
         }
 
-        require_once '../views/data_pengguna.php';
+        require_once '../views/user/daftar_barang.php';
     }
 
-    // A. PROSES TAMBAH USER
-    public function tambah_data_pengguna()
+    // A. PROSES TAMBAH KE KERANJANG
+    public function tambah_keranjang_item()
     {
-        require __DIR__ . '/../config/koneksi.php';
+        session_start();
 
-        if (isset($_POST['tambah_user'])) {
-            $nama     = mysqli_real_escape_string($koneksi, $_POST['nama']);
-            $nip      = mysqli_real_escape_string($koneksi, $_POST['nip']);
-            $username = mysqli_real_escape_string($koneksi, $_POST['username']);
-            $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-            $role     = $_POST['role']; // Ambil value dari select option
+        if (isset($_POST['tambah_keranjang'])) {
+            $id_barang   = $_POST['id_barang'];
+            $nama_barang = $_POST['nama_barang'];
+            $jumlah      = $_POST['jumlah'];
+            $satuan      = $_POST['satuan'];
+            $stok_max    = $_POST['stok_max'];
 
-            // Upload Tanda Tangan
-            $paraf_name = null;
-            if (!empty($_FILES['paraf']['name'])) {
-                $filename   = $_FILES['paraf']['name'];
-                $filesize   = $_FILES['paraf']['size'];
-                $ext        = pathinfo($filename, PATHINFO_EXTENSION);
-                $allowed    = ['png', 'jpg', 'jpeg'];
-
-                if (!in_array(strtolower($ext), $allowed)) {
-                    echo "<script>alert('Format TTD harus PNG, JPG, atau JPEG!'); window.location='" . $this->base_url . "data_pengguna';</script>";
-                    exit;
+            // Cek apakah barang sudah ada di keranjang?
+            $sudah_ada = false;
+            foreach ($_SESSION['keranjang'] as $key => $item) {
+                if ($item['id'] == $id_barang) {
+                    // Kalau sudah ada, update jumlahnya
+                    $_SESSION['keranjang'][$key]['jumlah'] += $jumlah;
+                    // Validasi jangan sampai melebihi stok
+                    if ($_SESSION['keranjang'][$key]['jumlah'] > $stok_max) {
+                        $_SESSION['keranjang'][$key]['jumlah'] = $stok_max;
+                    }
+                    $sudah_ada = true;
+                    break;
                 }
-                if ($filesize > 2000000) {
-                    echo "<script>alert('Ukuran file TTD terlalu besar (Max 2MB)!'); window.location='" . $this->base_url . "data_pengguna';</script>";
-                    exit;
-                }
-
-                $paraf_name = date('Ymd_His') . '_' . uniqid() . '.' . $ext;
-                move_uploaded_file($_FILES['paraf']['tmp_name'], 'assets/img/ttd/' . $paraf_name);
             }
 
-            $q = "INSERT INTO tb_user (nama, nip, username, password, role, paraf) 
-          VALUES ('$nama', '$nip', '$username', '$password', '$role', '$paraf_name')";
-
-            if (mysqli_query($koneksi, $q)) {
-                echo "<script>alert('User Berhasil Ditambahkan!'); window.location='" . $this->base_url . "data_pengguna';</script>";
-            } else {
-                echo "<script>alert('Gagal menambah user: " . mysqli_error($koneksi) . "');</script>";
+            // Jika belum ada, masukkan baru
+            if (!$sudah_ada) {
+                $_SESSION['keranjang'][] = [
+                    'id' => $id_barang,
+                    'nama' => $nama_barang,
+                    'jumlah' => $jumlah,
+                    'satuan' => $satuan,
+                    'stok_max' => $stok_max
+                ];
             }
+
+            echo "<script>alert('Barang masuk keranjang!'); window.location='" . $this->base_url . "daftar_barang';</script>";
         }
     }
 
-    // B. PROSES EDIT USER
-    public function edit_data_pengguna()
-    {
-        require __DIR__ . '/../config/koneksi.php';
-        // var_dump($_POST);
-        // exit;
-
-        if (isset($_POST['edit_user'])) {
-            $id       = $_POST['id_user'];
-            $nama     = mysqli_real_escape_string($koneksi, $_POST['nama']);
-            $nip      = mysqli_real_escape_string($koneksi, $_POST['nip']);
-            $username = mysqli_real_escape_string($koneksi, $_POST['username']);
-            $role     = $_POST['role'];
-
-            // Password Logic
-            if (!empty($_POST['password'])) {
-                $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-                $q_pass = ", password='$password'";
-            } else {
-                $q_pass = "";
-            }
-
-            // TTD Logic
-            $q_ttd = "";
-            if (!empty($_FILES['paraf']['name'])) {
-                $filename   = $_FILES['paraf']['name'];
-                $ext        = pathinfo($filename, PATHINFO_EXTENSION);
-                $paraf_name = date('Ymd_His') . '_' . uniqid() . '.' . $ext;
-                move_uploaded_file($_FILES['paraf']['tmp_name'], 'assets/img/ttd/' . $paraf_name);
-                $q_ttd = ", paraf='$paraf_name'";
-            }
-
-            $q = "UPDATE tb_user SET 
-          nama='$nama', nip='$nip', username='$username', role='$role' $q_pass $q_ttd
-          WHERE id='$id'";
-
-            if (mysqli_query($koneksi, $q)) {
-                echo "<script>alert('Data User Diupdate!'); window.location='" . $this->base_url . "data_pengguna';</script>";
-            } else {
-                echo "<script>alert('Gagal update!');</script>";
-            }
-        }
-    }
-
-    // C. PROSES HAPUS USER
-    public function hapus_data_pengguna()
+    // MASUK HALAMAN KERANJANG
+    public function keranjang()
     {
         session_start();
         require __DIR__ . '/../config/koneksi.php';
 
+        if (!isset($_SESSION['user_id'])) {
+            header("Location: login.php");
+            exit;
+        }
+
+        require_once '../views/user/keranjang.php';
+    }
+
+    // A. PROSES HAPUS ITEM DARI KERANJANG
+    public function hapus_keranjang_item()
+    {
+        session_start();
+
         if (isset($_GET['hapus'])) {
-            $id = $_GET['hapus'];
-            $q_img = mysqli_query($koneksi, "SELECT paraf FROM tb_user WHERE id='$id'");
-            $row_img = mysqli_fetch_assoc($q_img);
-            if ($row_img['paraf'] != null && file_exists('assets/img/ttd/' . $row_img['paraf'])) {
-                unlink('assets/img/ttd/' . $row_img['paraf']);
+            $key = $_GET['hapus'];
+            unset($_SESSION['keranjang'][$key]);
+            // Reset urutan array agar rapi
+            $_SESSION['keranjang'] = array_values($_SESSION['keranjang']);
+            echo "<script>window.location='" . $this->base_url . "keranjang';</script>";
+        }
+    }
+
+    // B. PROSES CHECKOUT/PENGAJUAN BARANG
+    public function checkout_keranjang()
+    {
+        session_start();
+        require __DIR__ . '/../config/koneksi.php';
+
+        if (isset($_POST['checkout'])) {
+            $user_id   = $_SESSION['user_id'];
+            $keperluan = mysqli_real_escape_string($koneksi, $_POST['keperluan']);
+            $tanggal   = date('Y-m-d');
+
+            // Validasi Keranjang Kosong
+            if (empty($_SESSION['keranjang'])) {
+                echo "<script>alert('Keranjang kosong!'); window.location='" . $this->base_url . "daftar_barang';</script>";
+                exit;
             }
 
-            $q = "DELETE FROM tb_user WHERE id='$id'";
-            if (mysqli_query($koneksi, $q)) {
-                echo "<script>alert('User Dihapus!'); window.location='" . $this->base_url . "data_pengguna';</script>";
+            // A. INSERT HEADER (tb_permintaan) - HANYA SEKALI!
+            $query_header = "INSERT INTO tb_permintaan (user_id, tanggal_permintaan, status, keperluan) 
+                     VALUES ('$user_id', '$tanggal', 'menunggu', '$keperluan')";
+
+            if (mysqli_query($koneksi, $query_header)) {
+                // Ambil ID Permintaan yang baru saja dibuat
+                $id_permintaan_baru = mysqli_insert_id($koneksi);
+
+                // B. INSERT DETAIL (Looping Keranjang)
+                $berhasil_detail = true;
+                foreach ($_SESSION['keranjang'] as $item) {
+                    $id_barang = $item['id'];
+                    $jumlah    = $item['jumlah'];
+                    $satuan    = $item['satuan'];
+
+                    // Masukkan ke tb_detail_permintaan dengan ID Header yang SAMA
+                    $q_detail = "INSERT INTO tb_detail_permintaan (permintaan_id, barang_id, jumlah, satuan) 
+                         VALUES ('$id_permintaan_baru', '$id_barang', '$jumlah', '$satuan')";
+
+                    if (!mysqli_query($koneksi, $q_detail)) {
+                        $berhasil_detail = false;
+                    }
+                }
+
+                if ($berhasil_detail) {
+                    // Kosongkan Keranjang
+                    unset($_SESSION['keranjang']);
+                    echo "<script>alert('Permintaan berhasil diajukan! Satu surat untuk semua barang.'); window.location='" . $this->base_url . "permintaan_saya';</script>";
+                } else {
+                    echo "<script>alert('Gagal menyimpan detail barang.');</script>";
+                }
             } else {
-                echo "<script>alert('Gagal hapus!');</script>";
+                echo "<script>alert('Gagal membuat permintaan: " . mysqli_error($koneksi) . "');</script>";
             }
         }
     }
 
+    // MASUK HALAMAN PERMINTAAN SAYA
+    public function permintaan_saya_page()
+    {
+        require __DIR__ . '/../config/koneksi.php';
+        session_start();
+
+        // 1. Cek Login (Hanya User/Staff)
+        if (!isset($_SESSION['user_id'])) {
+            header("Location: login.php");
+            exit;
+        }
+
+        require_once '../views/user/permintaan_saya.php';
+    }
+
+    // A. PROSES BATALKAN PERMINTAAN SAYA
+    public function batalkan_permintaan_saya()
+    {
+        session_start();
+        require __DIR__ . '/../config/koneksi.php';
+
+        if (isset($_GET['batal_id'])) {
+            $id_batal = $_GET['batal_id'];
+            $id_user = $_SESSION['user_id'];
+            // Cek keamanan: Pastikan permintaan milik user ini dan status 'menunggu'
+            $cek = mysqli_query($koneksi, "SELECT status FROM tb_permintaan WHERE id='$id_batal' AND user_id='$id_user'");
+            $d = mysqli_fetch_assoc($cek);
+
+            if ($d && $d['status'] == 'menunggu') {
+                mysqli_query($koneksi, "DELETE FROM tb_detail_permintaan WHERE permintaan_id='$id_batal'");
+                mysqli_query($koneksi, "DELETE FROM tb_permintaan WHERE id='$id_batal'");
+                echo "<script>alert('Permintaan berhasil dibatalkan.'); window.location='" . $this->base_url . "permintaan_saya';</script>";
+            } else {
+                echo "<script>alert('Gagal! Permintaan tidak bisa dibatalkan.'); window.location='" . $this->base_url . "permintaan_saya';</script>";
+            }
+        }
+    }
+
+    // B. PROSES EDIT PERMINTAAN SAYA
+    public function edit_permintaan_saya()
+    {
+        require __DIR__ . '/../config/koneksi.php';
+
+        if (isset($_POST['update_permintaan'])) {
+            $id_details = $_POST['id_detail']; // Array ID Detail
+            $jumlahs    = $_POST['jumlah'];    // Array Jumlah Baru
+
+            for ($i = 0; $i < count($id_details); $i++) {
+                $curr_id  = $id_details[$i];
+                $curr_jml = $jumlahs[$i];
+                mysqli_query($koneksi, "UPDATE tb_detail_permintaan SET jumlah='$curr_jml' WHERE id='$curr_id'");
+            }
+
+            echo "<script>alert('Perubahan jumlah berhasil disimpan!'); window.location='" . $this->base_url . "permintaan_saya';</script>";
+        }
+    }
+
+    // C. PROSES CETAK SURAT PERMINTAAN
+    public function cetak_surat()
+    {
+        session_start();
+        require __DIR__ . '/../config/koneksi.php';
+
+        if (!isset($_SESSION['user_id']) || !isset($_GET['id'])) {
+            header("Location: index.php");
+            exit;
+        }
+
+        $id_permintaan = $_GET['id'];
+
+        // ============================================
+        // QUERY 1: AMBIL DATA HEADER (User, Admin, Tgl)
+        // ============================================
+        // Perbaikan: Mengambil kolom 'paraf' tapi kita alias-kan jadi 'ttd_...' biar mudah
+        $query_header = "SELECT p.*, 
+                 u_pemohon.nama AS nama_pemohon, u_pemohon.nip AS nip_pemohon, u_pemohon.paraf AS ttd_pemohon,
+                 u_admin.nama AS nama_admin, u_admin.nip AS nip_admin, u_admin.paraf AS ttd_admin
+                 FROM tb_permintaan p
+                 JOIN tb_user u_pemohon ON p.user_id = u_pemohon.id
+                 LEFT JOIN tb_user u_admin ON p.admin_id = u_admin.id
+                 WHERE p.id = '$id_permintaan'";
+
+        $result_header = mysqli_query($koneksi, $query_header);
+        $data = mysqli_fetch_assoc($result_header);
+
+        // Validasi: Hanya bisa dicetak jika sudah DISETUJUI
+        if ($data['status'] != 'disetujui') {
+            echo "<script>alert('Surat belum bisa dicetak karena status belum disetujui!'); window.close();</script>";
+            exit;
+        }
+
+        require_once '../views/user/cetak_surat.php';
+    }
+
+    // MASUK HALAMAN PROFIL PENGGUNA
     public function profil_page()
     {
-        require_once '../views/profil.php';
+        require_once '../views/pengguna/profil.php';
     }
 }

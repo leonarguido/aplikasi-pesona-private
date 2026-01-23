@@ -8,12 +8,8 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
-
-// =============================================================
-// SET JUDUL HALAMAN
-// =============================================================
+// Set Judul Halaman
 $judul_halaman = "Dashboard";
-
 
 // Ambil Role & ID User
 $role    = $_SESSION['role'];

@@ -1,22 +1,18 @@
 <?php 
 
-require_once __DIR__ . '/../controllers/DashboardController.php';
+require_once __DIR__ . '/../controllers/AdminController.php';
 require_once __DIR__ . '/../controllers/AutentikasiController.php';
-require_once __DIR__ . '/../controllers/BarangBergerakController.php';
-require_once __DIR__ . '/../controllers/BarangTidakBergerakController.php';
+require_once __DIR__ . '/../controllers/DashboardController.php';
 require_once __DIR__ . '/../controllers/LogBarangBergerakController.php';
-require_once __DIR__ . '/../controllers/LaporanController.php';
-require_once __DIR__ . '/../controllers/PermintaanController.php';
+require_once __DIR__ . '/../controllers/PimpinanController.php';
 require_once __DIR__ . '/../controllers/UserController.php';
 
 
-$dashboard = new DashboardController();
+$admin = new AdminController();
 $autentikasi = new AutentikasiController();
-$barangBergerak = new BarangBergerakController();
-$barangTidakBergerak = new BarangTidakBergerakController();
+$dashboard = new DashboardController();
 $logBarangBergerak = new LogBarangBergerakController();
-$laporan = new LaporanController();
-$permintaan = new PermintaanController();
+$pimpinan = new PimpinanController();
 $user = new UserController();
 
 if (isset($_GET['method'])) {
@@ -27,6 +23,7 @@ if (isset($_GET['method'])) {
 // ==========================================
 // RUTE AUTENTIKASI CONTROLLER
 // ==========================================
+
         // AUTENTIKASI
         case 'login':
             $autentikasi->login();
@@ -39,43 +36,93 @@ if (isset($_GET['method'])) {
             break;
 
 // ==========================================
-// RUTE BARANG BERGERAK CONTROLLER
+// RUTE ADMIN CONTROLLER
+// ==========================================
+
+        // DATA BARANG
+        case 'data_barang':
+            $admin->data_barang_page();
+            break;
+        case 'import_excel_data_barang':
+            $admin->import_excel_data_barang();
+            break;
+        case 'tambah_data_barang':
+            $admin->tambah_data_barang();
+            break;
+        case 'edit_data_barang':
+            $admin->edit_data_barang();
+            break;
+        case 'hapus_data_barang':
+            $admin->hapus_data_barang();
+            break;
+
+        case 'persetujuan':
+            $admin->persetujuan_page();
+            break;
+        case 'riwayat_persetujuan':
+            $admin->riwayat_persetujuan_page();
+            break;
+        case 'proses_persetujuan':
+            $admin->proses_persetujuan();
+            break;
+        case 'proses_penolakan':
+            $admin->proses_penolakan();
+            break;
+            
+        // USER MANAGEMENT
+        case 'data_pengguna':
+            $admin->data_pengguna_page();
+            break;
+        case 'tambah_data_pengguna':
+            $admin->tambah_data_pengguna();
+            break;
+        case 'edit_data_pengguna':
+            $admin->edit_data_pengguna();
+            break;
+        case 'hapus_data_pengguna':
+            $admin->hapus_data_pengguna();
+            break;
+        
+// ==========================================
+// RUTE USER CONTROLLER
 // ==========================================
 
         // DAFTAR BARANG DAN KERANJANG
         case 'daftar_barang':
-            $barangBergerak->daftar_barang_page();
+            $user->daftar_barang_page();
             break;
         case 'keranjang':
-            $barangBergerak->keranjang();
+            $user->keranjang();
             break;
         case 'tambah_keranjang_item':
-            $barangBergerak->tambah_keranjang_item();
+            $user->tambah_keranjang_item();
             break;
         case 'hapus_keranjang_item':
-            $barangBergerak->hapus_keranjang_item();
+            $user->hapus_keranjang_item();
             break;
         case 'checkout_keranjang':
-            $barangBergerak->checkout_keranjang();
+            $user->checkout_keranjang();
             break;
 
-        // DATA BARANG
-        case 'data_barang':
-            $barangBergerak->data_barang_page();
+        // PERMINTAAN BARANG
+        case 'permintaan_saya':
+            $user->permintaan_saya_page();
             break;
-        case 'import_excel_data_barang':
-            $barangBergerak->import_excel_data_barang();
+        case 'batalkan_permintaan_saya':
+            $user->batalkan_permintaan_saya();
             break;
-        case 'tambah_data_barang':
-            $barangBergerak->tambah_data_barang();
+        case 'edit_permintaan_saya':
+            $user->edit_permintaan_saya();
             break;
-        case 'edit_data_barang':
-            $barangBergerak->edit_data_barang();
-            break;
-        case 'hapus_data_barang':
-            $barangBergerak->hapus_data_barang();
+        case 'cetak_surat':
+            $user->cetak_surat();
             break;
 
+        // PROFIL PENGGUNA
+        case 'profil_saya':
+            $user->profil_page();
+            break;
+        
 // ==========================================
 // RUTE LOG BARANG BERGERAK CONTROLLER
 // ==========================================
@@ -86,67 +133,23 @@ if (isset($_GET['method'])) {
             break;
 
 // ==========================================
-// RUTE PERMINTAAN CONTROLLER
+// RUTE PIMPINAN CONTROLLER
 // ==========================================
 
-        // PERMINTAAN BARANG
-        case 'permintaan_saya':
-            $permintaan->permintaan_saya_page();
-            break;
-        case 'batalkan_permintaan_saya':
-            $permintaan->batalkan_permintaan_saya();
-            break;
-        case 'edit_permintaan_saya':
-            $permintaan->edit_permintaan_saya();
-            break;
-        case 'persetujuan':
-            $permintaan->persetujuan_page();
-            break;
-        case 'proses_persetujuan':
-            $permintaan->proses_persetujuan();
-            break;
-        case 'proses_penolakan':
-            $permintaan->proses_penolakan();
-            break;
-        case 'cetak_surat':
-            $permintaan->cetak_surat();
-            break;
-        
-// ==========================================
-// RUTE USER CONTROLLER
-// ==========================================
-
-        // USER MANAGEMENT
-        case 'data_pengguna':
-            $user->data_pengguna_page();
-            break;
-        case 'tambah_data_pengguna':
-            $user->tambah_data_pengguna();
-            break;
-        case 'edit_data_pengguna':
-            $user->edit_data_pengguna();
-            break;
-        case 'hapus_data_pengguna':
-            $user->hapus_data_pengguna();
-            break;
-        case 'profil_saya':
-            $user->profil_page();
-            break;
-
-// ==========================================
-// RUTE LAPORAN CONTROLLER
-// ==========================================
-
+        // LAPORAN
         case 'laporan':
-            $laporan->laporan_page();
+            $pimpinan->laporan_page();
+            break;
+        case 'laporan_stok':
+            $pimpinan->laporan_stok_page();
             break;
         case 'cetak_laporan':
-            $laporan->cetak_laporan();
+            $pimpinan->cetak_laporan();
             break;        
 
 
+        // Default action or 404
         default:
-            // Default action or 404
             echo "Halaman tidak ditemukan.";
             break;
     }

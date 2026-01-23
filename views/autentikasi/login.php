@@ -3,7 +3,7 @@
 
 <head>
     <?php
-    require 'layout/header.php';
+    require __DIR__ . '/../layout/header.php';
     ?>
 </head>
 
