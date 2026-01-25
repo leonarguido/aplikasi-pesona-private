@@ -137,7 +137,7 @@ $id_user = $_SESSION['user_id'];
                                                 </thead>
                                                 <tbody>
                                                     <?php
-                                                    $q_low = mysqli_query($koneksi, "SELECT * FROM tb_barang_bergerak WHERE is_deleted=0 WHERE stok <= '$ambang_batas' ORDER BY stok ASC LIMIT 5");
+                                                    $q_low = mysqli_query($koneksi, "SELECT * FROM tb_barang_bergerak WHERE is_deleted=0 AND stok <= '$ambang_batas' ORDER BY stok ASC LIMIT 5");
                                                     if (mysqli_num_rows($q_low) > 0):
                                                         while ($low = mysqli_fetch_assoc($q_low)):
                                                     ?>
