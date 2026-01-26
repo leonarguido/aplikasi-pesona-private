@@ -101,12 +101,12 @@ if (isset($_GET['tgl_mulai']) && isset($_GET['tgl_selesai'])) {
                 <td>
                     <ul style="margin: 0; padding-left: 20px;">
                         <?php 
-                        $q_detail = mysqli_query($koneksi, "SELECT d.jumlah, d.satuan, b.nama_barang 
+                        $q_detail = mysqli_query($koneksi, "SELECT d.jumlah, d.satuan, b.nama_barang, b.merk_barang
                                                             FROM tb_detail_permintaan d
                                                             JOIN tb_barang_bergerak b ON d.barang_id = b.id
                                                             WHERE d.permintaan_id = '$id_req'");
                         while($item = mysqli_fetch_assoc($q_detail)){
-                            echo "<li>{$item['nama_barang']} : <b>{$item['jumlah']} {$item['satuan']}</b></li>";
+                            echo "<li>{$item['nama_barang']} ({$item['merk_barang']}) : <b>{$item['jumlah']} {$item['satuan']}</b></li>";
                         }
                         ?>
                     </ul>

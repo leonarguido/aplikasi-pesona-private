@@ -99,12 +99,12 @@ require 'layout/topbar.php';
                             <td>
                                 <ul class="pl-3 mb-0" style="font-size: 0.9rem;">
                                 <?php 
-                                    $q_detail = mysqli_query($koneksi, "SELECT d.jumlah, d.satuan, b.nama_barang 
+                                    $q_detail = mysqli_query($koneksi, "SELECT d.jumlah, d.satuan, b.nama_barang, b.merk_barang
                                                                         FROM tb_detail_permintaan d 
                                                                         JOIN tb_barang_bergerak b ON d.barang_id = b.id 
                                                                         WHERE d.permintaan_id = '$id_req'");
                                     while($d = mysqli_fetch_assoc($q_detail)){
-                                        echo "<li class='mb-1'>{$d['nama_barang']} (<b>{$d['jumlah']} {$d['satuan']}</b>)</li>";
+                                        echo "<li class='mb-1'>{$d['nama_barang']} ({$d['merk_barang']}) (<b>{$d['jumlah']} {$d['satuan']}</b>)</li>";
                                     }
                                 ?>
                                 </ul>
@@ -165,7 +165,7 @@ require 'layout/topbar.php';
                                                             </thead>
                                                             <tbody>
                                                                 <?php 
-                                                                $q_edit = mysqli_query($koneksi, "SELECT d.id AS id_detail, d.jumlah, d.satuan, b.nama_barang, b.stok AS stok_gudang 
+                                                                $q_edit = mysqli_query($koneksi, "SELECT d.id AS id_detail, d.jumlah, d.satuan, b.nama_barang, b.merk_barang, b.stok AS stok_gudang 
                                                                                                   FROM tb_detail_permintaan d 
                                                                                                   JOIN tb_barang_bergerak b ON d.barang_id = b.id 
                                                                                                   WHERE d.permintaan_id = '$id_req'");
@@ -173,7 +173,7 @@ require 'layout/topbar.php';
                                                                 ?>
                                                                 <tr>
                                                                     <td>
-                                                                        <?= $edit['nama_barang']; ?>
+                                                                        <?= $edit['nama_barang']; ?> (<?= $edit['merk_barang']; ?>)
                                                                         <br><small class="text-success">Sisa Stok Gudang: <?= $edit['stok_gudang']; ?></small>
                                                                     </td>
                                                                     <td>

@@ -30,12 +30,13 @@ if (isset($_POST['import_excel'])) {
             while (($data = fgetcsv($file, 10000, ",")) !== FALSE) {
                 $kode   = mysqli_real_escape_string($koneksi, $data[0]);
                 $nama   = mysqli_real_escape_string($koneksi, $data[1]);
-                $satuan = mysqli_real_escape_string($koneksi, $data[2]);
-                $stok   = (int) $data[3];
-                $desc   = mysqli_real_escape_string($koneksi, $data[4]);
+                $merk   = mysqli_real_escape_string($koneksi, $data[2]);
+                $satuan = mysqli_real_escape_string($koneksi, $data[3]);
+                $stok   = (int) $data[4];
+                $desc   = mysqli_real_escape_string($koneksi, $data[5]);
                 $cek = mysqli_query($koneksi, "SELECT kode_barang FROM tb_barang_bergerak WHERE kode_barang = '$kode'");
                 if (mysqli_num_rows($cek) == 0 && !empty($kode)) {
-                    $query = "INSERT INTO tb_barang_bergerak (kode_barang, nama_barang, satuan, stok, keterangan) VALUES ('$kode', '$nama', '$satuan', '$stok', '$desc')";
+                    $query = "INSERT INTO tb_barang_bergerak (kode_barang, nama_barang, merk_barang, satuan, stok, keterangan) VALUES ('$kode', '$nama', '$merk', '$satuan', '$stok', '$desc')";
                     mysqli_query($koneksi, $query);
                     $count++;
                 }
@@ -51,6 +52,7 @@ if (isset($_POST['import_excel'])) {
 // B. Tambah Manual
 if (isset($_POST['tambah'])) {
     $kode   = $_POST['kode_barang'];
+    $merk   = $_POST['merk_barang'];
     $nama   = $_POST['nama_barang'];
     $satuan = $_POST['satuan'];
     $desc   = $_POST['keterangan']; 
@@ -59,7 +61,7 @@ if (isset($_POST['tambah'])) {
     if (mysqli_num_rows($cek) > 0) {
         echo "<script>alert('Kode Barang sudah ada!');</script>";
     } else {
-        $query = "INSERT INTO tb_barang_bergerak (kode_barang, nama_barang, satuan, keterangan, stok) VALUES ('$kode', '$nama', '$satuan', '$desc', '$stok')";
+        $query = "INSERT INTO tb_barang_bergerak (kode_barang, merk_barang, nama_barang, satuan, keterangan, stok) VALUES ('$kode', '$merk', '$nama', '$satuan', '$desc', '$stok')";
         if (mysqli_query($koneksi, $query)) {
             echo "<script>alert('Barang berhasil ditambahkan!'); window.location='data_barang.php';</script>";
         } else {
@@ -71,11 +73,12 @@ if (isset($_POST['tambah'])) {
 // C. Edit Barang
 if (isset($_POST['edit'])) {
     $id     = $_POST['id'];
+    $merk   = $_POST['merk_barang'];
     $nama   = $_POST['nama_barang'];
     $satuan = $_POST['satuan'];
     $desc   = $_POST['keterangan'];
     $stok   = $_POST['stok'];
-    $query = "UPDATE tb_barang_bergerak SET nama_barang='$nama', satuan='$satuan', keterangan='$desc', stok='$stok' WHERE id='$id'";
+    $query = "UPDATE tb_barang_bergerak SET merk_barang='$merk', nama_barang='$nama', satuan='$satuan', keterangan='$desc', stok='$stok' WHERE id='$id'";
     if (mysqli_query($koneksi, $query)) {
         echo "<script>alert('Data berhasil diupdate!'); window.location='data_barang.php';</script>";
     }
@@ -125,6 +128,7 @@ require 'layout/topbar.php';
                         <tr>
                             <th width="5%">No</th>
                             <th>Kode</th>
+                            <th>Merk</th>
                             <th>Nama Barang</th>
                             <th>Satuan</th>
                             <th class="text-center">Stok</th>
@@ -143,6 +147,7 @@ require 'layout/topbar.php';
                         <tr>
                             <td><?= $no++; ?></td>
                             <td><?= $row['kode_barang']; ?></td>
+                            <td><?= $row['merk_barang']; ?></td>
                             <td class="font-weight-bold text-primary"><?= $row['nama_barang']; ?></td>
                             <td><?= $row['satuan']; ?></td>
                             
@@ -183,6 +188,12 @@ require 'layout/topbar.php';
                                                 <input type="text" name="nama_barang" class="form-control" value="<?= $row['nama_barang']; ?>" required>
                                             </div>
                                             <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label>Merk Barang</label>
+                                                        <input type="text" name="merk_barang" class="form-control" value="<?= $row['merk_barang']; ?>" required>
+                                                    </div>
+                                                </div>
                                                 <div class="col-md-6">
                                                     <div class="form-group">
                                                         <label>Stok</label>
@@ -274,6 +285,12 @@ require 'layout/topbar.php';
                         <input type="text" name="nama_barang" class="form-control" required>
                     </div>
                     <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Merk Barang</label>
+                                <input type="text" name="merk_barang" class="form-control" placeholder="Snowman, Bola Dunia, Toshiba" required>
+                            </div>
+                        </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label>Satuan</label>

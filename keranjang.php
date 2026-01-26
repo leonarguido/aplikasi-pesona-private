@@ -105,7 +105,7 @@ require 'layout/topbar.php';
                                     <?php foreach($_SESSION['keranjang'] as $key => $item): ?>
                                     <tr>
                                         <td><?= $key + 1; ?></td>
-                                        <td><?= $item['nama']; ?></td>
+                                        <td><?= $item['nama']; ?> (<?= $item['merk']; ?>)</td>
                                         <td><?= $item['jumlah']; ?></td>
                                         <td><?= $item['satuan']; ?></td>
                                         <td>

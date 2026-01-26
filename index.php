@@ -133,7 +133,7 @@ $id_user = $_SESSION['user_id'];
                                         while($low = mysqli_fetch_assoc($q_low)):
                                     ?>
                                     <tr>
-                                        <td><?= $low['nama_barang']; ?></td>
+                                        <td><?= $low['nama_barang']; ?> (<?= $low['merk_barang']; ?>)</td>
                                         <td><?= $low['satuan']; ?></td>
                                         <td class="text-center text-danger font-weight-bold"><?= $low['stok']; ?></td>
                                         <td class="text-center">
