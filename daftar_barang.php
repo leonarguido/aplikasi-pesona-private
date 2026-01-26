@@ -99,7 +99,7 @@ $jml_item_keranjang = count($_SESSION['keranjang']);
                     <tbody>
                         <?php
                         $no = 1;
-                        $query = "SELECT * FROM tb_barang_bergerak ORDER BY nama_barang ASC";
+                        $query = "SELECT * FROM tb_barang_bergerak WHERE is_deleted = 0 ORDER BY nama_barang ASC";
                         $result = mysqli_query($koneksi, $query);
                         
                         while ($row = mysqli_fetch_assoc($result)): 

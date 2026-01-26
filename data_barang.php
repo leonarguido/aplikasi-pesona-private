@@ -57,7 +57,7 @@ if (isset($_POST['tambah'])) {
     $satuan = $_POST['satuan'];
     $desc   = $_POST['keterangan']; 
     $stok   = $_POST['stok'];
-    $cek = mysqli_query($koneksi, "SELECT * FROM tb_barang_bergerak WHERE kode_barang = '$kode'");
+    $cek = mysqli_query($koneksi, "SELECT * FROM tb_barang_bergerak WHERE is_deleted = 0 AND kode_barang = '$kode'");
     if (mysqli_num_rows($cek) > 0) {
         echo "<script>alert('Kode Barang sudah ada!');</script>";
     } else {
@@ -87,7 +87,7 @@ if (isset($_POST['edit'])) {
 // D. Hapus Barang
 if (isset($_GET['hapus'])) {
     $id = $_GET['hapus'];
-    $query = "DELETE FROM tb_barang_bergerak WHERE id = '$id'";
+    $query = "UPDATE tb_barang_bergerak SET is_deleted = 1 WHERE id = '$id'";
     if (mysqli_query($koneksi, $query)) {
         echo "<script>alert('Barang berhasil dihapus!'); window.location='data_barang.php';</script>";
     }
@@ -139,7 +139,7 @@ require 'layout/topbar.php';
                     <tbody>
                         <?php
                         $no = 1;
-                        $query = "SELECT * FROM tb_barang_bergerak ORDER BY nama_barang ASC";
+                        $query = "SELECT * FROM tb_barang_bergerak WHERE is_deleted = 0 ORDER BY nama_barang ASC";
                         $data = mysqli_query($koneksi, $query);
                         
                         while ($row = mysqli_fetch_assoc($data)): 
