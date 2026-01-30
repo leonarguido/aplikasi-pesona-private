@@ -64,7 +64,6 @@
                                     <tbody>
                                         <?php
                                         $no = 1;
-                                        // Ambil semua data barang diurutkan nama
                                         $query = mysqli_query($koneksi, "SELECT * FROM tb_barang_bergerak WHERE is_deleted=0 ORDER BY nama_barang ASC");
 
                                         while ($row = mysqli_fetch_assoc($query)):
@@ -74,7 +73,7 @@
                                             if ($row['stok'] == 0) {
                                                 $status = "<span class='badge badge-danger'>Habis</span>";
                                                 $class_stok = "color: red; font-weight: bold;";
-                                            } elseif ($row['stok'] < 10) { // Angka 10 bisa diubah sesuai kebijakan
+                                            } elseif ($row['stok'] <= 10) { // Angka 10 bisa diubah sesuai kebijakan
                                                 $status = "<span class='badge badge-warning'>Menipis</span>";
                                                 $class_stok = "color: orange; font-weight: bold;";
                                             } else {
@@ -124,6 +123,7 @@
                     "language": {
                         "search": "Cari Stok:",
                         "lengthMenu": "Tampilkan _MENU_ antrian",
+                        "filter": '<select class="form-control form-control-sm"><option value="">Semua Status</option><option value="Aman">Aman</option><option value="Menipis">Menipis</option><option value="Habis">Habis</option></select>',
                         "zeroRecords": "Tidak ada stok yang cocok",
                         "info": "Menampilkan _PAGE_ dari _PAGES_",
                         "infoEmpty": "Tidak ada data",
@@ -136,8 +136,30 @@
                         }
                     }
                 });
+
+                let table = $('#dataTable').DataTable();
+                let status_filter = '<?= $status_stok; ?>';
+                // console.log("Status Filter dari PHP: ", status_filter);
+
+                $('#dataTable_filter').append(`
+                Filter:
+                    <label>
+                        <select name="status_stok" class="form-control form-control-sm">
+                            <option value="" ${status_filter === '' ? 'selected' : ''}>Semua Status</option>
+                            <option value="aman" ${status_filter === 'aman' ? 'selected' : ''}>Aman</option>
+                            <option value="menipis" ${status_filter === 'menipis' ? 'selected' : ''}>Menipis</option>
+                            <option value="habis" ${status_filter === 'habis' ? 'selected' : ''}>Habis</option>
+                        </select>
+                    </label>
+                    `);
+                table.column(6).search(status_filter).draw();
+
+                $(document).on('change', 'select[name="status_stok"]', function() {
+                    table.column(6).search(this.value).draw();
+                });
             }
         });
+
         if (window.innerHeight <= 700) {
             document.getElementById('accordionSidebar')
                 .style.height = '100vh';

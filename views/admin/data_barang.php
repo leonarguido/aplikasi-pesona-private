@@ -38,7 +38,7 @@
                                             <th width="5%">No</th>
                                             <th>Kode</th>
                                             <th>Merk Barang</th>
-                                            <th>Nama Barang</th>                                            
+                                            <th>Nama Barang</th>
                                             <th>Satuan</th>
                                             <th class="text-center">Stok</th>
                                             <th>Keterangan</th>

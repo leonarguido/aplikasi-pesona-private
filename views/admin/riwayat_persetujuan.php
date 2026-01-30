@@ -3,7 +3,7 @@
 
 <head>
     <?php require __DIR__ . '/../layout/header.php'; ?>
-    <?php $judul_halaman = "Laporan Stok Barang"; ?>
+    <?php $judul_halaman = "Laporan Riwayat Permintaan"; ?>
 </head>
 
 <body id="page-top">

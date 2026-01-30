@@ -2,7 +2,7 @@
 
 class AdminController
 {
-    protected $base_url = '/aplikasi-pesona-private/routes/web.php/?method=';
+    protected $base_url = '/aplikasi-pesona-private/routes/web.php/?page=';
 
     // MASUK HALAMAN DATA BARANG
     public function data_barang_page()
@@ -16,7 +16,12 @@ class AdminController
             exit;
         }
         if ($_SESSION['role'] == 'user' || $_SESSION['role'] == 'pimpinan') {
-            echo "<script>alert('Anda tidak memiliki akses!'); window.location='index.php';</script>";
+            $_SESSION['alert'] = [
+                'icon' => 'error',
+                'title' => 'Akses Ditolak!',
+            ];
+            // 'text' => 'Anda tidak memiliki akses!'
+            header("Location: index.php");
             exit;
         }
 
@@ -27,6 +32,7 @@ class AdminController
     public function tambah_data_barang()
     {
         require __DIR__ . '/../config/koneksi.php';
+        session_start();
 
         if (isset($_POST['tambah'])) {
             $kode   = $_POST['kode_barang'];
@@ -38,12 +44,23 @@ class AdminController
 
             $cek = mysqli_query($koneksi, "SELECT * FROM tb_barang_bergerak WHERE is_deleted=0 AND kode_barang = '$kode'");
             if (mysqli_num_rows($cek) > 0) {
-                echo "<script>alert('Kode Barang sudah ada!'); window.location='" . $this->base_url . "data_barang';</script>";
+                // echo "<script>alert('Kode Barang sudah ada!'); window.location='" . $this->base_url . "data_barang';</script>";
+                $_SESSION['alert'] = [
+                    'icon' => 'error',
+                    'title' => 'Kode Barang sudah ada!',
+                ];
+                header("Location: " . $this->base_url . "data_barang");
+                exit;
             } else {
                 $query = "INSERT INTO tb_barang_bergerak (kode_barang, merk_barang, nama_barang, satuan, keterangan, stok) 
                   VALUES ('$kode', '$merk', '$nama', '$satuan', '$desc', '$stok')";
                 if (mysqli_query($koneksi, $query)) {
-                    echo "<script>alert('Barang berhasil ditambahkan!'); window.location='" . $this->base_url . "data_barang';</script>";
+                    $_SESSION['alert'] = [
+                        'icon' => 'success',
+                        'title' => 'Barang berhasil ditambahkan!',
+                    ];
+                    header("Location: " . $this->base_url . "data_barang");
+                    exit;
                 } else {
                     echo "<script>alert('Gagal: " . mysqli_error($koneksi) . "');</script>";
                 }
@@ -56,6 +73,7 @@ class AdminController
     public function edit_data_barang()
     {
         require __DIR__ . '/../config/koneksi.php';
+        session_start();
 
         if (isset($_POST['edit'])) {
             $id     = $_POST['id'];
@@ -67,7 +85,12 @@ class AdminController
 
             $query = "UPDATE tb_barang_bergerak SET merk_barang='$merk', nama_barang='$nama', satuan='$satuan', keterangan='$desc', stok='$stok' WHERE id='$id'";
             if (mysqli_query($koneksi, $query)) {
-                echo "<script>alert('Data berhasil diupdate!'); window.location='" . $this->base_url . "data_barang';</script>";
+                $_SESSION['alert'] = [
+                    'icon' => 'success',
+                    'title' => 'Data barang berhasil diupdate!',
+                ];
+                header("Location: " . $this->base_url . "data_barang");
+                exit;
             }
         }
     }
@@ -76,12 +99,18 @@ class AdminController
     public function hapus_data_barang()
     {
         require __DIR__ . '/../config/koneksi.php';
+        session_start();
 
         if (isset($_GET['id'])) {
             $id = $_GET['id'];
             $query = "UPDATE tb_barang_bergerak SET is_deleted=1 WHERE id = '$id'";
             if (mysqli_query($koneksi, $query)) {
-                echo "<script>alert('Barang berhasil dihapus!'); window.location='" . $this->base_url . "data_barang';</script>";
+                $_SESSION['alert'] = [
+                    'icon' => 'success',
+                    'title' => 'Barang berhasil dihapus!',
+                ];
+                header("Location: " . $this->base_url . "data_barang");
+                exit;
             }
         }
     }
@@ -96,6 +125,7 @@ class AdminController
     public function import_excel_data_barang()
     {
         require __DIR__ . '/../config/koneksi.php';
+        session_start();
 
         if (isset($_POST['import_excel'])) {
             // Cek apakah file diupload
@@ -106,7 +136,14 @@ class AdminController
 
                 // Validasi Ekstensi harus CSV
                 if ($ext != 'csv') {
-                    echo "<script>alert('Format file harus .CSV (Comma Separated Values)!');</script>";
+                    // echo "<script>alert('Format file harus .CSV (Comma Separated Values)!');</script>";
+                    $_SESSION['alert'] = [
+                        'icon' => 'error',
+                        'title' => 'Format file harus .CSV (Comma Separated Values)!',
+                    ];
+                    var_dump($_SESSION);
+                    header("Location: " . $this->base_url . "data_barang");
+                    exit;
                 } else {
                     $file = fopen($filename, "r");
                     $count = 0; // Hitung data sukses
@@ -136,10 +173,22 @@ class AdminController
                         }
                     }
                     fclose($file);
-                    echo "<script>alert('Berhasil mengimpor $count data barang!'); window.location='" . $this->base_url . "data_barang';</script>";
+                    // echo "<script>alert('Berhasil mengimpor $count data barang!'); window.location='" . $this->base_url . "data_barang';</script>";
+                    $_SESSION['alert'] = [
+                        'icon' => 'success',
+                        'title' => "Berhasil mengimpor $count data barang!",
+                    ];
+                    header("Location: " . $this->base_url . "data_barang");
+                    exit;
                 }
             } else {
-                echo "<script>alert('Pilih file terlebih dahulu!');</script>";
+                // echo "<script>alert('Pilih file terlebih dahulu!');</script>";
+                $_SESSION['alert'] = [
+                    'icon' => 'error',
+                    'title' => 'Pilih file terlebih dahulu!',
+                ];
+                header("Location: " . $this->base_url . "data_barang");
+                exit;
             }
         }
     }
@@ -182,8 +231,8 @@ class AdminController
     // A. PROSES PERSETUJUAN
     public function proses_persetujuan()
     {
-        session_start();
         require __DIR__ . '/../config/koneksi.php';
+        session_start();
 
         if (isset($_POST['setuju'])) {
             $id_permintaan   = $_POST['id_permintaan'];
@@ -251,8 +300,8 @@ class AdminController
     // B. PROSES PENOLAKAN
     public function proses_penolakan()
     {
-        session_start();
         require __DIR__ . '/../config/koneksi.php';
+        session_start();
 
         if (isset($_POST['tolak'])) {
             $id_permintaan = $_POST['id_permintaan'];
@@ -278,8 +327,8 @@ class AdminController
     // MASUK HALAMAN DATA PENGGUNA
     public function data_pengguna_page()
     {
-        session_start();
         require __DIR__ . '/../config/koneksi.php';
+        session_start();
 
         // 1. Cek Login & Akses
         if (!isset($_SESSION['user_id'])) {
@@ -300,6 +349,7 @@ class AdminController
     public function tambah_data_pengguna()
     {
         require __DIR__ . '/../config/koneksi.php';
+        session_start();
 
         if (isset($_POST['tambah_user'])) {
             $nama     = mysqli_real_escape_string($koneksi, $_POST['nama']);
@@ -344,6 +394,7 @@ class AdminController
     public function edit_data_pengguna()
     {
         require __DIR__ . '/../config/koneksi.php';
+        session_start();
         // var_dump($_POST);
         // exit;
 
@@ -387,8 +438,8 @@ class AdminController
     // C. PROSES HAPUS USER
     public function hapus_data_pengguna()
     {
-        session_start();
         require __DIR__ . '/../config/koneksi.php';
+        session_start();
 
         if (isset($_GET['hapus'])) {
             $id = $_GET['hapus'];
@@ -406,6 +457,4 @@ class AdminController
             }
         }
     }
-
 }
-?>

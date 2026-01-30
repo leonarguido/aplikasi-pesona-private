@@ -15,8 +15,8 @@ $logBarangBergerak = new LogBarangBergerakController();
 $pimpinan = new PimpinanController();
 $user = new UserController();
 
-if (isset($_GET['method'])) {
-    $method = $_GET['method'];
+if (isset($_GET['page'])) {
+    $method = $_GET['page'];
 
     switch ($method) {
 
@@ -143,8 +143,17 @@ if (isset($_GET['method'])) {
         case 'laporan':
             $pimpinan->laporan_page();
             break;
+        case 'ajax_load_stok_barang':
+            $pimpinan->ajax_load_stok_barang();
+            break;
+        case 'ajax_load_riwayat_persetujuan':
+            $pimpinan->ajax_load_riwayat_persetujuan();
+            break;
         case 'laporan_stok':
             $pimpinan->laporan_stok_page();
+            break;
+        case 'laporan_permintaan':
+            $pimpinan->laporan_permintaan_page();
             break;
         case 'cetak_laporan':
             $pimpinan->cetak_laporan();

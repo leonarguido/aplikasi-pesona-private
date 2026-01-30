@@ -2,13 +2,13 @@
 
 class UserController
 {
-    protected $base_url = '/aplikasi-pesona-private/routes/web.php/?method=';
+    protected $base_url = '/aplikasi-pesona-private/routes/web.php/?page=';
 
     // MASUK HALAMAN DAFTAR BARANG
     public function daftar_barang_page()
     {
-        session_start();
         require __DIR__ . '/../config/koneksi.php';
+        session_start();
 
         if (!isset($_SESSION['user_id'])) {
             header("Location: login.php");
@@ -70,8 +70,8 @@ class UserController
     // MASUK HALAMAN KERANJANG
     public function keranjang()
     {
-        session_start();
         require __DIR__ . '/../config/koneksi.php';
+        session_start();
 
         if (!isset($_SESSION['user_id'])) {
             header("Location: login.php");
@@ -98,8 +98,8 @@ class UserController
     // B. PROSES CHECKOUT/PENGAJUAN BARANG
     public function checkout_keranjang()
     {
-        session_start();
         require __DIR__ . '/../config/koneksi.php';
+        session_start();
 
         if (isset($_POST['checkout'])) {
             $user_id   = $_SESSION['user_id'];
@@ -167,8 +167,8 @@ class UserController
     // A. PROSES BATALKAN PERMINTAAN SAYA
     public function batalkan_permintaan_saya()
     {
-        session_start();
         require __DIR__ . '/../config/koneksi.php';
+        session_start();
 
         if (isset($_GET['batal_id'])) {
             $id_batal = $_GET['batal_id'];
@@ -191,6 +191,7 @@ class UserController
     public function edit_permintaan_saya()
     {
         require __DIR__ . '/../config/koneksi.php';
+        session_start();
 
         if (isset($_POST['update_permintaan'])) {
             $id_details = $_POST['id_detail']; // Array ID Detail
@@ -209,8 +210,8 @@ class UserController
     // C. PROSES CETAK SURAT PERMINTAAN
     public function cetak_surat()
     {
-        session_start();
         require __DIR__ . '/../config/koneksi.php';
+        session_start();
 
         if (!isset($_SESSION['user_id']) || !isset($_GET['id'])) {
             header("Location: index.php");

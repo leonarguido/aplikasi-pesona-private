@@ -35,6 +35,8 @@
 <script src="<?= ASSETS_URL ?>vendor/datatables/jquery.dataTables.min.js"></script>
 <script src="<?= ASSETS_URL ?>vendor/datatables/dataTables.bootstrap4.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.10.0/js/bootstrap-datepicker.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
     $(document).ready(function() {
@@ -51,3 +53,14 @@
         });
     });
 </script>
+
+<?php if (isset($_SESSION['alert'])) : ?>
+    <script>
+        Swal.fire({
+            icon: '<?= $_SESSION['alert']['icon']; ?>',
+            title: '<?= $_SESSION['alert']['title']; ?>',
+            confirmButtonColor: '#4e73df'
+        });
+    </script>
+<?php unset($_SESSION['alert']);
+endif; ?>

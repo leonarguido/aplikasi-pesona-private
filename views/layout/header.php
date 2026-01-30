@@ -1,6 +1,6 @@
 <!-- Define BASE_URL -->
 <?php 
-define('BASE_URL', '/aplikasi-pesona-private/routes/web.php/?method='); 
+define('BASE_URL', '/aplikasi-pesona-private/routes/web.php/?page='); 
 // define('BASE_URL', '/aplikasi-pesona-private/');
 define('ASSETS_URL', '/aplikasi-pesona-private/assets/');
 ?>
@@ -24,4 +24,7 @@ define('ASSETS_URL', '/aplikasi-pesona-private/assets/');
 
     <!-- Added DataTables Buttons CSS -->
     <link href="https://cdn.datatables.net/buttons/2.3.6/css/buttons.dataTables.min.css" rel="stylesheet">
+
+    <!-- Bootstrap Datepicker CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.10.0/css/bootstrap-datepicker.min.css">
 

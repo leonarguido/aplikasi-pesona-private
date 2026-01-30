@@ -89,17 +89,23 @@
             </li>
 
             <li class="nav-item">
+                <a class="nav-link" href="<?= BASE_URL ?>laporan_permintaan">
+                    <i class="fas fa-fw fa-file-alt"></i>
+                    <span>Laporan Permintaan Saat Ini</span></a>
+            </li>
+
+            <li class="nav-item">
                 <a class="nav-link" href="<?= BASE_URL ?>laporan">
                     <i class="fas fa-fw fa-file-alt"></i>
-                    <span>Laporan Transaksi</span></a>
+                    <span>Laporan Transaksi Berhasil</span></a>
             </li>
         <?php endif; ?>
 
         <hr class="sidebar-divider d-none d-md-block">
-
+<!-- 
         <div class="text-center d-none d-md-inline">
             <button class="rounded-circle border-0" id="sidebarToggle"></button>
-        </div>
+        </div> -->
 
     </ul>
     <!-- End of Sidebar -->
