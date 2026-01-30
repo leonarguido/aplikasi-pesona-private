@@ -2,9 +2,9 @@
 // config/koneksi.php
 
 $server   = "localhost";
-$username = "root";      // Sesuaikan dengan user database kamu
-$password = "";          // Sesuaikan dengan password database kamu
-$database = "db_pesona_api"; // Sesuaikan dengan nama database yang sudah kamu buat
+$username = "root";      // Sesuaikan dengan user database 
+$password = "";          // Sesuaikan dengan password database 
+$database = "pesona"; // Sesuaikan dengan nama database 
 
 $koneksi = mysqli_connect($server, $username, $password, $database);
 

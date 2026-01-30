@@ -11,6 +11,15 @@ if (!isset($_SESSION['user_id'])) {
 $id_user = $_SESSION['user_id'];
 
 // ==============================================================
+// AMBIL DATA BARANG (Untuk Dropdown di Modal)
+// ==============================================================
+$list_barang = [];
+$q_b = mysqli_query($koneksi, "SELECT * FROM tb_barang_bergerak WHERE stok > 0 ORDER BY nama_barang ASC");
+while ($b = mysqli_fetch_assoc($q_b)) {
+    $list_barang[] = $b;
+}
+
+// ==============================================================
 // LOGIKA 1: PROSES BATALKAN PERMINTAAN
 // ==============================================================
 if (isset($_GET['batal_id'])) {
@@ -30,19 +39,56 @@ if (isset($_GET['batal_id'])) {
 }
 
 // ==============================================================
-// LOGIKA 2: PROSES UPDATE JUMLAH
+// LOGIKA 2: PROSES UPDATE & TAMBAH BARANG
 // ==============================================================
 if (isset($_POST['update_permintaan'])) {
-    $id_details = $_POST['id_detail']; // Array ID Detail
-    $jumlahs    = $_POST['jumlah'];    // Array Jumlah Baru
+    $id_permintaan = $_POST['id_permintaan'];
 
-    for ($i = 0; $i < count($id_details); $i++) {
-        $curr_id  = $id_details[$i];
-        $curr_jml = $jumlahs[$i];
-        mysqli_query($koneksi, "UPDATE tb_detail_permintaan SET jumlah='$curr_jml' WHERE id='$curr_id'");
+    // A. UPDATE BARANG YANG SUDAH ADA
+    if (isset($_POST['id_detail'])) {
+        $id_details = $_POST['id_detail']; 
+        $jumlahs    = $_POST['jumlah'];    
+
+        for ($i = 0; $i < count($id_details); $i++) {
+            $curr_id  = $id_details[$i];
+            $curr_jml = $jumlahs[$i];
+            mysqli_query($koneksi, "UPDATE tb_detail_permintaan SET jumlah='$curr_jml' WHERE id='$curr_id'");
+        }
     }
 
-    echo "<script>alert('Perubahan jumlah berhasil disimpan!'); window.location='permintaan_saya.php';</script>";
+    // B. TAMBAH BARANG BARU (SUSULAN)
+    if (isset($_POST['new_barang_id'])) {
+        $new_ids  = $_POST['new_barang_id'];
+        $new_jmls = $_POST['new_jumlah'];
+
+        for ($i = 0; $i < count($new_ids); $i++) {
+            $id_brg = $new_ids[$i];
+            $jml    = $new_jmls[$i];
+
+            if (!empty($id_brg) && $jml > 0) {
+                // 1. Ambil info satuan barang
+                $q_info = mysqli_query($koneksi, "SELECT satuan FROM tb_barang_bergerak WHERE id='$id_brg'");
+                $d_info = mysqli_fetch_assoc($q_info);
+                $satuan = $d_info['satuan'];
+
+                // 2. Cek apakah barang ini SUDAH ADA di permintaan ini? (Supaya tidak duplikat baris)
+                $cek_ada = mysqli_query($koneksi, "SELECT id, jumlah FROM tb_detail_permintaan WHERE permintaan_id='$id_permintaan' AND barang_id='$id_brg'");
+                
+                if (mysqli_num_rows($cek_ada) > 0) {
+                    // Jika sudah ada, kita tambahkan jumlahnya ke yang lama
+                    $row_ada = mysqli_fetch_assoc($cek_ada);
+                    $jml_baru = $row_ada['jumlah'] + $jml;
+                    $id_det_lama = $row_ada['id'];
+                    mysqli_query($koneksi, "UPDATE tb_detail_permintaan SET jumlah='$jml_baru' WHERE id='$id_det_lama'");
+                } else {
+                    // Jika belum ada, insert baru
+                    mysqli_query($koneksi, "INSERT INTO tb_detail_permintaan (permintaan_id, barang_id, jumlah, satuan) VALUES ('$id_permintaan', '$id_brg', '$jml', '$satuan')");
+                }
+            }
+        }
+    }
+
+    echo "<script>alert('Perubahan berhasil disimpan!'); window.location='permintaan_saya.php';</script>";
 }
 ?>
 
@@ -50,14 +96,32 @@ if (isset($_POST['update_permintaan'])) {
 require 'layout/header.php';
 require 'layout/sidebar.php';
 
-// ==========================================================
-// SET JUDUL KE TOPBAR
-// ==========================================================
+// Set Judul
 $judul_halaman     = "Riwayat Permintaan Saya";
 $deskripsi_halaman = "Daftar status permintaan barang yang pernah Anda ajukan.";
 
 require 'layout/topbar.php'; 
 ?>
+
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<style>
+    /* Penyesuaian Style Select2 agar cocok dengan Bootstrap */
+    .select2-container .select2-selection--single {
+        height: 31px !important; /* Sesuaikan tinggi dengan form-control-sm */
+        border: 1px solid #d1d3e2;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        line-height: 31px !important;
+        font-size: 0.875rem;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 31px !important;
+    }
+    /* Agar dropdown muncul di atas modal */
+    .select2-container {
+        z-index: 9999;
+    }
+</style>
 
 <div class="container-fluid">
 
@@ -135,7 +199,7 @@ require 'layout/topbar.php';
                                 <?php if($row['status'] == 'menunggu'): ?>
                                     
                                     <div class="btn-group btn-group-sm" role="group">
-                                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalEdit<?= $id_req; ?>" title="Edit Jumlah">
+                                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalEdit<?= $id_req; ?>" title="Edit / Tambah Barang">
                                             <i class="fas fa-edit"></i>
                                         </button>
                                         <a href="permintaan_saya.php?batal_id=<?= $id_req; ?>" class="btn btn-danger" onclick="return confirm('Yakin ingin membatalkan?')" title="Batalkan">
@@ -147,19 +211,19 @@ require 'layout/topbar.php';
                                         <div class="modal-dialog modal-lg" role="document">
                                             <div class="modal-content">
                                                 <div class="modal-header bg-primary text-white">
-                                                    <h5 class="modal-title">Edit Jumlah Permintaan</h5>
+                                                    <h5 class="modal-title">Edit Permintaan</h5>
                                                     <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
                                                 </div>
                                                 <form method="POST">
                                                     <div class="modal-body">
                                                         <input type="hidden" name="id_permintaan" value="<?= $id_req; ?>">
-                                                        <p class="small text-muted">Silakan ubah jumlah barang jika diperlukan:</p>
                                                         
-                                                        <table class="table table-sm table-bordered">
-                                                            <thead class="thead-light">
+                                                        <h6 class="font-weight-bold text-gray-800 mb-2">Barang yang Diajukan:</h6>
+                                                        <table class="table table-sm table-bordered mb-4">
+                                                            <thead class="bg-light">
                                                                 <tr>
                                                                     <th>Nama Barang</th>
-                                                                    <th width="120px">Jumlah</th>
+                                                                    <th width="150px">Jumlah</th>
                                                                     <th>Satuan</th>
                                                                 </tr>
                                                             </thead>
@@ -185,10 +249,34 @@ require 'layout/topbar.php';
                                                                 <?php endwhile; ?>
                                                             </tbody>
                                                         </table>
+
+                                                        <hr>
+
+                                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                                            <h6 class="font-weight-bold text-success mb-0"><i class="fas fa-plus-circle"></i> Tambah Barang Susulan</h6>
+                                                            <button type="button" class="btn btn-sm btn-success shadow-sm" onclick="tambahBaris('tabelSusulan<?= $id_req; ?>', 'modalEdit<?= $id_req; ?>')">
+                                                                <i class="fas fa-plus"></i> Baris
+                                                            </button>
+                                                        </div>
+                                                        
+                                                        <p class="small text-muted mb-2">Jika ada barang yang lupa dimasukkan, tambahkan di sini (bisa dicari).</p>
+
+                                                        <table class="table table-sm table-bordered" id="tabelSusulan<?= $id_req; ?>">
+                                                            <thead class="bg-light">
+                                                                <tr>
+                                                                    <th>Pilih Barang (Ketik untuk cari)</th>
+                                                                    <th width="120px">Jumlah</th>
+                                                                    <th width="50px"></th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                </tbody>
+                                                        </table>
+
                                                     </div>
                                                     <div class="modal-footer">
                                                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                                                        <button type="submit" name="update_permintaan" class="btn btn-primary">Simpan</button>
+                                                        <button type="submit" name="update_permintaan" class="btn btn-primary">Simpan Perubahan</button>
                                                     </div>
                                                 </form>
                                             </div>
@@ -198,7 +286,6 @@ require 'layout/topbar.php';
                                     <a href="cetak_surat.php?id=<?= $row['id']; ?>" target="_blank" class="btn btn-info btn-sm shadow-sm">
                                         <i class="fas fa-print"></i> Cetak
                                     </a>
-
                                 <?php else: ?>
                                     <button class="btn btn-secondary btn-sm" disabled><i class="fas fa-ban"></i></button>
                                 <?php endif; ?>
@@ -212,27 +299,60 @@ require 'layout/topbar.php';
         </div>
     </div>
 </div>
+
 <?php require 'layout/footer.php'; ?>
 
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
 <script>
+    // Membuat string option HTML dari PHP array
+    var optionsBarang = '<option value="">-- Cari Barang --</option>';
+    <?php foreach($list_barang as $brg): ?>
+        optionsBarang += '<option value="<?= $brg['id']; ?>"><?= addslashes($brg['nama_barang']); ?> (Stok: <?= $brg['stok']; ?>)</option>';
+    <?php endforeach; ?>
+
+    // Fungsi Tambah Baris dengan SELECT2
+    function tambahBaris(tableId, modalId) {
+        var table = document.getElementById(tableId).getElementsByTagName('tbody')[0];
+        var newRow = table.insertRow();
+        
+        // Generate ID unik untuk select ini agar bisa dipanggil jQuery
+        var uniqueId = "sel_" + Date.now() + Math.floor(Math.random() * 1000);
+
+        var cell1 = newRow.insertCell(0);
+        var cell2 = newRow.insertCell(1);
+        var cell3 = newRow.insertCell(2);
+
+        // Masukkan HTML Select dengan ID unik
+        cell1.innerHTML = '<select id="' + uniqueId + '" name="new_barang_id[]" class="form-control form-control-sm" required style="width:100%">' + optionsBarang + '</select>';
+        cell2.innerHTML = '<input type="number" name="new_jumlah[]" class="form-control form-control-sm" placeholder="Jml" min="1" required>';
+        cell3.innerHTML = '<button type="button" class="btn btn-danger btn-sm" onclick="hapusBaris(this)"><i class="fas fa-times"></i></button>';
+        cell3.className = 'text-center';
+
+        // AKTIFKAN SELECT2 PADA ELEMENT BARU
+        // dropdownParent sangat penting agar search box berfungsi di dalam Modal Bootstrap
+        $('#' + uniqueId).select2({
+            dropdownParent: $('#' + modalId),
+            placeholder: "Ketik nama barang...",
+            allowClear: true,
+            width: '100%' 
+        });
+    }
+
+    // Fungsi Hapus Baris
+    function hapusBaris(btn) {
+        var row = btn.parentNode.parentNode;
+        row.parentNode.removeChild(row);
+    }
+
     $(document).ready(function() {
         if (!$.fn.DataTable.isDataTable('#dataTable')) {
             $('#dataTable').DataTable({
+                "ordering": false,
                 "language": {
-                    "search": "Cari Riwayat:",
-                    "lengthMenu": "Tampilkan _MENU_ data",
-                    "zeroRecords": "Data tidak ditemukan",
-                    "info": "Halaman _PAGE_ dari _PAGES_",
-                    "infoEmpty": "Tidak ada data",
-                    "infoFiltered": "(difilter dari _MAX_ total data)",
-                    "paginate": {
-                        "first": "Awal",
-                        "last": "Akhir",
-                        "next": "Lanjut",
-                        "previous": "Kembali"
-                    }
-                },
-                "ordering": false 
+                    "search": "Cari:",
+                    "zeroRecords": "Data kosong"
+                }
             });
         }
     });

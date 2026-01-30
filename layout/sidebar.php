@@ -34,9 +34,17 @@
         <div class="sidebar-heading">Inventaris</div>
         
         <li class="nav-item">
-            <a class="nav-link" href="data_barang.php">
+            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseBarang" aria-expanded="true" aria-controls="collapseBarang">
                 <i class="fas fa-fw fa-boxes"></i>
-                <span>Data Barang</span></a>
+                <span>Data Barang</span>
+            </a>
+            <div id="collapseBarang" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                <div class="bg-white py-2 collapse-inner rounded">
+                    <h6 class="collapse-header">Jenis Aset:</h6>
+                    <a class="collapse-item" href="data_barang.php">Barang Bergerak</a>
+                    <a class="collapse-item" href="barang_tidak_bergerak.php">Brg Tidak Bergerak</a>
+                </div>
+            </div>
         </li>
         
         <li class="nav-item">

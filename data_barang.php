@@ -13,10 +13,10 @@ if ($_SESSION['role'] == 'user' || $_SESSION['role'] == 'pimpinan') {
 }
 
 // =======================================================
-// LOGIKA PHP (CRUD & IMPORT) - (TETAP SAMA)
+// LOGIKA PHP (CRUD & IMPORT)
 // =======================================================
 
-// A. LOGIKA IMPORT CSV
+// A. LOGIKA IMPORT CSV (Format Lama - Merek dikosongkan dulu agar tidak error)
 if (isset($_POST['import_excel'])) {
     if (isset($_FILES['file_excel']['name']) && $_FILES['file_excel']['name'] != "") {
         $filename = $_FILES['file_excel']['tmp_name'];
@@ -33,9 +33,12 @@ if (isset($_POST['import_excel'])) {
                 $satuan = mysqli_real_escape_string($koneksi, $data[2]);
                 $stok   = (int) $data[3];
                 $desc   = mysqli_real_escape_string($koneksi, $data[4]);
+                
+                // Cek Duplikasi
                 $cek = mysqli_query($koneksi, "SELECT kode_barang FROM tb_barang_bergerak WHERE kode_barang = '$kode'");
                 if (mysqli_num_rows($cek) == 0 && !empty($kode)) {
-                    $query = "INSERT INTO tb_barang_bergerak (kode_barang, nama_barang, satuan, stok, keterangan) VALUES ('$kode', '$nama', '$satuan', '$stok', '$desc')";
+                    // Merek diisi string kosong default dulu untuk import CSV lama
+                    $query = "INSERT INTO tb_barang_bergerak (kode_barang, nama_barang, merek, satuan, stok, keterangan) VALUES ('$kode', '$nama', '-', '$satuan', '$stok', '$desc')";
                     mysqli_query($koneksi, $query);
                     $count++;
                 }
@@ -48,18 +51,20 @@ if (isset($_POST['import_excel'])) {
     }
 }
 
-// B. Tambah Manual
+// B. Tambah Manual (UPDATE: Tambah Merek)
 if (isset($_POST['tambah'])) {
     $kode   = $_POST['kode_barang'];
     $nama   = $_POST['nama_barang'];
+    $merek  = $_POST['merek']; // Baru
     $satuan = $_POST['satuan'];
     $desc   = $_POST['keterangan']; 
     $stok   = $_POST['stok'];
+    
     $cek = mysqli_query($koneksi, "SELECT * FROM tb_barang_bergerak WHERE kode_barang = '$kode'");
     if (mysqli_num_rows($cek) > 0) {
         echo "<script>alert('Kode Barang sudah ada!');</script>";
     } else {
-        $query = "INSERT INTO tb_barang_bergerak (kode_barang, nama_barang, satuan, keterangan, stok) VALUES ('$kode', '$nama', '$satuan', '$desc', '$stok')";
+        $query = "INSERT INTO tb_barang_bergerak (kode_barang, nama_barang, merek, satuan, keterangan, stok) VALUES ('$kode', '$nama', '$merek', '$satuan', '$desc', '$stok')";
         if (mysqli_query($koneksi, $query)) {
             echo "<script>alert('Barang berhasil ditambahkan!'); window.location='data_barang.php';</script>";
         } else {
@@ -68,14 +73,16 @@ if (isset($_POST['tambah'])) {
     }
 }
 
-// C. Edit Barang
+// C. Edit Barang (UPDATE: Tambah Merek)
 if (isset($_POST['edit'])) {
     $id     = $_POST['id'];
     $nama   = $_POST['nama_barang'];
+    $merek  = $_POST['merek']; // Baru
     $satuan = $_POST['satuan'];
     $desc   = $_POST['keterangan'];
     $stok   = $_POST['stok'];
-    $query = "UPDATE tb_barang_bergerak SET nama_barang='$nama', satuan='$satuan', keterangan='$desc', stok='$stok' WHERE id='$id'";
+    
+    $query = "UPDATE tb_barang_bergerak SET nama_barang='$nama', merek='$merek', satuan='$satuan', keterangan='$desc', stok='$stok' WHERE id='$id'";
     if (mysqli_query($koneksi, $query)) {
         echo "<script>alert('Data berhasil diupdate!'); window.location='data_barang.php';</script>";
     }
@@ -97,7 +104,7 @@ require 'layout/sidebar.php';
 
 // SET JUDUL KE TOPBAR
 $judul_halaman = "Data Barang Bergerak";
-$deskripsi_halaman = "Kelola stok barang, tambah manual, atau import via Excel.";
+$deskripsi_halaman = "Kelola stok barang, merek, tambah manual, atau import via Excel.";
 
 require 'layout/topbar.php'; 
 ?>
@@ -118,6 +125,7 @@ require 'layout/topbar.php';
                 </button>
             </div>
         </div>
+
         <div class="card-body">
             <div class="table-responsive">
                 <table class="table table-bordered table-hover" id="dataTable" width="100%" cellspacing="0">
@@ -126,7 +134,7 @@ require 'layout/topbar.php';
                             <th width="5%">No</th>
                             <th>Kode</th>
                             <th>Nama Barang</th>
-                            <th>Satuan</th>
+                            <th>Merek</th> <th>Satuan</th>
                             <th class="text-center">Stok</th>
                             <th>Keterangan</th>
                             <th width="15%" class="text-center">Aksi</th>
@@ -144,7 +152,7 @@ require 'layout/topbar.php';
                             <td><?= $no++; ?></td>
                             <td><?= $row['kode_barang']; ?></td>
                             <td class="font-weight-bold text-primary"><?= $row['nama_barang']; ?></td>
-                            <td><?= $row['satuan']; ?></td>
+                            <td><?= !empty($row['merek']) ? $row['merek'] : '-'; ?></td> <td><?= $row['satuan']; ?></td>
                             
                             <td class="text-center">
                                 <?php if($row['stok'] > 0): ?>
@@ -182,6 +190,12 @@ require 'layout/topbar.php';
                                                 <label>Nama Barang</label>
                                                 <input type="text" name="nama_barang" class="form-control" value="<?= $row['nama_barang']; ?>" required>
                                             </div>
+                                            
+                                            <div class="form-group">
+                                                <label>Merek / Brand</label>
+                                                <input type="text" name="merek" class="form-control" value="<?= $row['merek']; ?>" placeholder="Cth: Kenko, Joyko, Asus">
+                                            </div>
+
                                             <div class="row">
                                                 <div class="col-md-6">
                                                     <div class="form-group">
@@ -198,6 +212,8 @@ require 'layout/topbar.php';
                                                             <option value="Buah" <?= ($row['satuan']=='Buah')?'selected':''; ?>>Buah</option>
                                                             <option value="Rim" <?= ($row['satuan']=='Rim')?'selected':''; ?>>Rim</option>
                                                             <option value="Box" <?= ($row['satuan']=='Box')?'selected':''; ?>>Box</option>
+                                                            <option value="Pack" <?= ($row['satuan']=='Pack')?'selected':''; ?>>Pack</option>
+                                                            <option value="Botol" <?= ($row['satuan']=='Botol')?'selected':''; ?>>Botol</option>
                                                         </select>
                                                     </div>
                                                 </div>
@@ -273,6 +289,12 @@ require 'layout/topbar.php';
                         <label>Nama Barang</label>
                         <input type="text" name="nama_barang" class="form-control" required>
                     </div>
+
+                    <div class="form-group">
+                        <label>Merek / Brand</label>
+                        <input type="text" name="merek" class="form-control" placeholder="Cth: Kenko, Joyko, Asus">
+                    </div>
+
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
@@ -283,6 +305,8 @@ require 'layout/topbar.php';
                                     <option value="Rim">Rim</option>
                                     <option value="Box">Box</option>
                                     <option value="Buah">Buah</option>
+                                    <option value="Pack">Pack</option>
+                                    <option value="Botol">Botol</option>
                                 </select>
                             </div>
                         </div>

@@ -19,11 +19,12 @@ if (!isset($_SESSION['keranjang'])) {
 if (isset($_POST['tambah_keranjang'])) {
     $id_barang   = $_POST['id_barang'];
     $nama_barang = $_POST['nama_barang'];
+    $merek       = $_POST['merek']; // Data Merek ditangkap
     $jumlah      = $_POST['jumlah'];
     $satuan      = $_POST['satuan'];
     $stok_max    = $_POST['stok_max'];
 
-    // Cek apakah barang sudah ada?
+    // Cek apakah barang sudah ada di keranjang?
     $sudah_ada = false;
     foreach ($_SESSION['keranjang'] as $key => $item) {
         if ($item['id'] == $id_barang) {
@@ -37,13 +38,14 @@ if (isset($_POST['tambah_keranjang'])) {
         }
     }
 
-    // Jika baru, masukkan
+    // Jika barang baru, masukkan ke array session
     if (!$sudah_ada) {
         $_SESSION['keranjang'][] = [
-            'id' => $id_barang,
-            'nama' => $nama_barang,
-            'jumlah' => $jumlah,
-            'satuan' => $satuan,
+            'id'       => $id_barang,
+            'nama'     => $nama_barang,
+            'merek'    => $merek, // Simpan merek ke session
+            'jumlah'   => $jumlah,
+            'satuan'   => $satuan,
             'stok_max' => $stok_max
         ];
     }
@@ -80,6 +82,7 @@ $jml_item_keranjang = count($_SESSION['keranjang']);
                 <span class="badge badge-light text-danger ml-1 font-weight-bold"><?= $jml_item_keranjang; ?></span>
             </a>
         </div>
+
         <div class="card-body">
             <div class="table-responsive">
                 <table class="table table-bordered table-hover" id="dataTable" width="100%" cellspacing="0">
@@ -88,7 +91,7 @@ $jml_item_keranjang = count($_SESSION['keranjang']);
                             <th width="5%">No</th>
                             <th>Kode</th>
                             <th>Nama Barang</th>
-                            <th>Stok</th>
+                            <th>Merek</th> <th>Stok</th>
                             <th>Satuan</th>
                             <th class="text-center" width="15%">Aksi</th>
                         </tr>
@@ -105,6 +108,9 @@ $jml_item_keranjang = count($_SESSION['keranjang']);
                             <td><?= $no++; ?></td>
                             <td><?= $row['kode_barang']; ?></td>
                             <td class="font-weight-bold text-primary"><?= $row['nama_barang']; ?></td>
+                            
+                            <td><?= !empty($row['merek']) ? $row['merek'] : '-'; ?></td>
+                            
                             <td class="<?= $row['stok'] == 0 ? 'text-danger font-weight-bold' : 'text-success font-weight-bold'; ?>">
                                 <?= $row['stok']; ?>
                             </td>
@@ -133,6 +139,12 @@ $jml_item_keranjang = count($_SESSION['keranjang']);
                                                 <label>Nama Barang</label>
                                                 <input type="text" class="form-control" value="<?= $row['nama_barang']; ?>" readonly>
                                             </div>
+                                            
+                                            <div class="form-group">
+                                                <label>Merek</label>
+                                                <input type="text" class="form-control" value="<?= !empty($row['merek']) ? $row['merek'] : '-'; ?>" readonly>
+                                            </div>
+
                                             <div class="form-group">
                                                 <label>Jumlah (Max: <?= $row['stok']; ?>)</label>
                                                 <input type="number" name="jumlah" class="form-control" min="1" max="<?= $row['stok']; ?>" required>
@@ -140,7 +152,7 @@ $jml_item_keranjang = count($_SESSION['keranjang']);
                                             
                                             <input type="hidden" name="id_barang" value="<?= $row['id']; ?>">
                                             <input type="hidden" name="nama_barang" value="<?= $row['nama_barang']; ?>">
-                                            <input type="hidden" name="satuan" value="<?= $row['satuan']; ?>">
+                                            <input type="hidden" name="merek" value="<?= $row['merek']; ?>"> <input type="hidden" name="satuan" value="<?= $row['satuan']; ?>">
                                             <input type="hidden" name="stok_max" value="<?= $row['stok']; ?>">
                                         </div>
                                         <div class="modal-footer">
