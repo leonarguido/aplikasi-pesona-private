@@ -34,13 +34,14 @@
         <div class="sidebar-heading">Inventaris</div>
         
         <li class="nav-item">
-            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseBarang" aria-expanded="true" aria-controls="collapseBarang">
+            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseDataBarang"
+                aria-expanded="true" aria-controls="collapseDataBarang">
                 <i class="fas fa-fw fa-boxes"></i>
                 <span>Data Barang</span>
             </a>
-            <div id="collapseBarang" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+            <div id="collapseDataBarang" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                 <div class="bg-white py-2 collapse-inner rounded">
-                    <h6 class="collapse-header">Jenis Aset:</h6>
+                    <h6 class="collapse-header">Pilih Kategori:</h6>
                     <a class="collapse-item" href="data_barang.php">Barang Bergerak</a>
                     <a class="collapse-item" href="barang_tidak_bergerak.php">Brg Tidak Bergerak</a>
                 </div>
@@ -72,12 +73,23 @@
 
 
         <?php if($_SESSION['role'] == 'user' || $_SESSION['role'] == 'staff'): ?>
-        <div class="sidebar-heading">Permintaan</div>
+        
+        <div class="sidebar-heading">Inventaris</div>
+
+        <li class="nav-item">
+            <a class="nav-link" href="aset_saya.php">
+                <i class="fas fa-fw fa-cube"></i>
+                <span>Barang Tidak Bergerak</span></a>
+        </li>
+        
+        <hr class="sidebar-divider my-2">
+
+        <div class="sidebar-heading">Permintaan Barang</div>
         
         <li class="nav-item">
             <a class="nav-link" href="daftar_barang.php">
                 <i class="fas fa-fw fa-search"></i>
-                <span>Daftar Barang</span></a>
+                <span>Daftar Barang Bergerak</span></a>
         </li>
         
         <li class="nav-item">
@@ -89,6 +101,17 @@
 
 
         <?php if($_SESSION['role'] == 'pimpinan'): ?>
+        
+        <div class="sidebar-heading">Data Inventaris</div>
+
+        <li class="nav-item">
+            <a class="nav-link" href="barang_tidak_bergerak.php">
+                <i class="fas fa-fw fa-building"></i>
+                <span>Barang Tidak Bergerak</span></a>
+        </li>
+
+        <hr class="sidebar-divider my-2">
+
         <div class="sidebar-heading">Laporan</div>
         
         <li class="nav-item">
