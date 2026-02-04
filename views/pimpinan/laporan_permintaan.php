@@ -3,7 +3,7 @@
 
 <head>
     <?php require __DIR__ . '/../layout/header.php'; ?>
-    <?php $judul_halaman = "Laporan Stok Barang"; ?>
+    <?php $judul_halaman = "Laporan Permintaan"; ?>
 </head>
 
 <body id="page-top">
@@ -42,7 +42,7 @@
 
                     <div class="card shadow mb-4" id="printableArea">
                         <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                            <h6 class="m-0 font-weight-bold text-primary">Data Stok per Tanggal: <?= date('d F Y'); ?></h6>
+                            <h6 class="m-0 font-weight-bold text-primary">Total Permintaan per Tanggal: <?= date('d F Y'); ?></h6>
                             <!-- <button onclick="window.print()" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
                                 <i class="fas fa-print fa-sm text-white-50"></i> Cetak / Simpan PDF
                             </button> -->
@@ -53,15 +53,14 @@
                                     <thead class="bg-dark text-white">
                                         <tr>
                                             <th width="5%" style="text-align:center;">No</th>
-                                            <th width="10%">Kode Barang</th>
-                                            <th width="10%">Merk Barang</th>
-                                            <th>Nama Barang</th>
-                                            <th width="15%" style="text-align:center;">Sisa Stok</th>
-                                            <th width="10%" style="text-align:center;">Satuan</th>
-                                            <th width="15%" class="no-print">Status</th>
+                                            <th width="15%">Tanggal</th>
+                                            <th width="15%">Pemohon</th>
+                                            <th>Rincian Barang (Final)</th>
+                                            <th width="15%" style="text-align:center;">Status</th>
+                                            <th width="15%" class="no-print">Admin Eksekutor</th>
                                         </tr>
                                     </thead>
-                                    <tbody id="tabel_laporan_stok_barang">
+                                    <tbody id="tabel_laporan_permintaan">
                                     </tbody>
                                 </table>
                             </div>
@@ -77,6 +76,7 @@
 
                         </div>
                     </div>
+
                 </div>
             </div>
         </div>
@@ -85,21 +85,21 @@
     <?php require '../views/layout/footer.php'; ?>
 
     <script>
-        function load_laporan_stok_barang($status_stok) {
+        function load_laporan_permintaan($status_permintaan) {
             $.ajax({
-                url: '<?= BASE_URL ?>ajax_load_laporan_stok_barang',
+                url: '<?= BASE_URL ?>ajax_load_laporan_permintaan',
                 type: 'POST',
                 data: {
-                    status_stok_post: $status_stok,
+                    status_permintaan_post: $status_permintaan,
                 },
                 success: function(res) {
                     $('#dataTable').DataTable().destroy();
 
                     if (!$.fn.DataTable.isDataTable('#dataTable')) {
-                        $('#tabel_laporan_stok_barang').html(res);
+                        $('#tabel_laporan_permintaan').html(res);
                         $('#dataTable').DataTable({
                             "language": {
-                                "search": "Cari Stok:",
+                                "search": "Cari Permintaan:",
                                 "lengthMenu": "Tampilkan _MENU_ antrian",
                                 "zeroRecords": "Tidak ada permintaan yang cocok",
                                 "info": "Menampilkan _PAGE_ dari _PAGES_",
@@ -117,24 +117,26 @@
                         $('#dataTable_filter').append(`
                         Filter:
                             <label>
-                                <select name="status_stok" class="form-control form-control-sm">
-                                    <option value="" ${$status_stok === '' ? 'selected' : ''}>Semua Status</option>
-                                    <option value="aman" ${$status_stok === 'aman' ? 'selected' : ''}>Aman</option>
-                                    <option value="menipis" ${$status_stok === 'menipis' ? 'selected' : ''}>Menipis</option>
-                                    <option value="habis" ${$status_stok === 'habis' ? 'selected' : ''}>Habis</option>
+                                <select name="status_permintaan" class="form-control form-control-sm">
+                                    <option value="" ${$status_permintaan === '' ? 'selected' : ''}>Semua Status</option>
+                                    <option value="menunggu" ${$status_permintaan === 'menunggu' ? 'selected' : ''}>Menunggu</option>
+                                    <option value="disetujui" ${$status_permintaan === 'disetujui' ? 'selected' : ''}>Disetujui</option>
+                                    <option value="ditolak" ${$status_permintaan === 'ditolak' ? 'selected' : ''}>Ditolak</option>
                                 </select>
                             </label>
-                        `);
+                        `);                    
                     }
+
                 }
             });
         }
-        // load awal page
-        load_laporan_stok_barang(<?= json_encode($status_stok) ?>);
 
-        $(document).on('change', 'select[name="status_stok"]', function() {
-            $status_stok = this.value;
-            load_laporan_stok_barang($status_stok);
+        // load awal page
+        load_laporan_permintaan(<?= json_encode($status_permintaan) ?>);
+
+        $(document).on('change', 'select[name="status_permintaan"]', function() {
+            $status_permintaan = this.value;
+            load_laporan_permintaan($status_permintaan);
         });
 
         if (window.innerHeight <= 700) {

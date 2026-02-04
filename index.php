@@ -210,7 +210,7 @@ $id_user = $_SESSION['user_id'];
                             <div class="col-lg-12">
                                 <div class="card shadow mb-4 border-left-primary">
                                     <div class="card-header py-3">
-                                        <h6 class="m-0 font-weight-bold text-primary">Selamat Datang, <?= $_SESSION['full_name']; ?>!</h6>
+                                        <h5 class="m-0 font-weight-bold text-primary">Selamat Datang, <?= $_SESSION['full_name']; ?>!</h5>
                                     </div>
                                 </div>
                             </div>
@@ -237,21 +237,31 @@ $id_user = $_SESSION['user_id'];
                         $q_habis = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM tb_barang_bergerak WHERE stok = 0");
                         $total_habis = mysqli_fetch_assoc($q_habis)['total'];
 
-                        // 1. Total Transaksi Disetujui
+                        // 1. Total Transaksi Berhasil (Seluruh Bulan)
                         $bulan_ini = date('m');
                         $q_semua = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM tb_permintaan WHERE status='disetujui'");
                         $total_semua = mysqli_fetch_assoc($q_semua)['total'];
 
-                        // 2. Permintaan Menunggu (Global)
+                        // 2. Permintaan Menunggu (Seluruh Bulan)
                         $q_pending = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM tb_permintaan WHERE status='menunggu'");
                         $total_pending = mysqli_fetch_assoc($q_pending)['total'];
 
-                        // 3. Disetujui Bulan Ini (Global)
+                        // 3. Disetujui Bulan Ini
                         $bulan_ini = date('m');
                         $q_acc = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM tb_permintaan WHERE status='disetujui' AND MONTH(tanggal_disetujui) = '$bulan_ini'");
                         $total_acc = mysqli_fetch_assoc($q_acc)['total'];
 
                         ?>
+
+                        <!-- <div class="row">
+                            <div class="col-lg-12">
+                                <div class="card shadow mb-4 border-left-dark">
+                                    <div class="card-header py-3">
+                                        <h6 class="m-0 font-weight-bold text-dark">Stok Barang Section</h6>
+                                    </div>
+                                </div>
+                            </div>
+                        </div> -->
 
                         <div class="row">
                             <div class="col-xl-3 col-md-6 mb-4">
@@ -276,7 +286,7 @@ $id_user = $_SESSION['user_id'];
                                                 <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Stok Aman</div>
                                                 <div class="h5 mb-0 font-weight-bold text-gray-800"><?= $total_aman; ?> Barang</div>
                                             </div>
-                                            <div class="col-auto"><i class="fas fa-boxes fa-2x text-gray-300"></i></div>
+                                            <div class="col-auto"><i class="fas fa-check-circle fa-2x text-gray-300"></i></div>
                                         </div>
                                         <form action="<?= BASE_URL ?>laporan_stok" method="POST">
                                             <input type="hidden" name="status_stok" value="aman">
@@ -321,17 +331,32 @@ $id_user = $_SESSION['user_id'];
                             </div>
                         </div>
 
+                        <!-- <div class="row">
+                            <div class="col-lg-12">
+                                <div class="card shadow mb-4 border-left-dark">
+                                    <div class="card-header py-3">
+                                        <h6 class="m-0 font-weight-bold text-dark">Transaksi Section</h6>
+                                    </div>
+                                </div>
+                            </div>
+                        </div> -->
+
                         <div class="row">
                             <div class="col-xl-3 col-md-6 mb-4">
-                                <div class="card border-left-primary shadow h-100 py-2">
+                                <div class="card border-left-success shadow h-100 py-2">
                                     <div class="card-body">
                                         <div class="row no-gutters align-items-center">
                                             <div class="col mr-2">
-                                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Transaksi (Seluruh Bulan)</div>
+                                                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Total Transaksi Berhasil</div>
+                                                <!-- <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Total Transaksi (Seluruh Bulan)</div> -->
                                                 <div class="h5 mb-0 font-weight-bold text-gray-800"><?= $total_semua ?> Ajuan</div>
                                             </div>
-                                            <div class="col-auto"><i class="fas fa-clock fa-2x text-gray-300"></i></div>
+                                            <div class="col-auto"><i class="fas fa-file-pdf fa-2x text-gray-300"></i></div>
                                         </div>
+                                        <form action="<?= BASE_URL ?>laporan_permintaan" method="POST">
+                                            <input type="hidden" name="status_permintaan" value="disetujui">
+                                            <button type="submit" class="btn btn-sm btn-success mt-2 shadow-sm btn-block">Cek Sekarang <i class="fas fa-arrow-right"></i></button>
+                                        </form>
                                     </div>
                                 </div>
                             </div>
@@ -345,14 +370,15 @@ $id_user = $_SESSION['user_id'];
                                             </div>
                                             <div class="col-auto"><i class="fas fa-clock fa-2x text-gray-300"></i></div>
                                         </div>
-                                        <?php if ($total_pending > 0): ?>
-                                            <a href="<?= BASE_URL ?>persetujuan" class="btn btn-sm btn-warning mt-2 shadow-sm btn-block">Proses Sekarang <i class="fas fa-arrow-right"></i></a>
-                                        <?php endif; ?>
+                                        <form action="<?= BASE_URL ?>laporan_permintaan" method="POST">
+                                            <input type="hidden" name="status_permintaan" value="menunggu">
+                                            <button type="submit" class="btn btn-sm btn-warning mt-2 shadow-sm btn-block">Cek Sekarang <i class="fas fa-arrow-right"></i></button>
+                                        </form>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="col-xl-3 col-md-6 mb-4">
+                            <!-- <div class="col-xl-3 col-md-6 mb-4">
                                 <div class="card border-left-success shadow h-100 py-2">
                                     <div class="card-body">
                                         <div class="row no-gutters align-items-center">
@@ -361,14 +387,14 @@ $id_user = $_SESSION['user_id'];
                                                 <div class="h5 mb-0 font-weight-bold text-gray-800"><?= $total_acc; ?> Transaksi</div>
                                             </div>
                                             <div class="col-auto"><i class="fas fa-check-circle fa-2x text-gray-300"></i></div>
-                                            <form action="<?= BASE_URL ?>riwayat_persetujuan" method="POST">
-                                                <input type="hidden" name="status_persetujuan" value="aman">
-                                                <button type="submit" class="btn btn-sm btn-success mt-2 shadow-sm btn-block">Cek Sekarang <i class="fas fa-arrow-right"></i></button>
-                                            </form>
                                         </div>
+                                        <form action="<?= BASE_URL ?>laporan_permintaan" method="POST">
+                                            <input type="hidden" name="status_permintaan" value="disetujui">
+                                            <button type="submit" class="btn btn-sm btn-success mt-2 shadow-sm btn-block">Cek Sekarang <i class="fas fa-arrow-right"></i></button>
+                                        </form>
                                     </div>
                                 </div>
-                            </div>
+                            </div> -->
                         </div>
 
                         <div class="row">

@@ -63,7 +63,13 @@ class UserController
                 ];
             }
 
-            echo "<script>alert('Barang masuk keranjang!'); window.location='" . $this->base_url . "daftar_barang';</script>";
+            // echo "<script>alert('Barang masuk keranjang!'); window.location='" . $this->base_url . "daftar_barang';</script>";
+            $_SESSION['alert'] = [
+                'icon' => 'success',
+                'title' => 'Barang masuk keranjang!',
+            ];
+            header("Location: " . $this->base_url . "daftar_barang");
+            exit;
         }
     }
 
@@ -91,7 +97,9 @@ class UserController
             unset($_SESSION['keranjang'][$key]);
             // Reset urutan array agar rapi
             $_SESSION['keranjang'] = array_values($_SESSION['keranjang']);
-            echo "<script>window.location='" . $this->base_url . "keranjang';</script>";
+
+            header("Location: " . $this->base_url . "keranjang");
+            exit;
         }
     }
 
@@ -108,7 +116,12 @@ class UserController
 
             // Validasi Keranjang Kosong
             if (empty($_SESSION['keranjang'])) {
-                echo "<script>alert('Keranjang kosong!'); window.location='" . $this->base_url . "daftar_barang';</script>";
+                // echo "<script>alert('Keranjang kosong!'); window.location='" . $this->base_url . "daftar_barang';</script>";
+                $_SESSION['alert'] = [
+                    'icon' => 'success',
+                    'title' => 'Keranjang kosong!',
+                ];
+                header("Location: " . $this->base_url . "daftar_barang");
                 exit;
             }
 
@@ -139,12 +152,30 @@ class UserController
                 if ($berhasil_detail) {
                     // Kosongkan Keranjang
                     unset($_SESSION['keranjang']);
-                    echo "<script>alert('Permintaan berhasil diajukan! Satu surat untuk semua barang.'); window.location='" . $this->base_url . "permintaan_saya';</script>";
+                    // echo "<script>alert('Permintaan berhasil diajukan! Satu surat untuk semua barang.'); window.location='" . $this->base_url . "permintaan_saya';</script>";
+                    $_SESSION['alert'] = [
+                        'icon' => 'success',
+                        'title' => 'Permintaan berhasil diajukan! Satu surat untuk semua barang',
+                    ];
+                    header("Location: " . $this->base_url . "permintaan_saya");
+                    exit;
                 } else {
-                    echo "<script>alert('Gagal menyimpan detail barang.');</script>";
+                    // echo "<script>alert('Gagal menyimpan detail barang.');</script>";
+                    $_SESSION['alert'] = [
+                        'icon' => 'error',
+                        'title' => 'Gagal menyimpan detail barang',
+                    ];
+                    header("Location: " . $this->base_url . "permintaan_saya");
+                    exit;
                 }
             } else {
-                echo "<script>alert('Gagal membuat permintaan: " . mysqli_error($koneksi) . "');</script>";
+                // echo "<script>alert('Gagal membuat permintaan: " . mysqli_error($koneksi) . "');</script>";
+                $_SESSION['alert'] = [
+                    'icon' => 'error',
+                    'title' => 'Gagal membuat permintaan' + mysqli_error($koneksi),
+                ];
+                header("Location: " . $this->base_url . "permintaan_saya");
+                exit;
             }
         }
     }
@@ -180,9 +211,21 @@ class UserController
             if ($d && $d['status'] == 'menunggu') {
                 mysqli_query($koneksi, "DELETE FROM tb_detail_permintaan WHERE permintaan_id='$id_batal'");
                 mysqli_query($koneksi, "DELETE FROM tb_permintaan WHERE id='$id_batal'");
-                echo "<script>alert('Permintaan berhasil dibatalkan.'); window.location='" . $this->base_url . "permintaan_saya';</script>";
+                // echo "<script>alert('Permintaan berhasil dibatalkan.'); window.location='" . $this->base_url . "permintaan_saya';</script>";
+                $_SESSION['alert'] = [
+                    'icon' => 'success',
+                    'title' => 'Permintaan berhasil dibatalkan!',
+                ];
+                header("Location: " . $this->base_url . "permintaan_saya");
+                exit;
             } else {
-                echo "<script>alert('Gagal! Permintaan tidak bisa dibatalkan.'); window.location='" . $this->base_url . "permintaan_saya';</script>";
+                // echo "<script>alert('Gagal! Permintaan tidak bisa dibatalkan.'); window.location='" . $this->base_url . "permintaan_saya';</script>";
+                $_SESSION['alert'] = [
+                    'icon' => 'error',
+                    'title' => 'Gagal! Permintaan tidak bisa dibatalkan',
+                ];
+                header("Location: " . $this->base_url . "permintaan_saya");
+                exit;
             }
         }
     }
@@ -203,7 +246,13 @@ class UserController
                 mysqli_query($koneksi, "UPDATE tb_detail_permintaan SET jumlah='$curr_jml' WHERE id='$curr_id'");
             }
 
-            echo "<script>alert('Perubahan jumlah berhasil disimpan!'); window.location='" . $this->base_url . "permintaan_saya';</script>";
+            // echo "<script>alert('Perubahan jumlah berhasil disimpan!'); window.location='" . $this->base_url . "permintaan_saya';</script>";
+            $_SESSION['alert'] = [
+                'icon' => 'success',
+                'title' => 'Perubahan jumlah berhasil disimpan!',
+            ];
+            header("Location: " . $this->base_url . "permintaan_saya");
+            exit;
         }
     }
 
@@ -237,7 +286,12 @@ class UserController
 
         // Validasi: Hanya bisa dicetak jika sudah DISETUJUI
         if ($data['status'] != 'disetujui') {
-            echo "<script>alert('Surat belum bisa dicetak karena status belum disetujui!'); window.close();</script>";
+            // echo "<script>alert('Surat belum bisa dicetak karena status belum disetujui!'); window.close();</script>";
+            $_SESSION['alert'] = [
+                'icon' => 'error',
+                'title' => 'Surat belum bisa dicetak karena status belum disetujui!',
+            ];
+            header("Location: " . $this->base_url . "cetak_surat");
             exit;
         }
 

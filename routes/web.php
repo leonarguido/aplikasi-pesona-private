@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 require_once __DIR__ . '/../controllers/AdminController.php';
 require_once __DIR__ . '/../controllers/AutentikasiController.php';
@@ -20,9 +20,9 @@ if (isset($_GET['page'])) {
 
     switch ($method) {
 
-// ==========================================
-// RUTE AUTENTIKASI CONTROLLER
-// ==========================================
+        // ==========================================
+        // RUTE AUTENTIKASI CONTROLLER
+        // ==========================================
 
         // AUTENTIKASI
         case 'login':
@@ -35,9 +35,9 @@ if (isset($_GET['page'])) {
             $autentikasi->logout();
             break;
 
-// ==========================================
-// RUTE ADMIN CONTROLLER
-// ==========================================
+        // ==========================================
+        // RUTE ADMIN CONTROLLER
+        // ==========================================
 
         // DATA BARANG
         case 'data_barang':
@@ -71,7 +71,7 @@ if (isset($_GET['page'])) {
         case 'proses_penolakan':
             $admin->proses_penolakan();
             break;
-            
+
         // USER MANAGEMENT
         case 'data_pengguna':
             $admin->data_pengguna_page();
@@ -85,10 +85,10 @@ if (isset($_GET['page'])) {
         case 'hapus_data_pengguna':
             $admin->hapus_data_pengguna();
             break;
-        
-// ==========================================
-// RUTE USER CONTROLLER
-// ==========================================
+
+        // ==========================================
+        // RUTE USER CONTROLLER
+        // ==========================================
 
         // DAFTAR BARANG DAN KERANJANG
         case 'daftar_barang':
@@ -125,23 +125,26 @@ if (isset($_GET['page'])) {
         case 'profil_saya':
             $user->profil_page();
             break;
-        
-// ==========================================
-// RUTE LOG BARANG BERGERAK CONTROLLER
-// ==========================================
+
+        // ==========================================
+        // RUTE LOG BARANG BERGERAK CONTROLLER
+        // ==========================================
 
         // LOG DATA BARANG
         case 'log_data_barang':
             $logBarangBergerak->log_data_barang_page();
             break;
 
-// ==========================================
-// RUTE PIMPINAN CONTROLLER
-// ==========================================
+        // ==========================================
+        // RUTE PIMPINAN CONTROLLER
+        // ==========================================
 
         // LAPORAN
         case 'laporan':
             $pimpinan->laporan_page();
+            break;
+        case 'laporan_stok':
+            $pimpinan->laporan_stok_page();
             break;
         case 'ajax_load_stok_barang':
             $pimpinan->ajax_load_stok_barang();
@@ -149,16 +152,27 @@ if (isset($_GET['page'])) {
         case 'ajax_load_riwayat_persetujuan':
             $pimpinan->ajax_load_riwayat_persetujuan();
             break;
-        case 'laporan_stok':
-            $pimpinan->laporan_stok_page();
-            break;
+        case 'ajax_load_laporan_stok_barang':
+            $pimpinan->ajax_load_laporan_stok_barang();
+        case 'ajax_load_laporan_permintaan':
+            $pimpinan->ajax_load_laporan_permintaan();
         case 'laporan_permintaan':
             $pimpinan->laporan_permintaan_page();
             break;
         case 'cetak_laporan':
             $pimpinan->cetak_laporan();
-            break;        
+            break;
 
+
+        // ==========================================
+        // RUTE PIMPINAN CONTROLLER
+        // ==========================================
+        case 'log_barang':
+            $logBarangBergerak->log_barang_bergerak();
+            break;
+        case 'ajax_load_log_barang_bergerak':
+            $logBarangBergerak->ajax_load_log_barang_bergerak();
+            break;
 
         // Default action or 404
         default:
@@ -167,5 +181,4 @@ if (isset($_GET['page'])) {
     }
 } else {
     $dashboard->index();
-}   
-?>
+}

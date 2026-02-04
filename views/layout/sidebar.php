@@ -85,13 +85,19 @@
             <li class="nav-item">
                 <a class="nav-link" href="<?= BASE_URL ?>laporan_stok">
                     <i class="fas fa-fw fa-boxes"></i>
-                    <span>Laporan Stok Saat Ini</span></a>
+                    <span>Laporan Stok</span></a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" href="<?= BASE_URL ?>log_barang">
+                    <i class="fas fa-fw fa-boxes"></i>
+                    <span>Log Barang</span></a>
             </li>
 
             <li class="nav-item">
                 <a class="nav-link" href="<?= BASE_URL ?>laporan_permintaan">
                     <i class="fas fa-fw fa-file-alt"></i>
-                    <span>Laporan Permintaan Saat Ini</span></a>
+                    <span>Laporan Permintaan</span></a>
             </li>
 
             <li class="nav-item">

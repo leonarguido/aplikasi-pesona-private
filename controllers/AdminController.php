@@ -20,7 +20,6 @@ class AdminController
                 'icon' => 'error',
                 'title' => 'Akses Ditolak!',
             ];
-            // 'text' => 'Anda tidak memiliki akses!'
             header("Location: index.php");
             exit;
         }
@@ -31,6 +30,7 @@ class AdminController
     // A. PROSES TAMBAH DATA BARANG
     public function tambah_data_barang()
     {
+        $log_barang = new LogBarangBergerakController();
         require __DIR__ . '/../config/koneksi.php';
         session_start();
 
@@ -54,7 +54,13 @@ class AdminController
             } else {
                 $query = "INSERT INTO tb_barang_bergerak (kode_barang, merk_barang, nama_barang, satuan, keterangan, stok) 
                   VALUES ('$kode', '$merk', '$nama', '$satuan', '$desc', '$stok')";
+
                 if (mysqli_query($koneksi, $query)) {
+                    // LOG BARANG
+                    $id_admin = $_SESSION['user_id'];
+                    $id_barang = mysqli_insert_id($koneksi);
+                    $log_barang->proses_log_barang($id_admin, $id_barang, "tambah");
+
                     $_SESSION['alert'] = [
                         'icon' => 'success',
                         'title' => 'Barang berhasil ditambahkan!',
@@ -62,7 +68,13 @@ class AdminController
                     header("Location: " . $this->base_url . "data_barang");
                     exit;
                 } else {
-                    echo "<script>alert('Gagal: " . mysqli_error($koneksi) . "');</script>";
+                    // echo "<script>alert('Gagal: " . mysqli_error($koneksi) . "');</script>";
+                    $_SESSION['alert'] = [
+                        'icon' => 'Gagal: ' + mysqli_error($koneksi),
+                        'title' => 'Kode Barang sudah ada!',
+                    ];
+                    header("Location: " . $this->base_url . "data_barang");
+                    exit;
                 }
             }
         }
@@ -72,6 +84,7 @@ class AdminController
     // B. PROSES EDIT DATA BARANG
     public function edit_data_barang()
     {
+        $log_barang = new LogBarangBergerakController();
         require __DIR__ . '/../config/koneksi.php';
         session_start();
 
@@ -85,6 +98,11 @@ class AdminController
 
             $query = "UPDATE tb_barang_bergerak SET merk_barang='$merk', nama_barang='$nama', satuan='$satuan', keterangan='$desc', stok='$stok' WHERE id='$id'";
             if (mysqli_query($koneksi, $query)) {
+                // LOG BARANG
+                $id_admin = $_SESSION['user_id'];
+                $id_barang = $id;
+                $log_barang->proses_log_barang($id_admin, $id_barang, "edit");
+
                 $_SESSION['alert'] = [
                     'icon' => 'success',
                     'title' => 'Data barang berhasil diupdate!',
@@ -98,6 +116,7 @@ class AdminController
     // C. PROSES HAPUS DATA BARANG
     public function hapus_data_barang()
     {
+        $log_barang = new LogBarangBergerakController();
         require __DIR__ . '/../config/koneksi.php';
         session_start();
 
@@ -105,6 +124,11 @@ class AdminController
             $id = $_GET['id'];
             $query = "UPDATE tb_barang_bergerak SET is_deleted=1 WHERE id = '$id'";
             if (mysqli_query($koneksi, $query)) {
+                // LOG BARANG
+                $id_admin = $_SESSION['user_id'];
+                $id_barang = $id;
+                $log_barang->proses_log_barang($id_admin, $id_barang, "hapus");
+
                 $_SESSION['alert'] = [
                     'icon' => 'success',
                     'title' => 'Barang berhasil dihapus!',
@@ -193,6 +217,200 @@ class AdminController
         }
     }
 
+    // MASUK HALAMAN DATA BARANG TIDAK BERGERAK
+    public function data_barang_tidak_bergerak_page()
+    {
+        require __DIR__ . '/../config/koneksi.php';
+        session_start();
+
+        // Cek Login & Role
+        if (!isset($_SESSION['user_id'])) {
+            header("Location: login.php");
+            exit;
+        }
+        if ($_SESSION['role'] == 'user' || $_SESSION['role'] == 'pimpinan') {
+            $_SESSION['alert'] = [
+                'icon' => 'error',
+                'title' => 'Akses Ditolak!',
+            ];
+            header("Location: index.php");
+            exit;
+        }
+
+        require_once '../views/admin/data_barang_tidak_bergerak.php';
+    }
+
+    // A. PROSES TAMBAH DATA BARANG
+    public function tambah_data_barang_tidak_bergerak()
+    {
+        require __DIR__ . '/../config/koneksi.php';
+        session_start();
+
+        if (isset($_POST['tambah'])) {
+            $kode   = $_POST['kode_barang'];
+            $merk   = $_POST['merk_barang'];
+            $nama   = $_POST['nama_barang'];
+            $satuan = $_POST['satuan'];
+            $desc   = $_POST['keterangan'];
+            $stok   = $_POST['stok'];
+
+            $cek = mysqli_query($koneksi, "SELECT * FROM tb_barang_bergerak_tidak_bergerak WHERE is_deleted=0 AND kode_barang = '$kode'");
+            if (mysqli_num_rows($cek) > 0) {
+                // echo "<script>alert('Kode Barang sudah ada!'); window.location='" . $this->base_url . "data_barang';</script>";
+                $_SESSION['alert'] = [
+                    'icon' => 'error',
+                    'title' => 'Kode Barang sudah ada!',
+                ];
+                header("Location: " . $this->base_url . "data_barang_tidak_bergerak");
+                exit;
+            } else {
+                $query = "INSERT INTO tb_barang_bergerak_tidak_bergerak (kode_barang, merk_barang, nama_barang, satuan, keterangan, stok) 
+                  VALUES ('$kode', '$merk', '$nama', '$satuan', '$desc', '$stok')";
+                if (mysqli_query($koneksi, $query)) {
+                    $_SESSION['alert'] = [
+                        'icon' => 'success',
+                        'title' => 'Barang berhasil ditambahkan!',
+                    ];
+                    header("Location: " . $this->base_url . "data_barang_tidak_bergerak");
+                    exit;
+                } else {
+                    // echo "<script>alert('Gagal: " . mysqli_error($koneksi) . "');</script>";
+                    $_SESSION['alert'] = [
+                        'icon' => 'Gagal: ' + mysqli_error($koneksi),
+                        'title' => 'Kode Barang sudah ada!',
+                    ];
+                    header("Location: " . $this->base_url . "data_barang_tidak_bergerak");
+                    exit;
+                }
+            }
+        }
+    }
+
+
+    // B. PROSES EDIT DATA BARANG
+    public function edit_data_barang_tidak_bergerak()
+    {
+        require __DIR__ . '/../config/koneksi.php';
+        session_start();
+
+        if (isset($_POST['edit'])) {
+            $id     = $_POST['id'];
+            $merk   = $_POST['merk_barang'];
+            $nama   = $_POST['nama_barang'];
+            $satuan = $_POST['satuan'];
+            $desc   = $_POST['keterangan'];
+            $stok   = $_POST['stok'];
+
+            $query = "UPDATE tb_barang_tidak_bergerak_bergerak SET merk_barang='$merk', nama_barang='$nama', satuan='$satuan', keterangan='$desc', stok='$stok' WHERE id='$id'";
+            if (mysqli_query($koneksi, $query)) {
+                $_SESSION['alert'] = [
+                    'icon' => 'success',
+                    'title' => 'Data barang berhasil diupdate!',
+                ];
+                header("Location: " . $this->base_url . "data_barang_tidak_bergerak");
+                exit;
+            }
+        }
+    }
+
+    // C. PROSES HAPUS DATA BARANG_tidak_bergerak
+    public function hapus_data_barang_tidak_bergerak()
+    {
+        require __DIR__ . '/../config/koneksi.php';
+        session_start();
+
+        if (isset($_GET['id'])) {
+            $id = $_GET['id'];
+            $query = "UPDATE tb_barang_tidak_bergerak_bergerak SET is_deleted=1 WHERE id = '$id'";
+            if (mysqli_query($koneksi, $query)) {
+                $_SESSION['alert'] = [
+                    'icon' => 'success',
+                    'title' => 'Barang berhasil dihapus!',
+                ];
+                header("Location: " . $this->base_url . "data_barang_tidak_bergerak");
+                exit;
+            }
+        }
+    }
+
+    // D. DOWNLOAD TEMPLATE EXCEL/CSV
+    public function template_barang_tidak_bergerak()
+    {
+        require_once '../views/admin/template_barang_tidak_bergerak.php';
+    }
+
+    // E. PROSES INPUT DATA DARI EXCEL/CSV
+    public function import_excel_data_barang_tidak_bergerak()
+    {
+        require __DIR__ . '/../config/koneksi.php';
+        session_start();
+
+        if (isset($_POST['import_excel'])) {
+            // Cek apakah file diupload
+            if (isset($_FILES['file_excel']['name']) && $_FILES['file_excel']['name'] != "") {
+
+                $filename = $_FILES['file_excel']['tmp_name'];
+                $ext = pathinfo($_FILES['file_excel']['name'], PATHINFO_EXTENSION);
+
+                // Validasi Ekstensi harus CSV
+                if ($ext != 'csv') {
+                    // echo "<script>alert('Format file harus .CSV (Comma Separated Values)!');</script>";
+                    $_SESSION['alert'] = [
+                        'icon' => 'error',
+                        'title' => 'Format file harus .CSV (Comma Separated Values)!',
+                    ];
+                    var_dump($_SESSION);
+                    header("Location: " . $this->base_url . "data_barang_tidak_bergerak");
+                    exit;
+                } else {
+                    $file = fopen($filename, "r");
+                    $count = 0; // Hitung data sukses
+
+                    // Lewati baris pertama (Header Judul) agar tidak ikut ter-input
+                    fgetcsv($file);
+
+                    while (($data = fgetcsv($file, 10000, ",")) !== FALSE) {
+                        // Mapping Data dari Excel/CSV ke Variabel
+                        // Kolom 0: Kode,  1: Nama, 2: Merk, 3: Satuan, 4: Stok, 5: Ket
+                        $kode   = mysqli_real_escape_string($koneksi, $data[0]);
+                        $nama   = mysqli_real_escape_string($koneksi, $data[1]);
+                        $merk   = mysqli_real_escape_string($koneksi, $data[2]);
+                        $satuan = mysqli_real_escape_string($koneksi, $data[3]);
+                        $stok   = (int) $data[4];
+                        $desc   = mysqli_real_escape_string($koneksi, $data[5]);
+
+                        // Cek Duplikat Kode Barang
+                        $cek = mysqli_query($koneksi, "SELECT kode_barang FROM tb_barang_tidak_bergerak WHERE kode_barang = '$kode'");
+
+                        if (mysqli_num_rows($cek) == 0 && !empty($kode)) {
+                            // Jika kode belum ada, Insert Baru
+                            $query = "INSERT INTO tb_barang_tidak_bergerak (kode_barang, merk_barang, nama_barang, satuan, stok, keterangan) 
+                              VALUES ('$kode', '$merk', '$nama', '$satuan', '$stok', '$desc')";
+                            mysqli_query($koneksi, $query);
+                            $count++;
+                        }
+                    }
+                    fclose($file);
+                    // echo "<script>alert('Berhasil mengimpor $count data barang!'); window.location='" . $this->base_url . "data_barang';</script>";
+                    $_SESSION['alert'] = [
+                        'icon' => 'success',
+                        'title' => "Berhasil mengimpor $count data barang_tidak_bergerak!",
+                    ];
+                    header("Location: " . $this->base_url . "data_barang_tidak_bergerak");
+                    exit;
+                }
+            } else {
+                // echo "<script>alert('Pilih file terlebih dahulu!');</script>";
+                $_SESSION['alert'] = [
+                    'icon' => 'error',
+                    'title' => 'Pilih file terlebih dahulu!',
+                ];
+                header("Location: " . $this->base_url . "data_barang_tidak_bergerak");
+                exit;
+            }
+        }
+    }
+
     // MASUK HALAMAN PERSETUJUAN
     public function persetujuan_page()
     {
@@ -204,7 +422,12 @@ class AdminController
             exit;
         }
         if ($_SESSION['role'] == 'staff' || $_SESSION['role'] == 'user') {
-            echo "<script>alert('Akses Ditolak!'); window.location='index.php';</script>";
+            // echo "<script>alert('Akses Ditolak!'); window.location='index.php';</script>";
+            $_SESSION['alert'] = [
+                'icon' => 'error',
+                'title' => 'Akses Ditolak!',
+            ];
+            header("Location: " . $this->base_url);
             exit;
         }
         require_once '../views/admin/persetujuan.php';
@@ -221,7 +444,12 @@ class AdminController
             exit;
         }
         if ($_SESSION['role'] == 'staff' || $_SESSION['role'] == 'user') {
-            echo "<script>alert('Akses Ditolak!'); window.location='index.php';</script>";
+            // echo "<script>alert('Akses Ditolak!'); window.location='index.php';</script>";
+            $_SESSION['alert'] = [
+                'icon' => 'error',
+                'title' => 'Akses Ditolak!',
+            ];
+            header("Location: " . $this->base_url);
             exit;
         }
 
@@ -271,7 +499,13 @@ class AdminController
 
             // TAHAP 2: EKSEKUSI
             if (!$stok_aman) {
-                echo "<script>alert('$error_msg');</script>";
+                // echo "<script>alert('$error_msg');</script>";
+                $_SESSION['alert'] = [
+                    'icon' => 'error',
+                    'title' => $error_msg,
+                ];
+                header("Location: " . $this->base_url . "persetujuan");
+                exit;
             } else {
                 foreach ($qty_approved_array as $id_detail => $jml_acc) {
                     mysqli_query($koneksi, "UPDATE tb_detail_permintaan SET jumlah = '$jml_acc' WHERE id = '$id_detail'");
@@ -289,9 +523,21 @@ class AdminController
                          WHERE id = '$id_permintaan'";
 
                 if (mysqli_query($koneksi, $query_update)) {
-                    echo "<script>alert('Permintaan berhasil DISETUJUI!'); window.location='" . $this->base_url . "persetujuan';</script>";
+                    // echo "<script>alert('Permintaan berhasil DISETUJUI!'); window.location='" . $this->base_url . "persetujuan';</script>";
+                    $_SESSION['alert'] = [
+                        'icon' => 'success',
+                        'title' => 'Permintaan berhasil DISETUJUI!',
+                    ];
+                    header("Location: " . $this->base_url . "persetujuan");
+                    exit;
                 } else {
-                    echo "<script>alert('Error: " . mysqli_error($koneksi) . "');</script>";
+                    // echo "<script>alert('Error: " . mysqli_error($koneksi) . "');</script>";
+                    $_SESSION['alert'] = [
+                        'icon' => 'error',
+                        'title' => 'Error:' + mysqli_error($koneksi),
+                    ];
+                    header("Location: " . $this->base_url . "persetujuan");
+                    exit;
                 }
             }
         }
@@ -317,9 +563,21 @@ class AdminController
               WHERE id = '$id_permintaan'";
 
             if (mysqli_query($koneksi, $query)) {
-                echo "<script>alert('Permintaan berhasil DITOLAK!'); window.location='" . $this->base_url . "persetujuan';</script>";
+                // echo "<script>alert('Permintaan berhasil DITOLAK!'); window.location='" . $this->base_url . "persetujuan';</script>";
+                $_SESSION['alert'] = [
+                    'icon' => 'error',
+                    'title' => 'Permintaan berhasil DITOLAK!',
+                ];
+                header("Location: " . $this->base_url . "persetujuan");
+                exit;
             } else {
-                echo "<script>alert('Error: " . mysqli_error($koneksi) . "');</script>";
+                // echo "<script>alert('Error: " . mysqli_error($koneksi) . "');</script>";
+                $_SESSION['alert'] = [
+                    'icon' => 'error',
+                    'title' => 'Error:' + mysqli_error($koneksi),
+                ];
+                header("Location: " . $this->base_url . "persetujuan");
+                exit;
             }
         }
     }
@@ -338,7 +596,12 @@ class AdminController
 
         // Hanya Super Admin yang boleh akses halaman ini
         if ($_SESSION['role'] != 'super_admin') {
-            echo "<script>alert('Akses Ditolak!'); window.location='index.php';</script>";
+            // echo "<script>alert('Akses Ditolak!'); window.location='index.php';</script>";
+            $_SESSION['alert'] = [
+                'icon' => 'error',
+                'title' => 'Akses Ditolak!',
+            ];
+            header("Location: " . $this->base_url);
             exit;
         }
 
@@ -367,11 +630,21 @@ class AdminController
                 $allowed    = ['png', 'jpg', 'jpeg'];
 
                 if (!in_array(strtolower($ext), $allowed)) {
-                    echo "<script>alert('Format TTD harus PNG, JPG, atau JPEG!'); window.location='" . $this->base_url . "data_pengguna';</script>";
+                    // echo "<script>alert('Format TTD harus PNG, JPG, atau JPEG!'); window.location='" . $this->base_url . "data_pengguna';</script>";
+                    $_SESSION['alert'] = [
+                        'icon' => 'error',
+                        'title' => 'Format TTD harus PNG, JPG, atau JPEG!',
+                    ];
+                    header("Location: " . $this->base_url . "data_pengguna");
                     exit;
                 }
                 if ($filesize > 2000000) {
-                    echo "<script>alert('Ukuran file TTD terlalu besar (Max 2MB)!'); window.location='" . $this->base_url . "data_pengguna';</script>";
+                    // echo "<script>alert('Ukuran file TTD terlalu besar (Max 2MB)!'); window.location='" . $this->base_url . "data_pengguna';</script>";
+                    $_SESSION['alert'] = [
+                        'icon' => 'error',
+                        'title' => 'Ukuran file TTD terlalu besar (Max 2MB)!',
+                    ];
+                    header("Location: " . $this->base_url . "data_pengguna");
                     exit;
                 }
 
@@ -383,9 +656,21 @@ class AdminController
           VALUES ('$nama', '$nip', '$username', '$password', '$role', '$paraf_name')";
 
             if (mysqli_query($koneksi, $q)) {
-                echo "<script>alert('User Berhasil Ditambahkan!'); window.location='" . $this->base_url . "data_pengguna';</script>";
+                // echo "<script>alert('User Berhasil Ditambahkan!'); window.location='" . $this->base_url . "data_pengguna';</script>";
+                $_SESSION['alert'] = [
+                    'icon' => 'success',
+                    'title' => 'User Berhasil Ditambahkan!',
+                ];
+                header("Location: " . $this->base_url . "data_pengguna");
+                exit;
             } else {
-                echo "<script>alert('Gagal menambah user: " . mysqli_error($koneksi) . "');</script>";
+                // echo "<script>alert('Gagal menambah user: " . mysqli_error($koneksi) . "');</script>";
+                $_SESSION['alert'] = [
+                    'icon' => 'success',
+                    'title' => 'Gagal menambah user:' + mysqli_error($koneksi),
+                ];
+                header("Location: " . $this->base_url . "data_pengguna");
+                exit;
             }
         }
     }
@@ -428,9 +713,21 @@ class AdminController
           WHERE id='$id'";
 
             if (mysqli_query($koneksi, $q)) {
-                echo "<script>alert('Data User Diupdate!'); window.location='" . $this->base_url . "data_pengguna';</script>";
+                // echo "<script>alert('Data User Diupdate!'); window.location='" . $this->base_url . "data_pengguna';</script>";
+                $_SESSION['alert'] = [
+                    'icon' => 'success',
+                    'title' => 'Data User Diupdate!',
+                ];
+                header("Location: " . $this->base_url . "data_pengguna");
+                exit;
             } else {
-                echo "<script>alert('Gagal update!');</script>";
+                // echo "<script>alert('Gagal update!');</script>";
+                $_SESSION['alert'] = [
+                    'icon' => 'error',
+                    'title' => 'Gagal update!',
+                ];
+                header("Location: " . $this->base_url . "data_pengguna");
+                exit;
             }
         }
     }
@@ -451,9 +748,21 @@ class AdminController
 
             $q = "DELETE FROM tb_user WHERE id='$id'";
             if (mysqli_query($koneksi, $q)) {
-                echo "<script>alert('User Dihapus!'); window.location='" . $this->base_url . "data_pengguna';</script>";
+                // echo "<script>alert('User Dihapus!'); window.location='" . $this->base_url . "data_pengguna';</script>";
+                $_SESSION['alert'] = [
+                    'icon' => 'success',
+                    'title' => 'User Dihapus!',
+                ];
+                header("Location: " . $this->base_url . "data_pengguna");
+                exit;
             } else {
-                echo "<script>alert('Gagal hapus!');</script>";
+                // echo "<script>alert('Gagal hapus!');</script>";
+                $_SESSION['alert'] = [
+                    'icon' => 'error',
+                    'title' => 'Gagal hapus!',
+                ];
+                header("Location: " . $this->base_url . "data_pengguna");
+                exit;
             }
         }
     }

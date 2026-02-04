@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Laporan Transaksi <?= $tgl_mulai; ?> sd <?= $tgl_selesai; ?></title>
+    <?php define('BASE_URL', '/aplikasi-pesona-private/routes/web.php/?page='); ?>
     <style>
         /* CSS untuk Tampilan Cetak */
         body {
@@ -92,7 +93,7 @@
 
     <div class="container">
         <div class="no-print" style="margin-bottom: 20px;">
-            <a href="laporan.php" class="btn-back">⬅ Kembali</a>
+            <a href="<?= BASE_URL ?>laporan" class="btn-back">⬅ Kembali</a>
             <button onclick="window.print()" class="btn-print">🖨️ Cetak / Simpan PDF</button>
         </div>
 
@@ -192,7 +193,7 @@
                 else:
                     ?>
                     <tr>
-                        <td colspan="5" style="text-align: center; padding: 20px;">Tidak ada data transaksi pada periode ini.</td>
+                        <td colspan="7" style="text-align: center; padding: 20px;">Tidak ada data transaksi pada periode ini.</td>
                     </tr>
                 <?php endif; ?>
             </tbody>

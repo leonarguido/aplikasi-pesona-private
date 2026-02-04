@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Surat Permintaan Barang - #<?= $data['id']; ?></title>
+    <?php define('BASE_URL', '/aplikasi-pesona-private/routes/web.php/?page='); ?>
     <style>
         body { font-family: 'Times New Roman', serif; font-size: 12pt; margin: 0; padding: 20px; color: #000; }
         .container { width: 100%; max-width: 800px; margin: auto; }

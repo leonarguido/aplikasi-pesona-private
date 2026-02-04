@@ -78,7 +78,7 @@
                                 </div>
                                 <div class="card-body">
                                     <div class="table-responsive">
-                                        <table class="table table-bordered table-striped" id="dataTable" width="100%" cellspacing="0">
+                                        <table class="table table-bordered table-striped" id="dataTableStok" width="100%" cellspacing="0">
                                             <thead class="bg-dark text-white">
                                                 <tr>
                                                     <th width="5%" style="text-align:center;">No</th>
@@ -117,14 +117,14 @@
                                 </div>
                                 <div class="card-body">
                                     <div class="table-responsive">
-                                        <table class="table table-bordered table-striped" id="dataTable" width="100%" cellspacing="0">
+                                        <table class="table table-bordered table-striped" id="dataTablePermintaan" width="100%" cellspacing="0">
                                             <thead class="bg-dark text-white">
                                                 <tr>
                                                     <th width="5%" style="text-align:center;">No</th>
                                                     <th width="10%">Tanggal Setuju</th>
                                                     <th width="10%">Pemohon</th>
-                                                    <th width="20%">Rincian Barang (Disetujui)</th>
-                                                    <th width="15%" style="text-align:center;">Jumlah</th>
+                                                    <th width="30%">Rincian Barang (Disetujui)</th>
+                                                    <th width="10%" style="text-align:center;">Jumlah</th>
                                                     <th width="10%" style="text-align:center;">Satuan</th>
                                                     <th width="10%">Admin Penyetuju</th>
                                                 </tr>
@@ -147,30 +147,6 @@
     <?php require '../views/layout/footer.php'; ?>
 
     <script>
-        $(document).ready(function() {
-            if (!$.fn.DataTable.isDataTable('#dataTable')) {
-                $('#dataTable').DataTable({
-                    "language": {
-                        "search": "Cari Stok:",
-                        "lengthMenu": "Tampilkan _MENU_ antrian",
-                        "filter": '<select class="form-control form-control-sm"><option value="">Semua Status</option><option value="Aman">Aman</option><option value="Menipis">Menipis</option><option value="Habis">Habis</option></select>',
-                        "zeroRecords": "Tidak ada stok yang cocok",
-                        "info": "Menampilkan _PAGE_ dari _PAGES_",
-                        "infoEmpty": "Tidak ada data",
-                        "infoFiltered": "(difilter dari _MAX_ total data)",
-                        "paginate": {
-                            "first": "Awal",
-                            "last": "Akhir",
-                            "next": "Lanjut",
-                            "previous": "Kembali"
-                        }
-                    }
-                });
-            }
-        });
-
-
-
         // ==========================================
         // STOK BARANG
         // ==========================================
@@ -186,14 +162,32 @@
                     tahun_angka_post: $tahun_angka
                 },
                 success: function(res) {
-                    $('#dataTable').DataTable().destroy();
+                    if ($.fn.DataTable.isDataTable('#dataTableStok')) {
+                        $('#dataTableStok').DataTable().destroy();
+                    }
+
                     $('#tabel_stok_barang').html(res);
-                    $('#dataTable').DataTable();
+                    $('#dataTableStok').DataTable({
+                        "language": {
+                            "search": "Cari Stok:",
+                            "lengthMenu": "Tampilkan _MENU_ antrian",
+                            "zeroRecords": "Tidak ada permintaan yang cocok",
+                            "info": "Menampilkan _PAGE_ dari _PAGES_",
+                            "infoEmpty": "Tidak ada data",
+                            "infoFiltered": "(difilter dari _MAX_ total data)",
+                            "paginate": {
+                                "first": "Awal",
+                                "last": "Akhir",
+                                "next": "Lanjut",
+                                "previous": "Kembali"
+                            }
+                        }
+                    });
                 }
             });
         }
         // load awal page
-        load_stok_barang(<?= $bulan_angka ?>, <?= $tahun_angka ?>);
+        load_stok_barang(<?= json_encode($bulan_angka) ?>, <?= json_encode($tahun_angka) ?>);
 
 
         // 2. LOAD BULAN OTOMATIS
@@ -213,7 +207,7 @@
             $('#kalender_stok_barang').val($tahun_angka + '-' + String($bulan_angka).padStart(2, '0'));
         }
         // load awal bulan
-        load_bulan_stok_barang(<?= $bulan_angka ?>, <?= $tahun_angka ?>);
+        load_bulan_stok_barang(<?= ($bulan_angka) ?>, <?= $tahun_angka ?>);
 
 
         // 3. KLIK KALENDER STOK BARANG
@@ -271,7 +265,6 @@
 
         // 2. LOAD RIWAYAT PERSETUJUAN OTOMATIS (AJAX)
         function load_riwayat_persetujuan($bulan_angka, $tahun_angka) {
-            console.log("Loading stok barang untuk bulan: " + $bulan_angka + ", tahun: " + $tahun_angka);
             $.ajax({
                 url: '<?= BASE_URL ?>ajax_load_riwayat_persetujuan',
                 type: 'POST',
@@ -280,15 +273,32 @@
                     tahun_angka_post: $tahun_angka
                 },
                 success: function(res) {
-                    console.log(res);
-                    $('#dataTable').DataTable().destroy();
+                    if ($.fn.DataTable.isDataTable('#dataTablePermintaan')) {
+                        $('#dataTablePermintaan').DataTable().destroy();
+                    }
+
                     $('#tabel_riwayat_persetujuan').html(res);
-                    $('#dataTable').DataTable();
+                    $('#dataTablePermintaan').DataTable({
+                        "language": {
+                            "search": "Cari Permintaan:",
+                            "lengthMenu": "Tampilkan _MENU_ antrian",
+                            "zeroRecords": "Tidak ada permintaan yang cocok",
+                            "info": "Menampilkan _PAGE_ dari _PAGES_",
+                            "infoEmpty": "Tidak ada data",
+                            "infoFiltered": "(difilter dari _MAX_ total data)",
+                            "paginate": {
+                                "first": "Awal",
+                                "last": "Akhir",
+                                "next": "Lanjut",
+                                "previous": "Kembali"
+                            }
+                        }
+                    });
                 }
             });
         }
         // load awal page
-        load_riwayat_persetujuan(<?= $bulan_angka ?>, <?= $tahun_angka ?>)
+        load_riwayat_persetujuan(<?= ($bulan_angka) ?>, <?= $tahun_angka ?>)
 
         // 2. LOAD BULAN OTOMATIS
         $('#kalender_riwayat_persetujuan').datepicker({
@@ -307,7 +317,7 @@
             $('#kalender_riwayat_persetujuan').val($tahun_angka + '-' + String($bulan_angka).padStart(2, '0'));
         }
         // load awal bulan
-        load_bulan_riwayat_persetujuan(<?= $bulan_angka ?>, <?= $tahun_angka ?>);
+        load_bulan_riwayat_persetujuan(<?= ($bulan_angka) ?>, <?= $tahun_angka ?>);
 
 
         // 3. KLIK KALENDER STOK BARANG

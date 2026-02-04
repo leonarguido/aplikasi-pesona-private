@@ -138,26 +138,7 @@
                 });
             }
         });
-        $(document).ready(function() {
-            if (!$.fn.DataTable.isDataTable('#dataTable')) {
-                $('#dataTable').DataTable({
-                    "language": {
-                        "search": "Cari Barang:",
-                        "lengthMenu": "Tampilkan _MENU_ data per halaman",
-                        "zeroRecords": "Data tidak ditemukan",
-                        "info": "Halaman _PAGE_ dari _PAGES_",
-                        "infoEmpty": "Tidak ada data",
-                        "infoFiltered": "(difilter dari _MAX_ total data)",
-                        "paginate": {
-                            "first": "Awal",
-                            "last": "Akhir",
-                            "next": "Lanjut",
-                            "previous": "Kembali"
-                        }
-                    }
-                });
-            }
-        });
+
         if (window.innerHeight <= 700) {
             document.getElementById('accordionSidebar')
                 .style.height = '100vh';

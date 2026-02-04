@@ -71,7 +71,7 @@
                                                     <button class="btn btn-warning btn-sm" data-toggle="modal" data-target="#editModal<?= $row['id']; ?>">
                                                         <i class="fas fa-edit"></i>
                                                     </button>
-                                                    <a href="<?= BASE_URL ?>hapus_data_barang&id=<?= $row['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Hapus barang ini?');">
+                                                    <a href="<?= BASE_URL ?>hapus_data_barang&id=<?= $row['id']; ?>" class="btn btn-danger btn-sm" onclick="confirmHapus(event, this.href)">
                                                         <i class="fas fa-trash"></i>
                                                     </a>
                                                     <!-- <a href="data_barang.php?hapus=row[id]" class="btn btn-danger btn-sm" onclick="return confirm('Hapus barang ini?');"> -->
@@ -244,6 +244,25 @@
         if (window.innerHeight <= 700) {
             document.getElementById('accordionSidebar')
                 .style.height = '100vh';
+        }
+
+        function confirmHapus(event, url) {
+            event.preventDefault();
+
+            Swal.fire({
+                title: 'Yakin?',
+                text: 'Barang akan dihapus permanen!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Ya, hapus!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = url;
+                }
+            });
         }
     </script>
 </body>

@@ -97,7 +97,7 @@
                                                             <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalEdit<?= $id_req; ?>" title="Edit Jumlah">
                                                                 <i class="fas fa-edit"></i>
                                                             </button>
-                                                            <a href="<?= BASE_URL ?>batalkan_permintaan_saya&batal_id=<?= $id_req; ?>" class="btn btn-danger" onclick="return confirm('Yakin ingin membatalkan?')" title="Batalkan">
+                                                            <a href="<?= BASE_URL ?>batalkan_permintaan_saya&batal_id=<?= $id_req; ?>" class="btn btn-danger" onclick="confirmHapus(event, this.href)">
                                                                 <i class="fas fa-trash"></i>
                                                             </a>
                                                         </div>
@@ -179,25 +179,45 @@
 
     <script>
         $(document).ready(function() {
-        if (!$.fn.DataTable.isDataTable('#dataTable')) {
-            $('#dataTable').DataTable({
-                "language": {
-                    "search": "Cari Permintaan:",
-                    "lengthMenu": "Tampilkan _MENU_ antrian",
-                    "zeroRecords": "Tidak ada permintaan yang cocok",
-                    "info": "Menampilkan _PAGE_ dari _PAGES_",
-                    "infoEmpty": "Tidak ada data",
-                    "infoFiltered": "(difilter dari _MAX_ total data)",
-                    "paginate": {
-                        "first": "Awal",
-                        "last": "Akhir",
-                        "next": "Lanjut",
-                        "previous": "Kembali"
+            if (!$.fn.DataTable.isDataTable('#dataTable')) {
+                $('#dataTable').DataTable({
+                    "language": {
+                        "search": "Cari Permintaan:",
+                        "lengthMenu": "Tampilkan _MENU_ antrian",
+                        "zeroRecords": "Tidak ada permintaan yang cocok",
+                        "info": "Menampilkan _PAGE_ dari _PAGES_",
+                        "infoEmpty": "Tidak ada data",
+                        "infoFiltered": "(difilter dari _MAX_ total data)",
+                        "paginate": {
+                            "first": "Awal",
+                            "last": "Akhir",
+                            "next": "Lanjut",
+                            "previous": "Kembali"
+                        }
                     }
+                });
+            }
+        });
+
+        function confirmHapus(event, url) {
+            event.preventDefault();
+
+            Swal.fire({
+                title: 'Yakin?',
+                text: 'Permintaan akan dibatalkan!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Ya, hapus!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = url;
                 }
             });
         }
-    });
+
         if (window.innerHeight <= 700) {
             document.getElementById('accordionSidebar')
                 .style.height = '100vh';
