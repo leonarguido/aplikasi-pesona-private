@@ -38,7 +38,7 @@
                                                     <th width="10%">Admin</th>
                                                     <th width="10%">Kode Barang</th>
                                                     <th width="20%">Nama Barang</th>
-                                                    <th width="10%" style="text-align:center;">Aksi</th>
+                                                    <th width="10%" style="text-align:center;">Histori Aksi</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="tabel_log">

@@ -1,3 +1,55 @@
+<?php
+session_start();
+require 'config/koneksi.php';
+
+if (!isset($_SESSION['user_id']) || !isset($_GET['id'])) {
+    header("Location: index.php");
+    exit;
+}
+
+$id_permintaan = $_GET['id'];
+
+// ============================================
+// QUERY DATA
+// ============================================
+$query_header = "SELECT p.*, 
+                 u_pemohon.nama AS nama_pemohon, u_pemohon.nip AS nip_pemohon, u_pemohon.paraf AS ttd_pemohon,
+                 u_admin.nama AS nama_admin, u_admin.nip AS nip_admin, u_admin.paraf AS ttd_admin
+                 FROM tb_permintaan p
+                 JOIN tb_user u_pemohon ON p.user_id = u_pemohon.id
+                 LEFT JOIN tb_user u_admin ON p.admin_id = u_admin.id
+                 WHERE p.id = '$id_permintaan'";
+
+$result_header = mysqli_query($koneksi, $query_header);
+$data = mysqli_fetch_assoc($result_header);
+
+// Validasi Status
+if ($data['status'] != 'disetujui') {
+    echo "<script>alert('Surat belum bisa dicetak karena status belum disetujui!'); window.close();</script>";
+    exit;
+}
+
+// ============================================
+// KONVERSI TANGGAL KE BAHASA INDONESIA
+// ============================================
+$tanggal_sql = $data['tanggal_disetujui']; // Format: YYYY-MM-DD
+
+// 1. Daftar Nama Bulan Indonesia
+$bulan_indo = [
+    1 => 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+    'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+];
+
+// 2. Pecah tanggal
+$pecah_tgl = explode('-', $tanggal_sql);
+$tgl = $pecah_tgl[2];
+$bln = (int) $pecah_tgl[1]; // Ubah '02' jadi 2 agar cocok dengan array
+$thn = $pecah_tgl[0];
+
+// 3. Gabungkan (Contoh: 03 Februari 2026)
+$tanggal_indonesia = $tgl . ' ' . $bulan_indo[$bln] . ' ' . $thn;
+?>
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -9,11 +61,15 @@
         .container { width: 100%; max-width: 800px; margin: auto; }
         
         /* KOP SURAT */
-        .header { text-align: center; border-bottom: 3px double black; padding-bottom: 10px; margin-bottom: 30px; }
-        .header h2 { margin: 0; font-size: 16pt; text-transform: uppercase; }
-        .header h3 { margin: 5px 0; font-size: 14pt; }
-        .header p { margin: 0; font-size: 11pt; }
-
+        .header-table { width: 100%; border-bottom: 3px double black; margin-bottom: 20px; padding-bottom: 10px; }
+        .header-table td { vertical-align: middle; }
+        .logo-kop { width: 100px; height: auto; }
+        
+        .text-kop { text-align: center; line-height: 1.2; }
+        .text-kop h2 { margin: 0; font-size: 14pt; font-weight: normal; font-family: 'Times New Roman', serif; }
+        .text-kop h1 { margin: 5px 0; font-size: 16pt; font-weight: bold; font-family: 'Times New Roman', serif; }
+        .text-kop p { margin: 0; font-size: 10pt; }
+        
         /* ISI SURAT */
         .content { margin-bottom: 30px; line-height: 1.5; }
         
@@ -25,12 +81,13 @@
         /* TANDA TANGAN */
         .ttd-wrapper { width: 100%; display: table; margin-top: 50px; }
         .ttd-box { display: table-cell; width: 50%; text-align: center; vertical-align: top; }
-        .img-ttd { width: 120px; height: auto; display: block; margin: 10px auto; }
-        .space-ttd { height: 80px; } /* Spasi jika tidak ada TTD */
+        .img-ttd { width: 100px; height: auto; display: block; margin: 10px auto; }
+        .space-ttd { height: 80px; } 
 
         /* TOMBOL PRINT */
         @media print {
             .no-print { display: none; }
+            @page { margin: 2cm; }
         }
         .btn-print {
             background: #4e73df; color: white; border: none; padding: 10px 20px; 
@@ -43,18 +100,23 @@
 <div class="container">
     <button onclick="window.print()" class="no-print btn-print">🖨️ Cetak Surat</button>
 
-    <div class="header">
-        <h2>PEMERINTAH KOTA CONTOH</h2>
-        <h3>DINAS PERDAGANGAN DAN PERINDUSTRIAN</h3>
-        <p>Jl. Jendral Sudirman No. 123, Telp. (021) 1234567</p>
-    </div>
+    <table class="header-table">
+        <tr>
+            <td width="15%" style="text-align: center;">
+                <img src="assets/img/logo_tutwuri.jpg" alt="Logo" class="logo-kop">
+            </td>
+            <td width="85%" class="text-kop">
+                <h2>KEMENTERIAN PENDIDIKAN DASAR<br>DAN MENENGAH</h2>
+                <h1>BALAI PENJAMINAN MUTU PENDIDIKAN PROVINSI BALI</h1>
+                <p>Jalan Letda Tantular Nomor 14 Niti Mandala, Denpasar</p>
+                <p>Telp. (0361) 225666, Fax. (0361) 246682</p>
+                <p>Pos el: bpmpbali@kemdikbud.go.id, Laman: www.bpmpbali.kemdikdasmen.go.id</p>
+            </td>
+        </tr>
+    </table>
 
     <div class="content">
-        <div style="text-align: right; margin-bottom: 20px;">
-            Denpasar, <?= date('d F Y', strtotime($data['tanggal_disetujui'])); ?>
-        </div>
-
-        <p><strong>Nomor Transaksi :</strong> #REQ-<?= sprintf("%04d", $data['id']); ?></p>
+        <p><strong>Nomor Surat :</strong> #REQ-<?= sprintf("%04d", $data['id']); ?></p>
         <p><strong>Perihal :</strong> Bukti Serah Terima Barang (ATK)</p>
         
         <br>
@@ -103,13 +165,11 @@
 
     <div class="ttd-wrapper">
         <div class="ttd-box">
+            <br>
             <p>Yang Menerima,</p>
             
             <?php 
-            // Cek apakah file paraf ada di folder assets/img/ttd/
-            // Sesuaikan path folder jika berbeda
             $path_ttd_pemohon = 'assets/img/ttd/' . $data['ttd_pemohon'];
-            
             if(!empty($data['ttd_pemohon']) && file_exists($path_ttd_pemohon)): 
             ?>
                 <img src="<?= $path_ttd_pemohon; ?>" class="img-ttd">
@@ -122,11 +182,9 @@
         </div>
 
         <div class="ttd-box">
-            <p>Yang Menyerahkan,<br>Admin Gudang</p>
-            
+            <p>Denpasar, <?= $tanggal_indonesia; ?>,<br>Admin Gudang</p>
             <?php 
             $path_ttd_admin = 'assets/img/ttd/' . $data['ttd_admin'];
-            
             if(!empty($data['ttd_admin']) && file_exists($path_ttd_admin)): 
             ?>
                 <img src="<?= $path_ttd_admin; ?>" class="img-ttd">
@@ -139,11 +197,6 @@
         </div>
     </div>
 </div>
-
-<script>
-    // Opsional: Otomatis print saat dibuka
-    // window.print();
-</script>
 
 </body>
 </html>
