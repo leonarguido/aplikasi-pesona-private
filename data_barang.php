@@ -225,7 +225,7 @@ require 'layout/topbar.php';
                                         </div>
                                         <div class="modal-footer">
                                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                                            <button type="submit" name="edit" class="btn btn-warning">Update</button>
+                                            <button type="submit" name="edit" class="btn btn-warning">Edit</button>
                                         </div>
                                     </form>
                                 </div>

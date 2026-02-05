@@ -3,24 +3,19 @@ session_start();
 require 'config/koneksi.php';
 
 // Cek Login & Role
-// KITA TAMBAHKAN 'pimpinan' DI SINI AGAR BISA AKSES
 if (!isset($_SESSION['user_id']) || ($_SESSION['role'] != 'admin' && $_SESSION['role'] != 'admin gudang' && $_SESSION['role'] != 'super_admin' && $_SESSION['role'] != 'pimpinan')) {
     header("Location: index.php");
     exit;
 }
 
-// =======================================================
-// 1. AMBIL DATA PEGAWAI (UNTUK DROPDOWN)
-// =======================================================
+// 1. AMBIL DATA PEGAWAI
 $list_pegawai = [];
 $q_pgw = mysqli_query($koneksi, "SELECT nip, nama FROM tb_user WHERE nip IS NOT NULL AND nip != '' ORDER BY nama ASC");
 while ($p = mysqli_fetch_assoc($q_pgw)) {
     $list_pegawai[] = $p;
 }
 
-// =======================================================
-// LOGIKA BACKEND (CRUD) - HANYA JALAN KALAU BUKAN PIMPINAN
-// =======================================================
+// LOGIKA BACKEND (CRUD)
 if ($_SESSION['role'] != 'pimpinan') {
 
     // A. TAMBAH DATA
@@ -34,12 +29,21 @@ if ($_SESSION['role'] != 'pimpinan') {
         $ket    = mysqli_real_escape_string($koneksi, $_POST['keterangan']);
         
         $nama_file = null;
+        
+        // --- PERBAIKAN UPLOAD ---
         if (!empty($_FILES['berkas']['name'])) {
             $file_tmp  = $_FILES['berkas']['tmp_name'];
             $file_name = time() . "_" . $_FILES['berkas']['name'];
-            if (!is_dir("assets/img/berkas/")) { mkdir("assets/img/berkas/", 0777, true); }
-            move_uploaded_file($file_tmp, "assets/img/berkas/" . $file_name);
-            $nama_file = $file_name;
+            
+            // Perbaikan Path: assets/berkas/ (sesuai folder Anda)
+            $target_dir = "assets/berkas/"; 
+            
+            // Buat folder jika belum ada (jaga-jaga)
+            if (!is_dir($target_dir)) { mkdir($target_dir, 0777, true); }
+            
+            if(move_uploaded_file($file_tmp, $target_dir . $file_name)){
+                $nama_file = $file_name;
+            }
         }
 
         $q = "INSERT INTO tb_barang_tidak_bergerak (nip, nama_barang, kode_barang, merk_barang, satuan, jumlah, keterangan, berkas) 
@@ -67,7 +71,9 @@ if ($_SESSION['role'] != 'pimpinan') {
         if (!empty($_FILES['berkas']['name'])) {
             $file_tmp  = $_FILES['berkas']['tmp_name'];
             $file_name = time() . "_" . $_FILES['berkas']['name'];
-            move_uploaded_file($file_tmp, "assets/img/berkas/" . $file_name);
+            
+            // Perbaikan Path: assets/berkas/
+            move_uploaded_file($file_tmp, "assets/berkas/" . $file_name);
             $query_file = ", berkas='$file_name'";
         }
 
@@ -86,9 +92,12 @@ if ($_SESSION['role'] != 'pimpinan') {
         $id = $_GET['hapus'];
         $q_cek = mysqli_query($koneksi, "SELECT berkas FROM tb_barang_tidak_bergerak WHERE id='$id'");
         $d_cek = mysqli_fetch_assoc($q_cek);
-        if($d_cek['berkas'] && file_exists("assets/img/berkas/".$d_cek['berkas'])){
-            unlink("assets/img/berkas/".$d_cek['berkas']);
+        
+        // Perbaikan Path Hapus: assets/berkas/
+        if($d_cek['berkas'] && file_exists("assets/berkas/".$d_cek['berkas'])){
+            unlink("assets/berkas/".$d_cek['berkas']);
         }
+        
         mysqli_query($koneksi, "DELETE FROM tb_barang_tidak_bergerak WHERE id='$id'");
         echo "<script>alert('Data Dihapus!'); window.location='barang_tidak_bergerak.php';</script>";
     }
@@ -99,7 +108,6 @@ if ($_SESSION['role'] != 'pimpinan') {
 require 'layout/header.php';
 require 'layout/sidebar.php';
 
-// Judul Halaman
 $judul_halaman = "Data Barang Tidak Bergerak";
 require 'layout/topbar.php'; 
 ?>
@@ -167,7 +175,7 @@ require 'layout/topbar.php';
                             <td><?= $row['jumlah']; ?> <?= $row['satuan']; ?></td>
                             <td class="text-center">
                                 <?php if($row['berkas']): ?>
-                                    <a href="assets/img/berkas/<?= $row['berkas']; ?>" target="_blank" class="btn btn-sm btn-success shadow-sm" title="Lihat Berkas">
+                                    <a href="/aplikasi-pesona/assets/berkas/<?= $row['berkas']; ?>" target="_blank" class="btn btn-sm btn-success shadow-sm" title="Lihat Berkas">
                                         <i class="fas fa-file-alt"></i> Lihat
                                     </a>
                                 <?php else: ?>
@@ -291,7 +299,6 @@ require 'layout/topbar.php';
     $(document).ready(function() {
         $('#dataTable').DataTable();
 
-        // Aktifkan Select2 HANYA jika elemennya ada (untuk admin)
         if ($('#selectNipTambah').length) {
             $('#selectNipTambah').select2({
                 dropdownParent: $('#modalTambah'),

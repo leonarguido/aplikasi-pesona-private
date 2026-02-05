@@ -20,7 +20,7 @@
         <hr class="sidebar-divider">
 
         <?php if($_SESSION['role'] == 'super_admin' || $_SESSION['role'] == 'super admin'): ?>
-        <div class="sidebar-heading">Admin Core</div>
+        <div class="sidebar-heading">Superadmin</div>
         
         <li class="nav-item">
             <a class="nav-link" href="data_pengguna.php">
@@ -30,8 +30,11 @@
         <?php endif; ?>
 
 
-        <?php if($_SESSION['role'] == 'admin gudang' || $_SESSION['role'] == 'admin'): ?>
-        <div class="sidebar-heading">Inventaris</div>
+        <?php 
+        // admin gudang  & super_admin
+        if($_SESSION['role'] == 'admin gudang' || $_SESSION['role'] == 'admin' || $_SESSION['role'] == 'super_admin' || $_SESSION['role'] == 'super admin'): 
+        ?>
+        <div class="sidebar-heading">Inventaris (Admin)</div>
         
         <li class="nav-item">
             <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseDataBarang"
@@ -62,7 +65,7 @@
 
         <hr class="sidebar-divider">
         
-        <div class="sidebar-heading">Laporan</div>
+        <div class="sidebar-heading">Laporan (Admin)</div>
         
         <li class="nav-item">
             <a class="nav-link" href="laporan.php">
@@ -72,7 +75,10 @@
         <?php endif; ?>
 
 
-        <?php if($_SESSION['role'] == 'user' || $_SESSION['role'] == 'staff'): ?>
+        <?php 
+        // staf & super_admin
+        if($_SESSION['role'] == 'user' || $_SESSION['role'] == 'staff' || $_SESSION['role'] == 'super_admin' || $_SESSION['role'] == 'super admin'): 
+        ?>
         
         <div class="sidebar-heading">Inventaris</div>
 
@@ -99,8 +105,10 @@
         </li>
         <?php endif; ?>
 
-
-        <?php if($_SESSION['role'] == 'pimpinan'): ?>
+        <?php 
+        // pimpnan
+        if($_SESSION['role'] == 'pimpinan'): 
+        ?>
         
         <div class="sidebar-heading">Data Inventaris</div>
 
