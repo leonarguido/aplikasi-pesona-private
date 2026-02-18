@@ -19,7 +19,6 @@ if (isset($_POST['aksi_setuju'])) {
     $id_pinjam = $_POST['id'];
     
     // Update status jadi 'disetujui' SAJA. 
-    // Tanggal kembali tetap mengikuti apa yang diinput Admin.
     $query = "UPDATE tb_peminjaman SET status='disetujui' WHERE id='$id_pinjam' AND user_id='$id_staf_login'";
     
     if (mysqli_query($koneksi, $query)) {
@@ -138,14 +137,35 @@ require 'layout/topbar.php';
                                         <i class="fas fa-times"></i> Tolak
                                     </button>
 
-                                <?php elseif($row['status'] == 'disetujui' || $row['status'] == 'selesai'): ?>
-                                    <a href="cetak_berita_acara.php?id=<?= $row['id']; ?>" target="_blank" class="btn btn-primary btn-sm btn-block">
-                                        <i class="fas fa-print"></i> Cetak Berita Acara
+                                <?php elseif($row['status'] == 'disetujui'): ?>
+                                    <a href="cetak_berita_acara.php?id=<?= $row['id']; ?>" target="_blank" class="btn btn-primary btn-sm btn-block" title="Cetak Draft untuk TTD">
+                                        <i class="fas fa-print"></i> Cetak Draft Berita Acara
                                     </a>
-                                    <?php if($row['status'] == 'disetujui'): ?>
-                                        <small class="text-muted mt-2 d-block text-xs">
-                                            *Silakan cetak, TTD basah, lalu serahkan ke Admin untuk diupload.
-                                        </small>
+                                    <small class="text-muted mt-2 d-block text-xs">
+                                        *Cetak, TTD, lalu serahkan ke Admin.
+                                    </small>
+
+                                <?php elseif($row['status'] == 'selesai'): ?>
+                                    <?php if(!empty($row['file_ba_signed'])): ?>
+                                        <a href="assets/arsip/<?= $row['file_ba_signed']; ?>" target="_blank" class="btn btn-success btn-sm btn-block" title="Lihat Dokumen Asli">
+                                            <i class="fas fa-file-pdf"></i> Berita Acara Peminjaman
+                                        </a>
+                                    <?php else: ?>
+                                        <span class="badge badge-light text-muted border">Menunggu Upload Admin</span>
+                                    <?php endif; ?>
+
+                                <?php elseif($row['status'] == 'dikembalikan'): ?>
+                                    
+                                    <?php if(!empty($row['file_ba_signed'])): ?>
+                                        <a href="assets/arsip/<?= $row['file_ba_signed']; ?>" target="_blank" class="btn btn-outline-success btn-sm btn-block mb-2">
+                                            <i class="fas fa-file-pdf"></i> Berita Acara Pinjam
+                                        </a>
+                                    <?php endif; ?>
+
+                                    <?php if(!empty($row['file_ba_kembali'])): ?>
+                                        <a href="assets/arsip/<?= $row['file_ba_kembali']; ?>" target="_blank" class="btn btn-outline-info btn-sm btn-block">
+                                            <i class="fas fa-file-pdf"></i> Berita Acara Kembali
+                                        </a>
                                     <?php endif; ?>
                                     
                                 <?php else: ?>
@@ -182,7 +202,7 @@ require 'layout/topbar.php';
                                             </ul>
 
                                             <div class="alert alert-warning small mt-3">
-                                                Dengan klik <b>"Ya, Saya Setuju"</b>, sistem akan membuatkan Berita Acara untuk Anda cetak dan tandatangani.
+                                                Dengan klik <b>"Ya, Saya Setuju"</b>, sistem akan membuatkan Draft Berita Acara untuk Anda cetak.
                                             </div>
                                         </div>
                                         <div class="modal-footer">
