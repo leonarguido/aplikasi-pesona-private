@@ -31,26 +31,28 @@
 
 
         <?php 
-        // admin gudang  & super_admin
         if($_SESSION['role'] == 'admin gudang' || $_SESSION['role'] == 'admin' || $_SESSION['role'] == 'super_admin' || $_SESSION['role'] == 'super admin'): 
         ?>
-        <div class="sidebar-heading">Inventaris (Admin)</div>
-        
+        <div class="sidebar-heading">Aset BMN</div>
+
         <li class="nav-item">
-            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseDataBarang"
-                aria-expanded="true" aria-controls="collapseDataBarang">
-                <i class="fas fa-fw fa-boxes"></i>
-                <span>Data Barang</span>
-            </a>
-            <div id="collapseDataBarang" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                <div class="bg-white py-2 collapse-inner rounded">
-                    <h6 class="collapse-header">Pilih Kategori:</h6>
-                    <a class="collapse-item" href="data_barang.php">Barang Bergerak</a>
-                    <a class="collapse-item" href="barang_tidak_bergerak.php">Brg Tidak Bergerak</a>
-                </div>
-            </div>
+            <a class="nav-link" href="input_peminjaman_barang.php">
+                <i class="fas fa-fw fa-file-alt"></i> <span>Input Peminjaman Barang</span></a>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link" href="pengembalian_barang.php">
+                <i class="fas fa-fw fa-undo"></i>
+                <span>Pengembalian Barang</span></a>
         </li>
         
+        <div class="sidebar-heading">Barang Habis Pakai</div>
+
+        <li class="nav-item">
+            <a class="nav-link" href="data_barang.php">
+                <i class="fas fa-fw fa-dolly"></i> <span>Data Barang Bergerak</span></a>
+        </li>
+
         <li class="nav-item">
             <a class="nav-link" href="persetujuan.php">
                 <i class="fas fa-fw fa-check-circle"></i>
@@ -76,21 +78,20 @@
 
 
         <?php 
-        // staf & super_admin
         if($_SESSION['role'] == 'user' || $_SESSION['role'] == 'staff' || $_SESSION['role'] == 'super_admin' || $_SESSION['role'] == 'super admin'): 
         ?>
         
-        <div class="sidebar-heading">Inventaris</div>
+        <div class="sidebar-heading">Barang BMN</div>
 
         <li class="nav-item">
-            <a class="nav-link" href="aset_saya.php">
+            <a class="nav-link" href="peminjaman_saya.php">
                 <i class="fas fa-fw fa-cube"></i>
-                <span>Barang Tidak Bergerak</span></a>
+                <span>Peminjaman Saya</span></a>
         </li>
         
         <hr class="sidebar-divider my-2">
 
-        <div class="sidebar-heading">Permintaan Barang</div>
+        <div class="sidebar-heading">Permintaan Barang Habis Pakai</div>
         
         <li class="nav-item">
             <a class="nav-link" href="daftar_barang.php">
@@ -105,17 +106,17 @@
         </li>
         <?php endif; ?>
 
+
         <?php 
-        // pimpnan
         if($_SESSION['role'] == 'pimpinan'): 
         ?>
         
         <div class="sidebar-heading">Data Inventaris</div>
 
         <li class="nav-item">
-            <a class="nav-link" href="barang_tidak_bergerak.php">
+            <a class="nav-link" href="input_peminjaman_barang.php">
                 <i class="fas fa-fw fa-building"></i>
-                <span>Barang Tidak Bergerak</span></a>
+                <span>Input Peminjaman Barang</span></a>
         </li>
 
         <hr class="sidebar-divider my-2">
