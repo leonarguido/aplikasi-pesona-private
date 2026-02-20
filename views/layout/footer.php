@@ -52,6 +52,11 @@
             }
         });
     });
+
+    if (window.innerHeight <= 700) {
+        document.getElementById('accordionSidebar')
+            .style.height = '100vh';
+    }
 </script>
 
 <?php if (isset($_SESSION['alert'])) : ?>
@@ -59,7 +64,13 @@
         Swal.fire({
             icon: '<?= $_SESSION['alert']['icon']; ?>',
             title: '<?= $_SESSION['alert']['title']; ?>',
-            confirmButtonColor: '#4e73df'
+            text: '<?= $_SESSION['alert']['text']; ?>',
+            showConfirmButton: false,
+            timer: 1500,
+            timerProgressBar: true,
+            width: '420px',
+            padding: '2em',
+            // confirmButtonColor: '#4e73df'
         });
     </script>
 <?php unset($_SESSION['alert']);

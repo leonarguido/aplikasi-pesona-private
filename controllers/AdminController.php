@@ -18,7 +18,8 @@ class AdminController
         if ($_SESSION['role'] == 'user' || $_SESSION['role'] == 'pimpinan') {
             $_SESSION['alert'] = [
                 'icon' => 'error',
-                'title' => 'Akses Ditolak!',
+                'title' => 'Gagal!',
+                'text' => 'Akses Ditolak!',
             ];
             header("Location: index.php");
             exit;
@@ -47,7 +48,8 @@ class AdminController
                 // echo "<script>alert('Kode Barang sudah ada!'); window.location='" . $this->base_url . "data_barang';</script>";
                 $_SESSION['alert'] = [
                     'icon' => 'error',
-                    'title' => 'Kode Barang sudah ada!',
+                    'title' => 'Gagal!',
+                    'text' => 'Kode Barang sudah ada!',
                 ];
                 header("Location: " . $this->base_url . "data_barang");
                 exit;
@@ -63,7 +65,8 @@ class AdminController
 
                     $_SESSION['alert'] = [
                         'icon' => 'success',
-                        'title' => 'Barang berhasil ditambahkan!',
+                        'title' => 'Berhasil!',
+                        'text' => 'Barang berhasil ditambahkan!',
                     ];
                     header("Location: " . $this->base_url . "data_barang");
                     exit;
@@ -105,7 +108,8 @@ class AdminController
 
                 $_SESSION['alert'] = [
                     'icon' => 'success',
-                    'title' => 'Data barang berhasil diupdate!',
+                    'title' => 'Berhasil!',
+                    'text' => 'Data barang berhasil diupdate!',
                 ];
                 header("Location: " . $this->base_url . "data_barang");
                 exit;
@@ -131,7 +135,8 @@ class AdminController
 
                 $_SESSION['alert'] = [
                     'icon' => 'success',
-                    'title' => 'Barang berhasil dihapus!',
+                    'title' => 'Berhasil!',
+                    'text' => 'Barang berhasil dihapus!',
                 ];
                 header("Location: " . $this->base_url . "data_barang");
                 exit;
@@ -163,7 +168,8 @@ class AdminController
                     // echo "<script>alert('Format file harus .CSV (Comma Separated Values)!');</script>";
                     $_SESSION['alert'] = [
                         'icon' => 'error',
-                        'title' => 'Format file harus .CSV (Comma Separated Values)!',
+                        'title' => 'Gagal!',
+                        'text' => 'Format file harus .CSV (Comma Separated Values)!',
                     ];
                     var_dump($_SESSION);
                     header("Location: " . $this->base_url . "data_barang");
@@ -200,7 +206,8 @@ class AdminController
                     // echo "<script>alert('Berhasil mengimpor $count data barang!'); window.location='" . $this->base_url . "data_barang';</script>";
                     $_SESSION['alert'] = [
                         'icon' => 'success',
-                        'title' => "Berhasil mengimpor $count data barang!",
+                        'title' => 'Berhasil!',
+                        'text' => "Berhasil mengimpor $count data barang!",
                     ];
                     header("Location: " . $this->base_url . "data_barang");
                     exit;
@@ -209,7 +216,8 @@ class AdminController
                 // echo "<script>alert('Pilih file terlebih dahulu!');</script>";
                 $_SESSION['alert'] = [
                     'icon' => 'error',
-                    'title' => 'Pilih file terlebih dahulu!',
+                    'title' => 'Gagal!',
+                    'text' => 'Pilih file terlebih dahulu!',
                 ];
                 header("Location: " . $this->base_url . "data_barang");
                 exit;
@@ -231,7 +239,8 @@ class AdminController
         if ($_SESSION['role'] == 'user' || $_SESSION['role'] == 'pimpinan') {
             $_SESSION['alert'] = [
                 'icon' => 'error',
-                'title' => 'Akses Ditolak!',
+                'title' => 'Gagal!',
+                'text' => 'Akses Ditolak!',
             ];
             header("Location: index.php");
             exit;
@@ -259,7 +268,8 @@ class AdminController
                 // echo "<script>alert('Kode Barang sudah ada!'); window.location='" . $this->base_url . "data_barang';</script>";
                 $_SESSION['alert'] = [
                     'icon' => 'error',
-                    'title' => 'Kode Barang sudah ada!',
+                    'title' => 'Gagal!',
+                    'text' => 'Kode Barang sudah ada!',
                 ];
                 header("Location: " . $this->base_url . "data_barang_tidak_bergerak");
                 exit;
@@ -269,7 +279,8 @@ class AdminController
                 if (mysqli_query($koneksi, $query)) {
                     $_SESSION['alert'] = [
                         'icon' => 'success',
-                        'title' => 'Barang berhasil ditambahkan!',
+                        'title' => 'Berhasil!',
+                        'text' => 'Barang berhasil ditambahkan!',
                     ];
                     header("Location: " . $this->base_url . "data_barang_tidak_bergerak");
                     exit;
@@ -305,7 +316,8 @@ class AdminController
             if (mysqli_query($koneksi, $query)) {
                 $_SESSION['alert'] = [
                     'icon' => 'success',
-                    'title' => 'Data barang berhasil diupdate!',
+                    'title' => 'Berhasil!',
+                    'text' => 'Data barang berhasil diupdate!',
                 ];
                 header("Location: " . $this->base_url . "data_barang_tidak_bergerak");
                 exit;
@@ -325,7 +337,8 @@ class AdminController
             if (mysqli_query($koneksi, $query)) {
                 $_SESSION['alert'] = [
                     'icon' => 'success',
-                    'title' => 'Barang berhasil dihapus!',
+                    'title' => 'Berhasil!',
+                    'text' => 'Barang berhasil dihapus!',
                 ];
                 header("Location: " . $this->base_url . "data_barang_tidak_bergerak");
                 exit;
@@ -357,7 +370,8 @@ class AdminController
                     // echo "<script>alert('Format file harus .CSV (Comma Separated Values)!');</script>";
                     $_SESSION['alert'] = [
                         'icon' => 'error',
-                        'title' => 'Format file harus .CSV (Comma Separated Values)!',
+                        'title' => 'Gagal!',
+                        'text' => 'Format file harus .CSV (Comma Separated Values)!',
                     ];
                     var_dump($_SESSION);
                     header("Location: " . $this->base_url . "data_barang_tidak_bergerak");
@@ -394,7 +408,8 @@ class AdminController
                     // echo "<script>alert('Berhasil mengimpor $count data barang!'); window.location='" . $this->base_url . "data_barang';</script>";
                     $_SESSION['alert'] = [
                         'icon' => 'success',
-                        'title' => "Berhasil mengimpor $count data barang_tidak_bergerak!",
+                        'title' => 'Berhasil!',
+                        'text' => "Berhasil mengimpor $count data barang_tidak_bergerak!",
                     ];
                     header("Location: " . $this->base_url . "data_barang_tidak_bergerak");
                     exit;
@@ -403,7 +418,8 @@ class AdminController
                 // echo "<script>alert('Pilih file terlebih dahulu!');</script>";
                 $_SESSION['alert'] = [
                     'icon' => 'error',
-                    'title' => 'Pilih file terlebih dahulu!',
+                    'title' => 'Gagal!',
+                    'text' => 'Pilih file terlebih dahulu!',
                 ];
                 header("Location: " . $this->base_url . "data_barang_tidak_bergerak");
                 exit;
@@ -425,7 +441,8 @@ class AdminController
             // echo "<script>alert('Akses Ditolak!'); window.location='index.php';</script>";
             $_SESSION['alert'] = [
                 'icon' => 'error',
-                'title' => 'Akses Ditolak!',
+                'title' => 'Gagal!',
+                'text' => 'Akses Ditolak!',
             ];
             header("Location: " . $this->base_url);
             exit;
@@ -447,7 +464,8 @@ class AdminController
             // echo "<script>alert('Akses Ditolak!'); window.location='index.php';</script>";
             $_SESSION['alert'] = [
                 'icon' => 'error',
-                'title' => 'Akses Ditolak!',
+                'title' => 'Gagal!',
+                'text' => 'Akses Ditolak!',
             ];
             header("Location: " . $this->base_url);
             exit;
@@ -502,7 +520,8 @@ class AdminController
                 // echo "<script>alert('$error_msg');</script>";
                 $_SESSION['alert'] = [
                     'icon' => 'error',
-                    'title' => $error_msg,
+                    'title' => 'Gagal!',
+                    'text' => $error_msg,
                 ];
                 header("Location: " . $this->base_url . "persetujuan");
                 exit;
@@ -526,7 +545,8 @@ class AdminController
                     // echo "<script>alert('Permintaan berhasil DISETUJUI!'); window.location='" . $this->base_url . "persetujuan';</script>";
                     $_SESSION['alert'] = [
                         'icon' => 'success',
-                        'title' => 'Permintaan berhasil DISETUJUI!',
+                        'title' => 'Berhasil!',
+                        'text' => 'Permintaan berhasil DISETUJUI!',
                     ];
                     header("Location: " . $this->base_url . "persetujuan");
                     exit;
@@ -534,7 +554,8 @@ class AdminController
                     // echo "<script>alert('Error: " . mysqli_error($koneksi) . "');</script>";
                     $_SESSION['alert'] = [
                         'icon' => 'error',
-                        'title' => 'Error:' + mysqli_error($koneksi),
+                        'title' => 'Gagal!',
+                        'text' => 'Error:' + mysqli_error($koneksi),
                     ];
                     header("Location: " . $this->base_url . "persetujuan");
                     exit;
@@ -566,7 +587,8 @@ class AdminController
                 // echo "<script>alert('Permintaan berhasil DITOLAK!'); window.location='" . $this->base_url . "persetujuan';</script>";
                 $_SESSION['alert'] = [
                     'icon' => 'error',
-                    'title' => 'Permintaan berhasil DITOLAK!',
+                    'title' => 'Gagal!',
+                    'text' => 'Permintaan berhasil DITOLAK!',
                 ];
                 header("Location: " . $this->base_url . "persetujuan");
                 exit;
@@ -574,7 +596,8 @@ class AdminController
                 // echo "<script>alert('Error: " . mysqli_error($koneksi) . "');</script>";
                 $_SESSION['alert'] = [
                     'icon' => 'error',
-                    'title' => 'Error:' + mysqli_error($koneksi),
+                    'title' => 'Gagal!',
+                    'text' => 'Error:' + mysqli_error($koneksi),
                 ];
                 header("Location: " . $this->base_url . "persetujuan");
                 exit;
@@ -599,7 +622,8 @@ class AdminController
             // echo "<script>alert('Akses Ditolak!'); window.location='index.php';</script>";
             $_SESSION['alert'] = [
                 'icon' => 'error',
-                'title' => 'Akses Ditolak!',
+                'title' => 'Gagal!',
+                'text' => 'Akses Ditolak!',
             ];
             header("Location: " . $this->base_url);
             exit;
@@ -633,7 +657,8 @@ class AdminController
                     // echo "<script>alert('Format TTD harus PNG, JPG, atau JPEG!'); window.location='" . $this->base_url . "data_pengguna';</script>";
                     $_SESSION['alert'] = [
                         'icon' => 'error',
-                        'title' => 'Format TTD harus PNG, JPG, atau JPEG!',
+                        'title' => 'Gagal!',
+                        'text' => 'Format TTD harus PNG, JPG, atau JPEG!',
                     ];
                     header("Location: " . $this->base_url . "data_pengguna");
                     exit;
@@ -642,14 +667,17 @@ class AdminController
                     // echo "<script>alert('Ukuran file TTD terlalu besar (Max 2MB)!'); window.location='" . $this->base_url . "data_pengguna';</script>";
                     $_SESSION['alert'] = [
                         'icon' => 'error',
-                        'title' => 'Ukuran file TTD terlalu besar (Max 2MB)!',
+                        'title' => 'Gagal!',
+                        'text' => 'Ukuran file TTD terlalu besar (Max 2MB)!',
                     ];
                     header("Location: " . $this->base_url . "data_pengguna");
                     exit;
                 }
 
                 $paraf_name = date('Ymd_His') . '_' . uniqid() . '.' . $ext;
-                move_uploaded_file($_FILES['paraf']['tmp_name'], 'assets/img/ttd/' . $paraf_name);
+                $target_dir = __DIR__ . '/../assets/img/ttd/';
+                $target_path = $target_dir . $paraf_name;
+                move_uploaded_file($_FILES['paraf']['tmp_name'], $target_path);
             }
 
             $q = "INSERT INTO tb_user (nama, nip, username, password, role, paraf) 
@@ -659,7 +687,8 @@ class AdminController
                 // echo "<script>alert('User Berhasil Ditambahkan!'); window.location='" . $this->base_url . "data_pengguna';</script>";
                 $_SESSION['alert'] = [
                     'icon' => 'success',
-                    'title' => 'User Berhasil Ditambahkan!',
+                    'title' => 'Berhasil!',
+                    'text' => 'User Berhasil Ditambahkan!',
                 ];
                 header("Location: " . $this->base_url . "data_pengguna");
                 exit;
@@ -667,7 +696,8 @@ class AdminController
                 // echo "<script>alert('Gagal menambah user: " . mysqli_error($koneksi) . "');</script>";
                 $_SESSION['alert'] = [
                     'icon' => 'success',
-                    'title' => 'Gagal menambah user:' + mysqli_error($koneksi),
+                    'title' => 'Berhasil!',
+                    'text' => 'Gagal menambah user:' + mysqli_error($koneksi),
                 ];
                 header("Location: " . $this->base_url . "data_pengguna");
                 exit;
@@ -716,7 +746,8 @@ class AdminController
                 // echo "<script>alert('Data User Diupdate!'); window.location='" . $this->base_url . "data_pengguna';</script>";
                 $_SESSION['alert'] = [
                     'icon' => 'success',
-                    'title' => 'Data User Diupdate!',
+                    'title' => 'Berhasil!',
+                    'text' => 'Data User Diupdate!',
                 ];
                 header("Location: " . $this->base_url . "data_pengguna");
                 exit;
@@ -724,7 +755,8 @@ class AdminController
                 // echo "<script>alert('Gagal update!');</script>";
                 $_SESSION['alert'] = [
                     'icon' => 'error',
-                    'title' => 'Gagal update!',
+                    'title' => 'Gagal!',
+                    'text' => 'Gagal update!',
                 ];
                 header("Location: " . $this->base_url . "data_pengguna");
                 exit;
@@ -751,7 +783,8 @@ class AdminController
                 // echo "<script>alert('User Dihapus!'); window.location='" . $this->base_url . "data_pengguna';</script>";
                 $_SESSION['alert'] = [
                     'icon' => 'success',
-                    'title' => 'User Dihapus!',
+                    'title' => 'Berhasil!',
+                    'text' => 'User Dihapus!',
                 ];
                 header("Location: " . $this->base_url . "data_pengguna");
                 exit;
@@ -759,7 +792,8 @@ class AdminController
                 // echo "<script>alert('Gagal hapus!');</script>";
                 $_SESSION['alert'] = [
                     'icon' => 'error',
-                    'title' => 'Gagal hapus!',
+                    'title' => 'Gagal!',
+                    'text' => 'Gagal hapus!',
                 ];
                 header("Location: " . $this->base_url . "data_pengguna");
                 exit;

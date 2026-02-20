@@ -18,7 +18,8 @@ class LogBarangBergerakController
             // echo "<script>alert('Akses Ditolak!'); window.location='index.php';</script>";
             $_SESSION['alert'] = [
                 'icon' => 'error',
-                'title' => 'Akses Ditolak!',
+                    'title' => 'Gagal!',
+                'text' => 'Akses Ditolak!',
             ];
             header("Location: index.php");
             exit;
@@ -58,7 +59,7 @@ class LogBarangBergerakController
                     l.aksi
                 FROM tb_log_barang_bergerak l
                 JOIN tb_user u ON l.admin_id = u.id
-                JOIN tb_barang_bergerak b ON l.barang_bergerak_id = b.id
+                JOIN tb_barang_bergerak b ON l.barang_id = b.id
                 WHERE MONTH(l.tanggal) = '$bulan' AND YEAR(l.tanggal) = '$tahun'
             ");
 

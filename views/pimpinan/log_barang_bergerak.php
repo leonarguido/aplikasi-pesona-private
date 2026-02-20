@@ -3,7 +3,7 @@
 
 <head>
     <?php require __DIR__ . '/../layout/header.php'; ?>
-    <?php $judul_halaman = "Log Barang Bergerak"; ?>
+    <?php $judul_halaman = "Log Barang Habis Pakai"; ?>
 </head>
 
 <body id="page-top">
@@ -112,7 +112,7 @@
         });
 
         function load_bulan_log($bulan_angka, $tahun_angka) {
-            $('#bulan_ini_log').text('Log Barang Bergerak per Bulan: ' + new Date($tahun_angka, $bulan_angka - 1).toLocaleString('id-ID', {
+            $('#bulan_ini_log').text('Log Barang Habis Pakai per Bulan: ' + new Date($tahun_angka, $bulan_angka - 1).toLocaleString('id-ID', {
                 month: 'long'
             }) + ' ' + $tahun_angka);
 

@@ -18,7 +18,8 @@ class PimpinanController
             // echo "<script>alert('Akses Ditolak!'); window.location='index.php';</script>";
             $_SESSION['alert'] = [
                 'icon' => 'error',
-                'title' => 'Akses Ditolak!',
+                'title' => 'Gagal!',
+                'text' => 'Akses Ditolak!',
             ];
             header("Location: index.php");
             exit;
@@ -169,7 +170,8 @@ class PimpinanController
             // echo "<script>alert('Akses Ditolak!'); window.location='index.php';</script>";
             $_SESSION['alert'] = [
                 'icon' => 'error',
-                'title' => 'Akses Ditolak!',
+                'title' => 'Gagal!',
+                'text' => 'Akses Ditolak!',
             ];
             header("Location: index.php");
             exit;
@@ -253,7 +255,8 @@ class PimpinanController
             // echo "<script>alert('Akses Ditolak!'); window.location='index.php';</script>";
             $_SESSION['alert'] = [
                 'icon' => 'error',
-                'title' => 'Akses Ditolak!',
+                'title' => 'Gagal!',
+                'text' => 'Akses Ditolak!',
             ];
             header("Location: index.php");
             exit;

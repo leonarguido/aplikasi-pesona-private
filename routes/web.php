@@ -125,6 +125,12 @@ if (isset($_GET['page'])) {
         case 'profil_saya':
             $user->profil_page();
             break;
+        case 'ganti_password':
+            $user->ganti_password();
+            break;
+        case 'upload_paraf':
+            $user->upload_paraf();
+            break;
 
         // ==========================================
         // RUTE LOG BARANG BERGERAK CONTROLLER
@@ -132,7 +138,7 @@ if (isset($_GET['page'])) {
 
         // LOG DATA BARANG
         case 'log_data_barang':
-            $logBarangBergerak->log_data_barang_page();
+            $logBarangBergerak->log_barang_bergerak();
             break;
 
         // ==========================================
