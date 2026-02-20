@@ -66,7 +66,8 @@ class UserController
             // echo "<script>alert('Barang masuk keranjang!'); window.location='" . $this->base_url . "daftar_barang';</script>";
             $_SESSION['alert'] = [
                 'icon' => 'success',
-                'title' => 'Barang masuk keranjang!',
+'title' => 'Berhasil!',
+                'text' => 'Barang masuk keranjang!',
             ];
             header("Location: " . $this->base_url . "daftar_barang");
             exit;
@@ -119,7 +120,8 @@ class UserController
                 // echo "<script>alert('Keranjang kosong!'); window.location='" . $this->base_url . "daftar_barang';</script>";
                 $_SESSION['alert'] = [
                     'icon' => 'success',
-                    'title' => 'Keranjang kosong!',
+'title' => 'Berhasil!',
+                    'text' => 'Keranjang kosong!',
                 ];
                 header("Location: " . $this->base_url . "daftar_barang");
                 exit;
@@ -155,7 +157,8 @@ class UserController
                     // echo "<script>alert('Permintaan berhasil diajukan! Satu surat untuk semua barang.'); window.location='" . $this->base_url . "permintaan_saya';</script>";
                     $_SESSION['alert'] = [
                         'icon' => 'success',
-                        'title' => 'Permintaan berhasil diajukan! Satu surat untuk semua barang',
+'title' => 'Berhasil!',
+                        'text' => 'Permintaan berhasil diajukan! Satu surat untuk semua barang',
                     ];
                     header("Location: " . $this->base_url . "permintaan_saya");
                     exit;
@@ -163,7 +166,8 @@ class UserController
                     // echo "<script>alert('Gagal menyimpan detail barang.');</script>";
                     $_SESSION['alert'] = [
                         'icon' => 'error',
-                        'title' => 'Gagal menyimpan detail barang',
+'title' => 'Gagal!',
+                        'text' => 'Gagal menyimpan detail barang',
                     ];
                     header("Location: " . $this->base_url . "permintaan_saya");
                     exit;
@@ -172,7 +176,8 @@ class UserController
                 // echo "<script>alert('Gagal membuat permintaan: " . mysqli_error($koneksi) . "');</script>";
                 $_SESSION['alert'] = [
                     'icon' => 'error',
-                    'title' => 'Gagal membuat permintaan' + mysqli_error($koneksi),
+'title' => 'Gagal!',
+                    'text' => 'Gagal membuat permintaan' + mysqli_error($koneksi),
                 ];
                 header("Location: " . $this->base_url . "permintaan_saya");
                 exit;
@@ -190,6 +195,12 @@ class UserController
         if (!isset($_SESSION['user_id'])) {
             header("Location: login.php");
             exit;
+        }
+
+        $list_barang = [];
+        $q_b = mysqli_query($koneksi, "SELECT * FROM tb_barang_bergerak WHERE stok > 0 ORDER BY nama_barang ASC");
+        while ($b = mysqli_fetch_assoc($q_b)) {
+            $list_barang[] = $b;
         }
 
         require_once '../views/user/permintaan_saya.php';
@@ -214,7 +225,8 @@ class UserController
                 // echo "<script>alert('Permintaan berhasil dibatalkan.'); window.location='" . $this->base_url . "permintaan_saya';</script>";
                 $_SESSION['alert'] = [
                     'icon' => 'success',
-                    'title' => 'Permintaan berhasil dibatalkan!',
+'title' => 'Berhasil!',
+                    'text' => 'Permintaan berhasil dibatalkan!',
                 ];
                 header("Location: " . $this->base_url . "permintaan_saya");
                 exit;
@@ -222,7 +234,8 @@ class UserController
                 // echo "<script>alert('Gagal! Permintaan tidak bisa dibatalkan.'); window.location='" . $this->base_url . "permintaan_saya';</script>";
                 $_SESSION['alert'] = [
                     'icon' => 'error',
-                    'title' => 'Gagal! Permintaan tidak bisa dibatalkan',
+'title' => 'Gagal!',
+                    'text' => 'Gagal! Permintaan tidak bisa dibatalkan',
                 ];
                 header("Location: " . $this->base_url . "permintaan_saya");
                 exit;
@@ -237,19 +250,56 @@ class UserController
         session_start();
 
         if (isset($_POST['update_permintaan'])) {
-            $id_details = $_POST['id_detail']; // Array ID Detail
-            $jumlahs    = $_POST['jumlah'];    // Array Jumlah Baru
+            $id_permintaan = $_POST['id_permintaan'];
 
-            for ($i = 0; $i < count($id_details); $i++) {
-                $curr_id  = $id_details[$i];
-                $curr_jml = $jumlahs[$i];
-                mysqli_query($koneksi, "UPDATE tb_detail_permintaan SET jumlah='$curr_jml' WHERE id='$curr_id'");
+            // A. UPDATE BARANG YANG SUDAH ADA
+            if (isset($_POST['id_detail'])) {
+                $id_details = $_POST['id_detail'];
+                $jumlahs    = $_POST['jumlah'];
+
+                for ($i = 0; $i < count($id_details); $i++) {
+                    $curr_id  = $id_details[$i];
+                    $curr_jml = $jumlahs[$i];
+                    mysqli_query($koneksi, "UPDATE tb_detail_permintaan SET jumlah='$curr_jml' WHERE id='$curr_id'");
+                }
             }
 
-            // echo "<script>alert('Perubahan jumlah berhasil disimpan!'); window.location='" . $this->base_url . "permintaan_saya';</script>";
+            // B. TAMBAH BARANG BARU (SUSULAN)
+            if (isset($_POST['new_barang_id'])) {
+                $new_ids  = $_POST['new_barang_id'];
+                $new_jmls = $_POST['new_jumlah'];
+
+                for ($i = 0; $i < count($new_ids); $i++) {
+                    $id_brg = $new_ids[$i];
+                    $jml    = $new_jmls[$i];
+
+                    if (!empty($id_brg) && $jml > 0) {
+                        // 1. Ambil info satuan barang
+                        $q_info = mysqli_query($koneksi, "SELECT satuan FROM tb_barang_bergerak WHERE id='$id_brg'");
+                        $d_info = mysqli_fetch_assoc($q_info);
+                        $satuan = $d_info['satuan'];
+
+                        // 2. Cek apakah barang ini SUDAH ADA di permintaan ini? (Supaya tidak duplikat baris)
+                        $cek_ada = mysqli_query($koneksi, "SELECT id, jumlah FROM tb_detail_permintaan WHERE permintaan_id='$id_permintaan' AND barang_id='$id_brg'");
+
+                        if (mysqli_num_rows($cek_ada) > 0) {
+                            // Jika sudah ada, kita tambahkan jumlahnya ke yang lama
+                            $row_ada = mysqli_fetch_assoc($cek_ada);
+                            $jml_baru = $row_ada['jumlah'] + $jml;
+                            $id_det_lama = $row_ada['id'];
+                            mysqli_query($koneksi, "UPDATE tb_detail_permintaan SET jumlah='$jml_baru' WHERE id='$id_det_lama'");
+                        } else {
+                            // Jika belum ada, insert baru
+                            mysqli_query($koneksi, "INSERT INTO tb_detail_permintaan (permintaan_id, barang_id, jumlah, satuan) VALUES ('$id_permintaan', '$id_brg', '$jml', '$satuan')");
+                        }
+                    }
+                }
+            }
+
             $_SESSION['alert'] = [
                 'icon' => 'success',
-                'title' => 'Perubahan jumlah berhasil disimpan!',
+'title' => 'Berhasil!',
+                'text' => 'Perubahan berhasil disimpan!',
             ];
             header("Location: " . $this->base_url . "permintaan_saya");
             exit;
@@ -269,10 +319,6 @@ class UserController
 
         $id_permintaan = $_GET['id'];
 
-        // ============================================
-        // QUERY 1: AMBIL DATA HEADER (User, Admin, Tgl)
-        // ============================================
-        // Perbaikan: Mengambil kolom 'paraf' tapi kita alias-kan jadi 'ttd_...' biar mudah
         $query_header = "SELECT p.*, 
                  u_pemohon.nama AS nama_pemohon, u_pemohon.nip AS nip_pemohon, u_pemohon.paraf AS ttd_pemohon,
                  u_admin.nama AS nama_admin, u_admin.nip AS nip_admin, u_admin.paraf AS ttd_admin
@@ -289,13 +335,62 @@ class UserController
             // echo "<script>alert('Surat belum bisa dicetak karena status belum disetujui!'); window.close();</script>";
             $_SESSION['alert'] = [
                 'icon' => 'error',
-                'title' => 'Surat belum bisa dicetak karena status belum disetujui!',
+'title' => 'Gagal!',
+                'text' => 'Surat belum bisa dicetak karena status belum disetujui!',
             ];
             header("Location: " . $this->base_url . "cetak_surat");
             exit;
+        } else {
+            $tanggal_sql = $data['tanggal_disetujui']; // Format: YYYY-MM-DD
+
+            // 1. Daftar Nama Bulan Indonesia
+            $bulan_indo = [
+                1 => 'Januari',
+                'Februari',
+                'Maret',
+                'April',
+                'Mei',
+                'Juni',
+                'Juli',
+                'Agustus',
+                'September',
+                'Oktober',
+                'November',
+                'Desember'
+            ];
+
+            // 2. Pecah tanggal
+            $pecah_tgl = explode('-', $tanggal_sql);
+            $tgl = $pecah_tgl[2];
+            $bln = (int) $pecah_tgl[1]; // Ubah '02' jadi 2 agar cocok dengan array
+            $thn = $pecah_tgl[0];
+
+            // 3. Gabungkan (Contoh: 03 Februari 2026)
+            $tanggal_indonesia = $tgl . ' ' . $bulan_indo[$bln] . ' ' . $thn;
         }
 
         require_once '../views/user/cetak_surat.php';
+    }
+
+    public function aset_saya()
+    {
+        session_start();
+        require __DIR__ . '/../config/koneksi.php';
+
+        // 1. Cek Login (Hanya User/Staff)
+        if (!isset($_SESSION['user_id'])) {
+            header("Location: login.php");
+            exit;
+        }
+
+        $id_user = $_SESSION['user_id'];
+
+        // 2. Ambil Info User (Terutama NIP)
+        $q_user = mysqli_query($koneksi, "SELECT nip, nama FROM tb_user WHERE id='$id_user'");
+        $d_user = mysqli_fetch_assoc($q_user);
+        $nip_user = $d_user['nip']; // NIP User yang login
+
+        require_once '../views/user/aset_saya.php';
     }
 
     // MASUK HALAMAN PROFIL PENGGUNA

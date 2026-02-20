@@ -3,7 +3,7 @@
 
 <head>
     <?php require __DIR__ . '/../layout/header.php'; ?>
-    <?php $judul_halaman = "Log Barang Bergerak"; ?>
+    <?php $judul_halaman = "Log Barang Tidak bergerak"; ?>
 </head>
 
 <body id="page-top">
@@ -37,9 +37,8 @@
                                                     <th width="10%">Tanggal</th>
                                                     <th width="10%">Admin</th>
                                                     <th width="10%">Kode Barang</th>
-                                                    <th width="10%" style="text-align:center;">Nama Barang</th>
+                                                    <th width="20%">Nama Barang</th>
                                                     <th width="10%" style="text-align:center;">Histori Aksi</th>
-                                                    <th width="20%" style="text-align:center;">Keterangan</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="tabel_log">
@@ -47,38 +46,6 @@
                                         </table>
                                     </div>
                                 </div>
-
-                                <div class="modal fade" id="modalEdit" tabindex="-1">
-                                    <div class="modal-dialog">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title">Edit Log Stok Barang</h5>
-                                                <button class="close" data-dismiss="modal">&times;</button>
-                                            </div>
-                                            <form method="POST" id="formEdit" action="">
-                                                <div class="modal-body">
-                                                    <input type="hidden" name="id" id="editId">
-                                                    <input type="hidden" name="stok_lama" id="stokLama">
-                                                    <input type="hidden" name="kode_barang" id="editKode">
-                                                    
-                                                    <div class="form-group">
-                                                        <label>Stok</label>
-                                                        <input type="number" class="form-control" name="stok_baru" min="1" id="editStok">
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label>Keterangan</label>
-                                                        <textarea class="form-control" name="keterangan" id="editKet"></textarea>
-                                                    </div>
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                                                    <button type="submit" name="edit_log" class="btn btn-primary">Simpan</button>
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-
                             </div>
                         </div>
                     </div>
@@ -99,7 +66,7 @@
         function load_log($bulan_angka, $tahun_angka) {
             // console.log("Loading LOG BARANG untuk bulan: " + $bulan_angka + ", tahun: " + $tahun_angka);
             $.ajax({
-                url: '<?= BASE_URL ?>ajax_load_log_barang_bergerak',
+                url: '<?= BASE_URL ?>ajax_load_log_barang_tg',
                 type: 'POST',
                 data: {
                     bulan_angka_post: $bulan_angka,
@@ -112,9 +79,7 @@
 
                     $('#tabel_log').html(res);
                     $('#dataTableLog').DataTable({
-                        "order": [
-                            [0, 'desc']
-                        ],
+                        "order": [[0, 'desc']],
                         "language": {
                             "search": "Cari Log:",
                             "lengthMenu": "Tampilkan _MENU_ antrian",
@@ -147,7 +112,7 @@
         });
 
         function load_bulan_log($bulan_angka, $tahun_angka) {
-            $('#bulan_ini_log').text('Log Barang Bergerak per Bulan: ' + new Date($tahun_angka, $bulan_angka - 1).toLocaleString('id-ID', {
+            $('#bulan_ini_log').text('Log Barang Tidak Bergerak per Bulan: ' + new Date($tahun_angka, $bulan_angka - 1).toLocaleString('id-ID', {
                 month: 'long'
             }) + ' ' + $tahun_angka);
 
@@ -205,21 +170,7 @@
         });
 
 
-        // MODAL EDIT STOK BARANG
-        $(document).on('click', '.btn-edit', function() {
-            let id = $(this).data('id');
-            let kode = $(this).data('kode');
-            let stok = $(this).data('stok');
-            let ket = $(this).data('keterangan');
-
-            $('#editId').val(id);
-            $('#editKode').val(kode);
-            $('#stokLama').val(stok);
-            $('#editStok').val(stok);
-            $('#editKet').val(ket);
-
-            $('#formEdit').attr('action', '<?= $this->base_url ?>edit_log_stok_barang&id=' + id);
-        });
+         
     </script>
 </body>
 

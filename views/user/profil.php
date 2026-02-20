@@ -33,13 +33,13 @@ if (isset($_POST['upload_ttd'])) {
 
         // Generate nama baru agar tidak duplikat
         $nama_baru = "ttd_" . $id_user . "_" . uniqid() . "." . $file_ext;
-        
+
         move_uploaded_file($tmp_name, 'assets/img/ttd/' . $nama_baru);
 
         // Update Database
         $query = "UPDATE tb_user SET ttd = '$nama_baru' WHERE id = '$id_user'";
         mysqli_query($koneksi, $query);
-        
+
         echo "<script>alert('Tanda tangan berhasil diupload!'); window.location='profil.php';</script>";
     }
 }
@@ -65,72 +65,72 @@ $data = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT * FROM tb_user WHERE i
             <div class="col-md-10">
                 <?php require __DIR__ . '/../layout/topbar.php'; ?>
                 <div class="container-fluid mt-4">
-    <h1 class="h3 mb-4 text-gray-800">Profil Saya</h1>
+                    <h1 class="h3 mb-4 text-gray-800">Profil Saya</h1>
 
-    <div class="row">
-        <div class="col-md-6">
-            <div class="card shadow">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Data & Tanda Tangan</h6>
-                </div>
-                <div class="card-body text-center">
-                    <img class="img-profile rounded-circle mb-3" src="assets/img/undraw_profile.svg" width="100">
-                    <h4><?= $data['nama']; ?></h4>
-                    <p class="text-muted"><?= ucfirst($data['role']); ?></p>
-                    
-                    <hr>
-                    
-                    <h5>Tanda Tangan Digital</h5>
-                    <div class="mb-3">
-                        <?php if(!empty($data['ttd'])): ?>
-                            <img src="assets/img/ttd/<?= $data['ttd']; ?>" class="img-thumbnail" width="200">
-                            <p class="small text-success mt-2"><i class="fas fa-check-circle"></i> TTD Tersedia</p>
-                        <?php else: ?>
-                            <div class="alert alert-warning">Belum ada tanda tangan. Silakan upload gambar TTD (putih bersih) agar muncul di surat.</div>
-                        <?php endif; ?>
-                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card shadow">
+                                <div class="card-header py-3">
+                                    <h6 class="m-0 font-weight-bold text-primary">Data & Tanda Tangan</h6>
+                                </div>
+                                <div class="card-body text-center">
+                                    <img class="img-profile rounded-circle mb-3" src="assets/img/undraw_profile.svg" width="100">
+                                    <h4><?= $data['nama']; ?></h4>
+                                    <p class="text-muted"><?= ucfirst($data['role']); ?></p>
 
-                    <form method="POST" enctype="multipart/form-data">
-                        <div class="form-group text-left">
-                            <label>Upload/Ganti TTD (Format JPG/PNG)</label>
-                            <input type="file" name="foto_ttd" class="form-control-file" required>
+                                    <hr>
+
+                                    <h5>Tanda Tangan Digital</h5>
+                                    <div class="mb-3">
+                                        <?php if (!empty($data['ttd'])): ?>
+                                            <img src="assets/img/ttd/<?= $data['ttd']; ?>" class="img-thumbnail" width="200">
+                                            <p class="small text-success mt-2"><i class="fas fa-check-circle"></i> TTD Tersedia</p>
+                                        <?php else: ?>
+                                            <div class="alert alert-warning">Belum ada tanda tangan. Silakan upload gambar TTD (putih bersih) agar muncul di surat.</div>
+                                        <?php endif; ?>
+                                    </div>
+
+                                    <form method="POST" enctype="multipart/form-data">
+                                        <div class="form-group text-left">
+                                            <label>Upload/Ganti TTD (Format JPG/PNG)</label>
+                                            <input type="file" name="foto_ttd" class="form-control-file" required>
+                                        </div>
+                                        <button type="submit" name="upload_ttd" class="btn btn-primary btn-block">Simpan Tanda Tangan</button>
+                                    </form>
+                                </div>
+                            </div>
                         </div>
-                        <button type="submit" name="upload_ttd" class="btn btn-primary btn-block">Simpan Tanda Tangan</button>
-                    </form>
+                    </div>
                 </div>
-            </div>
-        </div>
-    </div>
-</div>
 
-    <?php require '../views/layout/footer.php'; ?>
+                <?php require __DIR__ . '/../layout/footer.php'; ?>
 
-    <script>
-        $(document).ready(function() {
-        if (!$.fn.DataTable.isDataTable('#dataTable')) {
-            $('#dataTable').DataTable({
-                "language": {
-                    "search": "Cari:",
-                    "lengthMenu": "Tampilkan _MENU_ antrian",
-                    "zeroRecords": "Tidak ada yang cocok",
-                    "info": "Menampilkan _PAGE_ dari _PAGES_",
-                    "infoEmpty": "Tidak ada data",
-                    "infoFiltered": "(difilter dari _MAX_ total data)",
-                    "paginate": {
-                        "first": "Awal",
-                        "last": "Akhir",
-                        "next": "Lanjut",
-                        "previous": "Kembali"
+                <script>
+                    $(document).ready(function() {
+                        if (!$.fn.DataTable.isDataTable('#dataTable')) {
+                            $('#dataTable').DataTable({
+                                "language": {
+                                    "search": "Cari:",
+                                    "lengthMenu": "Tampilkan _MENU_ antrian",
+                                    "zeroRecords": "Tidak ada yang cocok",
+                                    "info": "Menampilkan _PAGE_ dari _PAGES_",
+                                    "infoEmpty": "Tidak ada data",
+                                    "infoFiltered": "(difilter dari _MAX_ total data)",
+                                    "paginate": {
+                                        "first": "Awal",
+                                        "last": "Akhir",
+                                        "next": "Lanjut",
+                                        "previous": "Kembali"
+                                    }
+                                }
+                            });
+                        }
+                    });
+                    if (window.innerHeight <= 700) {
+                        document.getElementById('accordionSidebar')
+                            .style.height = '100vh';
                     }
-                }
-            });
-        }
-    });
-if (window.innerHeight <= 700) {
-        document.getElementById('accordionSidebar')
-            .style.height = '100vh';
-        }
-    </script>
+                </script>
 </body>
 
 </html>

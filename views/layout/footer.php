@@ -37,6 +37,7 @@
 <script src="https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.10.0/js/bootstrap-datepicker.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 <script>
     $(document).ready(function() {
@@ -52,6 +53,11 @@
             }
         });
     });
+
+    if (window.innerHeight <= 700) {
+        document.getElementById('accordionSidebar')
+            .style.height = '100vh';
+    }
 </script>
 
 <?php if (isset($_SESSION['alert'])) : ?>
@@ -59,7 +65,13 @@
         Swal.fire({
             icon: '<?= $_SESSION['alert']['icon']; ?>',
             title: '<?= $_SESSION['alert']['title']; ?>',
-            confirmButtonColor: '#4e73df'
+            text: '<?= $_SESSION['alert']['text']; ?>',
+            showConfirmButton: false,
+            timer: 1500,
+            timerProgressBar: true,
+            width: '420px',
+            padding: '2em',
+            // confirmButtonColor: '#4e73df'
         });
     </script>
 <?php unset($_SESSION['alert']);

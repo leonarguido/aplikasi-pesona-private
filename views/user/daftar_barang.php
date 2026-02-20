@@ -139,10 +139,7 @@
             }
         });
 
-        if (window.innerHeight <= 700) {
-            document.getElementById('accordionSidebar')
-                .style.height = '100vh';
-        }
+         
     </script>
 </body>
 

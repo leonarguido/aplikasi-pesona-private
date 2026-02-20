@@ -106,7 +106,7 @@
         </div>
     </div>
 
-    <?php require '../views/layout/footer.php'; ?>
+    <?php require __DIR__ . '/../layout/footer.php'; ?>
 
     <script>
         $(document).ready(function() {
@@ -130,10 +130,7 @@
                 });
             }
         });
-        if (window.innerHeight <= 700) {
-            document.getElementById('accordionSidebar')
-                .style.height = '100vh';
-        }
+         
     </script>
 </body>
 

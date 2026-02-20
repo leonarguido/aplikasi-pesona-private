@@ -71,7 +71,7 @@
                                 <div class="card-body">
                                     <form method="POST" action="<?= BASE_URL ?>checkout_keranjang">
                                         <div class="form-group">
-                                            <label class="font-weight-bold">Keperluan / Alasan</label>
+                                            <label class="font-weight-bold small text-uppercase">Keperluan / Alasan</label>
                                             <textarea name="keperluan" class="form-control" rows="4" placeholder="Contoh: Kebutuhan ATK Bulanan Divisi IT..." required></textarea>
                                             <small class="text-muted">Keperluan ini berlaku untuk semua barang di keranjang.</small>
                                         </div>
@@ -79,8 +79,8 @@
                                         <hr>
 
                                         <?php if (!empty($_SESSION['keranjang'])): ?>
-                                            <button type="submit" name="checkout" class="btn btn-primary btn-block btn-lg">
-                                                <i class="fas fa-paper-plane"></i> Ajukan Permintaan
+                                            <button type="submit" name="checkout" class="btn btn-primary btn-block shadow-sm py-2">
+                                                <i class="fas fa-paper-plane mr-2"></i> Ajukan Permintaan
                                             </button>
                                         <?php else: ?>
                                             <button type="button" class="btn btn-secondary btn-block" disabled>Keranjang Kosong</button>
@@ -95,7 +95,7 @@
         </div>
     </div>
 
-    <?php require '../views/layout/footer.php'; ?>
+    <?php require __DIR__ . '/../layout/footer.php'; ?>
 
     <script>
         $(document).ready(function() {
@@ -118,10 +118,7 @@
             });
         }
     });
-        if (window.innerHeight <= 700) {
-            document.getElementById('accordionSidebar')
-                .style.height = '100vh';
-        }
+         
     </script>
 </body>
 

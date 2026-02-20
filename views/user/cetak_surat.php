@@ -1,61 +1,12 @@
-<?php
-session_start();
-require 'config/koneksi.php';
-
-if (!isset($_SESSION['user_id']) || !isset($_GET['id'])) {
-    header("Location: index.php");
-    exit;
-}
-
-$id_permintaan = $_GET['id'];
-
-// ============================================
-// QUERY DATA
-// ============================================
-$query_header = "SELECT p.*, 
-                 u_pemohon.nama AS nama_pemohon, u_pemohon.nip AS nip_pemohon, u_pemohon.paraf AS ttd_pemohon,
-                 u_admin.nama AS nama_admin, u_admin.nip AS nip_admin, u_admin.paraf AS ttd_admin
-                 FROM tb_permintaan p
-                 JOIN tb_user u_pemohon ON p.user_id = u_pemohon.id
-                 LEFT JOIN tb_user u_admin ON p.admin_id = u_admin.id
-                 WHERE p.id = '$id_permintaan'";
-
-$result_header = mysqli_query($koneksi, $query_header);
-$data = mysqli_fetch_assoc($result_header);
-
-// Validasi Status
-if ($data['status'] != 'disetujui') {
-    echo "<script>alert('Surat belum bisa dicetak karena status belum disetujui!'); window.close();</script>";
-    exit;
-}
-
-// ============================================
-// KONVERSI TANGGAL KE BAHASA INDONESIA
-// ============================================
-$tanggal_sql = $data['tanggal_disetujui']; // Format: YYYY-MM-DD
-
-// 1. Daftar Nama Bulan Indonesia
-$bulan_indo = [
-    1 => 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
-    'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
-];
-
-// 2. Pecah tanggal
-$pecah_tgl = explode('-', $tanggal_sql);
-$tgl = $pecah_tgl[2];
-$bln = (int) $pecah_tgl[1]; // Ubah '02' jadi 2 agar cocok dengan array
-$thn = $pecah_tgl[0];
-
-// 3. Gabungkan (Contoh: 03 Februari 2026)
-$tanggal_indonesia = $tgl . ' ' . $bulan_indo[$bln] . ' ' . $thn;
-?>
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <title>Surat Permintaan Barang - #<?= $data['id']; ?></title>
-    <?php define('BASE_URL', '/aplikasi-pesona-private/routes/web.php/?page='); ?>
+    <?php
+    define('BASE_URL', '/aplikasi-pesona-private/routes/web.php/?page='); 
+    define('ASSETS_URL', '/aplikasi-pesona-private/assets/');
+    ?>
     <style>
         body { font-family: 'Times New Roman', serif; font-size: 12pt; margin: 0; padding: 20px; color: #000; }
         .container { width: 100%; max-width: 800px; margin: auto; }
@@ -103,7 +54,7 @@ $tanggal_indonesia = $tgl . ' ' . $bulan_indo[$bln] . ' ' . $thn;
     <table class="header-table">
         <tr>
             <td width="15%" style="text-align: center;">
-                <img src="assets/img/logo_tutwuri.jpg" alt="Logo" class="logo-kop">
+                <img src="<?= ASSETS_URL ?>img/logo_tutwuri.jpg" alt="Logo" class="logo-kop">
             </td>
             <td width="85%" class="text-kop">
                 <h2>KEMENTERIAN PENDIDIKAN DASAR<br>DAN MENENGAH</h2>
@@ -169,10 +120,10 @@ $tanggal_indonesia = $tgl . ' ' . $bulan_indo[$bln] . ' ' . $thn;
             <p>Yang Menerima,</p>
             
             <?php 
-            $path_ttd_pemohon = 'assets/img/ttd/' . $data['ttd_pemohon'];
-            if(!empty($data['ttd_pemohon']) && file_exists($path_ttd_pemohon)): 
+            $path_ttd_pemohon = ASSETS_URL . 'img/ttd/' . $data['ttd_pemohon'];
+            if(!empty($data['ttd_pemohon'])): 
             ?>
-                <img src="<?= $path_ttd_pemohon; ?>" class="img-ttd">
+                <img src="<?= ASSETS_URL ?>img/ttd/<?= $data['ttd_pemohon']; ?>" class="img-ttd">
             <?php else: ?>
                 <div class="space-ttd"></div>
             <?php endif; ?>
@@ -184,10 +135,9 @@ $tanggal_indonesia = $tgl . ' ' . $bulan_indo[$bln] . ' ' . $thn;
         <div class="ttd-box">
             <p>Denpasar, <?= $tanggal_indonesia; ?>,<br>Admin Gudang</p>
             <?php 
-            $path_ttd_admin = 'assets/img/ttd/' . $data['ttd_admin'];
-            if(!empty($data['ttd_admin']) && file_exists($path_ttd_admin)): 
+            if(!empty($data['ttd_admin'])): 
             ?>
-                <img src="<?= $path_ttd_admin; ?>" class="img-ttd">
+                <img src="<?= ASSETS_URL ?>img/ttd/<?= $data['ttd_admin']; ?>" class="img-ttd">
             <?php else: ?>
                 <div class="space-ttd"></div>
             <?php endif; ?>

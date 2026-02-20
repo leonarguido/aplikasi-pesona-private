@@ -22,7 +22,7 @@
 
                     <div class="card shadow mb-4">
                         <div class="card-header py-3 border-bottom-primary">
-                            <h6 class="m-0 font-weight-bold text-primary">Log Permintaan</h6>
+                            <h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-file-alt"></i> Log Permintaan Anda</h6>
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
@@ -110,46 +110,70 @@
                                                                         <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
                                                                     </div>
                                                                     <form method="POST" action="<?= BASE_URL ?>edit_permintaan_saya">
-                                                                        <div class="modal-body">
-                                                                            <input type="hidden" name="id_permintaan" value="<?= $id_req; ?>">
-                                                                            <p class="small text-muted">Silakan ubah jumlah barang jika diperlukan:</p>
-
-                                                                            <table class="table table-sm table-bordered">
-                                                                                <thead class="thead-light">
-                                                                                    <tr>
-                                                                                        <th>Nama Barang</th>
-                                                                                        <th width="120px">Jumlah</th>
-                                                                                        <th>Satuan</th>
-                                                                                    </tr>
-                                                                                </thead>
-                                                                                <tbody>
-                                                                                    <?php
-                                                                                    $q_edit = mysqli_query($koneksi, "SELECT d.id AS id_detail, d.jumlah, d.satuan, b.nama_barang, b.merk_barang, b.stok AS stok_gudang 
+                                                    <div class="modal-body">
+                                                        <input type="hidden" name="id_permintaan" value="<?= $id_req; ?>">
+                                                        
+                                                        <h6 class="font-weight-bold text-gray-800 mb-2">Barang yang Diajukan:</h6>
+                                                        <table class="table table-sm table-bordered mb-4">
+                                                            <thead class="bg-light">
+                                                                <tr>
+                                                                    <th>Nama Barang</th>
+                                                                    <th width="150px">Jumlah</th>
+                                                                    <th>Satuan</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <?php 
+                                                                $q_edit = mysqli_query($koneksi, "SELECT d.id AS id_detail, d.jumlah, d.satuan, b.nama_barang, b.stok AS stok_gudang 
                                                                                                   FROM tb_detail_permintaan d 
                                                                                                   JOIN tb_barang_bergerak b ON d.barang_id = b.id 
                                                                                                   WHERE d.permintaan_id = '$id_req'");
-                                                                                    while ($edit = mysqli_fetch_assoc($q_edit)):
-                                                                                    ?>
-                                                                                        <tr>
-                                                                                            <td>
-                                                                                                <?= $edit['nama_barang']; ?> (<?= $edit['merk_barang']; ?>)
-                                                                                                <br><small class="text-success">Sisa Stok Gudang: <?= $edit['stok_gudang']; ?></small>
-                                                                                            </td>
-                                                                                            <td>
-                                                                                                <input type="hidden" name="id_detail[]" value="<?= $edit['id_detail']; ?>">
-                                                                                                <input type="number" name="jumlah[]" class="form-control form-control-sm" value="<?= $edit['jumlah']; ?>" min="1" max="<?= $edit['stok_gudang']; ?>" required>
-                                                                                            </td>
-                                                                                            <td class="align-middle"><?= $edit['satuan']; ?></td>
-                                                                                        </tr>
-                                                                                    <?php endwhile; ?>
-                                                                                </tbody>
-                                                                            </table>
-                                                                        </div>
-                                                                        <div class="modal-footer">
-                                                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                                                                            <button type="submit" name="update_permintaan" class="btn btn-primary">Simpan</button>
-                                                                        </div>
-                                                                    </form>
+                                                                while($edit = mysqli_fetch_assoc($q_edit)):
+                                                                ?>
+                                                                <tr>
+                                                                    <td>
+                                                                        <?= $edit['nama_barang']; ?>
+                                                                        <br><small class="text-success">Sisa Stok Gudang: <?= $edit['stok_gudang']; ?></small>
+                                                                    </td>
+                                                                    <td>
+                                                                        <input type="hidden" name="id_detail[]" value="<?= $edit['id_detail']; ?>">
+                                                                        <input type="number" name="jumlah[]" class="form-control form-control-sm" value="<?= $edit['jumlah']; ?>" min="1" max="<?= $edit['stok_gudang']; ?>" required>
+                                                                    </td>
+                                                                    <td class="align-middle"><?= $edit['satuan']; ?></td>
+                                                                </tr>
+                                                                <?php endwhile; ?>
+                                                            </tbody>
+                                                        </table>
+
+                                                        <hr>
+
+                                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                                            <h6 class="font-weight-bold text-success mb-0"><i class="fas fa-plus-circle"></i> Tambah Barang Susulan</h6>
+                                                            <button type="button" class="btn btn-sm btn-success shadow-sm" onclick="tambahBaris('tabelSusulan<?= $id_req; ?>', 'modalEdit<?= $id_req; ?>')">
+                                                                <i class="fas fa-plus"></i> Baris
+                                                            </button>
+                                                        </div>
+                                                        
+                                                        <p class="small text-muted mb-2">Jika ada barang yang lupa dimasukkan, tambahkan di sini (bisa dicari).</p>
+
+                                                        <table class="table table-sm table-bordered" id="tabelSusulan<?= $id_req; ?>">
+                                                            <thead class="bg-light">
+                                                                <tr>
+                                                                    <th>Pilih Barang (Ketik untuk cari)</th>
+                                                                    <th width="120px">Jumlah</th>
+                                                                    <th width="50px"></th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                </tbody>
+                                                        </table>
+
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                                                        <button type="submit" name="update_permintaan" class="btn btn-primary">Simpan Perubahan</button>
+                                                    </div>
+                                                </form>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -175,7 +199,7 @@
 
         </div>
     </div>
-    <?php require '../views/layout/footer.php'; ?>
+    <?php require __DIR__ . '/../layout/footer.php'; ?>
 
     <script>
         $(document).ready(function() {
@@ -199,6 +223,46 @@
             }
         });
 
+        // Membuat string option HTML dari PHP array
+    var optionsBarang = '<option value="">-- Cari Barang --</option>';
+    <?php foreach($list_barang as $brg): ?>
+        optionsBarang += '<option value="<?= $brg['id']; ?>"><?= addslashes($brg['nama_barang']); ?> (Stok: <?= $brg['stok']; ?>)</option>';
+    <?php endforeach; ?>
+
+    // Fungsi Tambah Baris dengan SELECT2
+    function tambahBaris(tableId, modalId) {
+        var table = document.getElementById(tableId).getElementsByTagName('tbody')[0];
+        var newRow = table.insertRow();
+        
+        // Generate ID unik untuk select ini agar bisa dipanggil jQuery
+        var uniqueId = "sel_" + Date.now() + Math.floor(Math.random() * 1000);
+
+        var cell1 = newRow.insertCell(0);
+        var cell2 = newRow.insertCell(1);
+        var cell3 = newRow.insertCell(2);
+
+        // Masukkan HTML Select dengan ID unik
+        cell1.innerHTML = '<select id="' + uniqueId + '" name="new_barang_id[]" class="form-control form-control-sm" required style="width:100%">' + optionsBarang + '</select>';
+        cell2.innerHTML = '<input type="number" name="new_jumlah[]" class="form-control form-control-sm" placeholder="Jml" min="1" required>';
+        cell3.innerHTML = '<button type="button" class="btn btn-danger btn-sm" onclick="hapusBaris(this)"><i class="fas fa-times"></i></button>';
+        cell3.className = 'text-center';
+
+        // AKTIFKAN SELECT2 PADA ELEMENT BARU
+        // dropdownParent sangat penting agar search box berfungsi di dalam Modal Bootstrap
+        $('#' + uniqueId).select2({
+            dropdownParent: $('#' + modalId),
+            placeholder: "Ketik nama barang...",
+            allowClear: true,
+            width: '100%' 
+        });
+    }
+
+    // Fungsi Hapus Baris
+    function hapusBaris(btn) {
+        var row = btn.parentNode.parentNode;
+        row.parentNode.removeChild(row);
+    }
+
         function confirmHapus(event, url) {
             event.preventDefault();
 
@@ -218,10 +282,7 @@
             });
         }
 
-        if (window.innerHeight <= 700) {
-            document.getElementById('accordionSidebar')
-                .style.height = '100vh';
-        }
+         
     </script>
 </body>
 

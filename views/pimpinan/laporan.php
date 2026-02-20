@@ -48,7 +48,6 @@
                                                             value="<?= date('Y-m-d'); ?>">
                                                     </div>
                                                 </div>
-
                                             </div>
                                         </div>
                                         <hr>
@@ -144,7 +143,7 @@
         </div>
     </div>
 
-    <?php require '../views/layout/footer.php'; ?>
+    <?php require __DIR__ . '/../layout/footer.php'; ?>
 
     <script>
         // ==========================================
@@ -367,10 +366,7 @@
             load_bulan_riwayat_persetujuan($bulan_angka, $tahun_angka);
         });
 
-        if (window.innerHeight <= 700) {
-            document.getElementById('accordionSidebar')
-                .style.height = '100vh';
-        }
+         
     </script>
 </body>
 

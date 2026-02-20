@@ -3,7 +3,7 @@
 require_once __DIR__ . '/../controllers/AdminController.php';
 require_once __DIR__ . '/../controllers/AutentikasiController.php';
 require_once __DIR__ . '/../controllers/DashboardController.php';
-require_once __DIR__ . '/../controllers/LogBarangBergerakController.php';
+require_once __DIR__ . '/../controllers/LogBarangController.php';
 require_once __DIR__ . '/../controllers/PimpinanController.php';
 require_once __DIR__ . '/../controllers/UserController.php';
 
@@ -11,7 +11,7 @@ require_once __DIR__ . '/../controllers/UserController.php';
 $admin = new AdminController();
 $autentikasi = new AutentikasiController();
 $dashboard = new DashboardController();
-$logBarangBergerak = new LogBarangBergerakController();
+$logBarang = new LogBarangController();
 $pimpinan = new PimpinanController();
 $user = new UserController();
 
@@ -39,7 +39,7 @@ if (isset($_GET['page'])) {
         // RUTE ADMIN CONTROLLER
         // ==========================================
 
-        // DATA BARANG
+        // DATA BARANG BERGERAK
         case 'data_barang':
             $admin->data_barang_page();
             break;
@@ -55,10 +55,28 @@ if (isset($_GET['page'])) {
         case 'edit_data_barang':
             $admin->edit_data_barang();
             break;
+        case 'edit_data_stok_barang':
+            $admin->edit_data_stok_barang();
+            break;
         case 'hapus_data_barang':
             $admin->hapus_data_barang();
             break;
 
+        // DATA BARANG TIDAK BERGERAK
+        case 'data_barang_tg':
+            $admin->data_barang_tg();
+            break;
+        case 'tambah_data_barang_tg':
+            $admin->tambah_data_barang_tg();
+            break;
+        case 'edit_data_barang_tg':
+            $admin->edit_data_barang_tg();
+            break;
+        case 'hapus_data_barang_tg':
+            $admin->hapus_data_barang_tg();
+            break;
+
+        // PROSES PERSETUJUAN ADMIN
         case 'persetujuan':
             $admin->persetujuan_page();
             break;
@@ -121,18 +139,14 @@ if (isset($_GET['page'])) {
             $user->cetak_surat();
             break;
 
-        // PROFIL PENGGUNA
-        case 'profil_saya':
-            $user->profil_page();
+        // ASET SAYA
+        case 'aset_saya':
+            $user->aset_saya();
             break;
 
-        // ==========================================
-        // RUTE LOG BARANG BERGERAK CONTROLLER
-        // ==========================================
-
-        // LOG DATA BARANG
-        case 'log_data_barang':
-            $logBarangBergerak->log_data_barang_page();
+        // PROFIL PENGGUNA
+        case 'profil':
+            $user->profil_page();
             break;
 
         // ==========================================
@@ -154,24 +168,47 @@ if (isset($_GET['page'])) {
             break;
         case 'ajax_load_laporan_stok_barang':
             $pimpinan->ajax_load_laporan_stok_barang();
+            break;
         case 'ajax_load_laporan_permintaan':
             $pimpinan->ajax_load_laporan_permintaan();
+            break;
         case 'laporan_permintaan':
             $pimpinan->laporan_permintaan_page();
             break;
         case 'cetak_laporan':
             $pimpinan->cetak_laporan();
             break;
+        case 'laporan_stock_opname':
+            $pimpinan->laporan_stock_opname_page();
+            break;
+        case 'proses_stock_opname':
+            $pimpinan->proses_stock_opname();
+            break;
+        case 'ajax_load_per_orang':
+            $pimpinan->ajax_load_per_orang();
+            break;
+        case 'ajax_load_per_item':
+            $pimpinan->ajax_load_per_item();
+            break;
 
 
         // ==========================================
-        // RUTE PIMPINAN CONTROLLER
+        // RUTE LOG BARANG CONTROLLER
         // ==========================================
         case 'log_barang':
-            $logBarangBergerak->log_barang_bergerak();
+            $logBarang->log_barang_bergerak();
+            break;
+        case 'edit_log_stok_barang':
+            $logBarang->edit_log_stok_barang();
             break;
         case 'ajax_load_log_barang_bergerak':
-            $logBarangBergerak->ajax_load_log_barang_bergerak();
+            $logBarang->ajax_load_log_barang_bergerak();
+            break;
+        case 'log_barang_tg':
+            $logBarang->log_barang_tg();
+            break;
+        case 'ajax_load_log_barang_tg':
+            $logBarang->ajax_load_log_barang_tg();
             break;
 
         // Default action or 404

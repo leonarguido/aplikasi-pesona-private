@@ -68,6 +68,9 @@
                                                 </td>
                                                 <td><small><?= $row['keterangan']; ?></small></td>
                                                 <td class="text-center">
+                                                    <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#editStokModal<?= $row['id']; ?>">
+                                                        <i class="fas fa-plus"></i>
+                                                    </button>
                                                     <button class="btn btn-warning btn-sm" data-toggle="modal" data-target="#editModal<?= $row['id']; ?>">
                                                         <i class="fas fa-edit"></i>
                                                     </button>
@@ -79,6 +82,50 @@
                                                     <!-- </a> -->
                                                 </td>
                                             </tr>
+
+                                            <div class="modal fade" id="editStokModal<?= $row['id']; ?>" tabindex="-1">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title">Tambah Stok Barang</h5>
+                                                            <button class="close" data-dismiss="modal">&times;</button>
+                                                        </div>
+                                                        <form method="POST" action="<?= BASE_URL ?>edit_data_stok_barang">
+                                                            <div class="modal-body">
+                                                                <input type="hidden" name="id" value="<?= $row['id']; ?>">
+                                                                <div class="form-group">
+                                                                    <div class="row">
+                                                                        <div class="col">
+                                                                            <label>Stok Saat Ini</label>
+                                                                            <input type="number" class="form-control" value="<?= $row['stok']; ?>" readonly>
+                                                                        </div>
+                                                                        <div class="col">
+                                                                            <label>Tambah Stok</label>
+                                                                            <input type="number" name="stok" min="1" class="form-control" required>
+                                                                        </div>
+                                                                        <!-- <div class="col" id="tambahStokDiv">
+                                                                            <label>Tambah Stok</label>
+                                                                            <input type="number" name="stok" min="0" class="form-control" required>
+                                                                        </div>
+                                                                        <div class="col" id="kurangiStokDiv">
+                                                                            <label>Kurangi Stok</label>
+                                                                            <input type="number" name="stok" max="0" class="form-control" required>
+                                                                        </div> -->
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label>Keterangan</label>
+                                                                    <textarea name="keterangan" class="form-control" required></textarea>
+                                                                </div>
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                                                                <button type="submit" name="edit_stok" class="btn btn-primary">Simpan</button>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
 
                                             <div class="modal fade" id="editModal<?= $row['id']; ?>" tabindex="-1">
                                                 <div class="modal-dialog">
@@ -110,7 +157,7 @@
                                                                 </div>
                                                                 <div class="form-group">
                                                                     <label>Stok</label>
-                                                                    <input type="number" name="stok" class="form-control" value="<?= $row['stok']; ?>" required>
+                                                                    <input type="number" name="stok" class="form-control" value="<?= $row['stok']; ?>" readonly>
                                                                 </div>
                                                                 <div class="form-group">
                                                                     <label>Keterangan</label>
@@ -218,7 +265,7 @@
         </div>
     </div>
 
-    <?php require '../views/layout/footer.php'; ?>
+    <?php require __DIR__ . '/../layout/footer.php'; ?>
 
     <script>
         $(document).ready(function() {
@@ -241,10 +288,22 @@
                 });
             }
         });
-        if (window.innerHeight <= 700) {
-            document.getElementById('accordionSidebar')
-                .style.height = '100vh';
-        }
+
+        $(document).ready(function() {
+            $('#fiturKhusus').change(function() {
+                if ($(this).is(':checked')) {
+                    $('#tambahStokDiv').hide();
+                    $('#kurangiStokDiv').show();
+                } else {
+                    $('#tambahStokDiv').show();
+                    $('#kurangiStokDiv').hide();
+                }
+            });
+
+            // Inisialisasi tampilan awal
+            $('#fiturKhusus').trigger('change');
+        });
+         
 
         function confirmHapus(event, url) {
             event.preventDefault();

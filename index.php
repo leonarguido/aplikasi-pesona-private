@@ -558,10 +558,7 @@ $id_user = $_SESSION['user_id'];
     <?php require 'views/layout/footer.php'; ?>
 
     <script>
-        if (window.innerHeight <= 700) {
-            document.getElementById('accordionSidebar')
-                .style.height = '100vh';
-        }
+         
     </script>
 </body>
 

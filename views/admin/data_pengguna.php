@@ -62,7 +62,7 @@
                                                     <?php endif; ?>
                                                 </td>
                                                 <td class="text-center">
-                                                    <?php if (!empty($row['paraf'])): ?>
+                                                    <?php if (!empty($row['paraf'])):?>
                                                         <img src="<?= ASSETS_URL ?>img/ttd/<?= $row['paraf']; ?>" alt="TTD" style="height: 40px;">
                                                     <?php else: ?>
                                                         <span class="text-muted"><small>Belum ada</small></span>
@@ -192,7 +192,7 @@
         </div>
     </div>
 
-    <?php require '../views/layout/footer.php'; ?>
+    <?php require __DIR__ . '/../layout/footer.php'; ?>
 
     <script>
         $(document).ready(function() {
@@ -215,10 +215,7 @@
             });
         }
     });
-        if (window.innerHeight <= 700) {
-            document.getElementById('accordionSidebar')
-                .style.height = '100vh';
-        }
+         
     </script>
 </body>
 

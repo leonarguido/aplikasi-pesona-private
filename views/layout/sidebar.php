@@ -33,9 +33,18 @@
             <div class="sidebar-heading">Inventaris</div>
 
             <li class="nav-item">
-                <a class="nav-link" href="<?= BASE_URL ?>data_barang">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseDataBarang"
+                    aria-expanded="true" aria-controls="collapseDataBarang">
                     <i class="fas fa-fw fa-boxes"></i>
-                    <span>Data Barang</span></a>
+                    <span>Data Barang</span>
+                </a>
+                <div id="collapseDataBarang" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <h6 class="collapse-header">Pilih Kategori:</h6>
+                        <a class="collapse-item" href="<?= BASE_URL ?>data_barang">Barang Bergerak</a>
+                        <a class="collapse-item" href="<?= BASE_URL ?>data_barang_tg">Brg Tidak Bergerak</a>
+                    </div>
+                </div>
             </li>
 
             <li class="nav-item">
@@ -55,9 +64,20 @@
             <div class="sidebar-heading">Laporan</div>
 
             <li class="nav-item">
-                <a class="nav-link" href="<?= BASE_URL ?>laporan">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseDataLaporan"
+                    aria-expanded="true" aria-controls="collapseDataLaporan">
                     <i class="fas fa-fw fa-file-pdf"></i>
-                    <span>Laporan Transaksi</span></a>
+                    <span>Laporan</span>
+                </a>
+                <div id="collapseDataLaporan" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <h6 class="collapse-header">Pilih Kategori:</h6>
+                        <a class="collapse-item" href="<?= BASE_URL ?>laporan_stok">Laporan Stok Barang</a>
+                        <a class="collapse-item" href="<?= BASE_URL ?>laporan_stock_opname">Laporan Stock Opname</a>
+                        <a class="collapse-item" href="<?= BASE_URL ?>laporan_permintaan">Laporan Permintaan</a>
+                        <a class="collapse-item" href="<?= BASE_URL ?>laporan">Laporan Transaksi Berhasil</a>
+                    </div>
+                </div>
             </li>
         <?php endif; ?>
 
@@ -76,6 +96,16 @@
                     <i class="fas fa-fw fa-history"></i>
                     <span>Riwayat Permintaan</span></a>
             </li>
+
+            <hr class="sidebar-divider">
+
+            <div class="sidebar-heading">Aset Saya</div>
+
+            <li class="nav-item">
+                <a class="nav-link" href="<?= BASE_URL ?>aset_saya">
+                    <i class="fas fa-fw fa-file-pdf"></i>
+                    <span>Aset Saya</span></a>
+            </li>
         <?php endif; ?>
 
 
@@ -83,32 +113,40 @@
             <div class="sidebar-heading">Laporan</div>
 
             <li class="nav-item">
-                <a class="nav-link" href="<?= BASE_URL ?>laporan_stok">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseDataLaporan"
+                    aria-expanded="true" aria-controls="collapseDataLaporan">
+                    <i class="fas fa-fw fa-file-pdf"></i>
+                    <span>Laporan</span>
+                </a>
+                <div id="collapseDataLaporan" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <h6 class="collapse-header">Pilih Kategori:</h6>
+                        <a class="collapse-item" href="<?= BASE_URL ?>laporan_stok">Laporan Stok Barang</a>
+                        <a class="collapse-item" href="<?= BASE_URL ?>laporan_stock_opname">Laporan Stock Opname</a>
+                        <a class="collapse-item" href="<?= BASE_URL ?>laporan_permintaan">Laporan Permintaan</a>
+                        <a class="collapse-item" href="<?= BASE_URL ?>laporan">Laporan Transaksi Berhasil</a>
+                    </div>
+                </div>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseDataBarang"
+                    aria-expanded="true" aria-controls="collapseDataBarang">
                     <i class="fas fa-fw fa-boxes"></i>
-                    <span>Laporan Stok</span></a>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link" href="<?= BASE_URL ?>log_barang">
-                    <i class="fas fa-fw fa-boxes"></i>
-                    <span>Log Barang</span></a>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link" href="<?= BASE_URL ?>laporan_permintaan">
-                    <i class="fas fa-fw fa-file-alt"></i>
-                    <span>Laporan Permintaan</span></a>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link" href="<?= BASE_URL ?>laporan">
-                    <i class="fas fa-fw fa-file-alt"></i>
-                    <span>Laporan Transaksi Berhasil</span></a>
+                    <span>Log Barang</span>
+                </a>
+                <div id="collapseDataBarang" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <h6 class="collapse-header">Pilih Kategori:</h6>
+                        <a class="collapse-item" href="<?= BASE_URL ?>log_barang">Log Barang Bergerak</a>
+                        <a class="collapse-item" href="<?= BASE_URL ?>log_barang_tg">Log Brg Tidak Bergerak</a>
+                    </div>
+                </div>
             </li>
         <?php endif; ?>
 
         <hr class="sidebar-divider d-none d-md-block">
-<!-- 
+        <!-- 
         <div class="text-center d-none d-md-inline">
             <button class="rounded-circle border-0" id="sidebarToggle"></button>
         </div> -->

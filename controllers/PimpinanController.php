@@ -18,7 +18,8 @@ class PimpinanController
             // echo "<script>alert('Akses Ditolak!'); window.location='index.php';</script>";
             $_SESSION['alert'] = [
                 'icon' => 'error',
-                'title' => 'Akses Ditolak!',
+                'title' => 'Gagal!',
+                'text' => 'Akses Ditolak!',
             ];
             header("Location: index.php");
             exit;
@@ -154,6 +155,299 @@ class PimpinanController
         }
     }
 
+    public function laporan_stock_opname_page()
+    {
+        require __DIR__ . '/../config/koneksi.php';
+        session_start();
+
+        // Cek Akses (Hanya Admin)
+        if (!isset($_SESSION['user_id'])) {
+            header("Location: login.php");
+            exit;
+        }
+        if ($_SESSION['role'] == 'user') {
+            // echo "<script>alert('Akses Ditolak!'); window.location='index.php';</script>";
+            $_SESSION['alert'] = [
+                'icon' => 'error',
+                'title' => 'Gagal!',
+                'text' => 'Akses Ditolak!',
+            ];
+            header("Location: index.php");
+            exit;
+        }
+
+        // Load Bulan & Tahun Sekarang
+        $bulan_angka = date('m');
+        $tahun_angka = date('Y');
+
+        // AMBIL DATA BARANG (UNTUK DROPDOWN)
+        $list_barang = [];
+        $q_brg = mysqli_query($koneksi, "SELECT id, kode_barang, nama_barang FROM tb_barang_bergerak WHERE is_deleted = 0 ORDER BY nama_barang ASC");
+        while ($b = mysqli_fetch_assoc($q_brg)) {
+            $list_barang[] = $b;
+        }
+
+        // AMBIL DATA PEGAWAI (UNTUK DROPDOWN)
+        $list_pegawai = [];
+        $q_pgw = mysqli_query($koneksi, "SELECT id, nip, nama FROM tb_user WHERE nip IS NOT NULL AND nip != '' ORDER BY nama ASC");
+        while ($p = mysqli_fetch_assoc($q_pgw)) {
+            $list_pegawai[] = $p;
+        }
+
+        require_once '../views/pimpinan/laporan_stock_opname.php';
+    }
+
+    public function proses_stock_opname()
+    {
+        require __DIR__ . '/../config/koneksi.php';
+        session_start();
+
+        if (isset($_POST['proses_stock_opname'])) {
+            $kategori    = $_POST['kategori'];
+            $item       = $_POST['item'];
+            $pegawai    = $_POST['pegawai'];
+            $tgl_mulai  = $_POST['tgl_mulai'];
+            $tgl_selesai = $_POST['tgl_selesai'];
+
+            if (!$kategori) {
+                $_SESSION['alert'] = [
+                    'icon' => 'error',
+                    'title' => 'Gagal!',
+                    'text' => 'Kategori filter harus dipilih.'
+                ];
+                header("Location: " . $this->base_url . "laporan_stock_opname");
+                exit;
+            } elseif ($kategori == 'item' && !$item) {
+                $_SESSION['alert'] = [
+                    'icon' => 'error',
+                    'title' => 'Gagal!',
+                    'text' => 'Jika memilih filter berdasarkan item, maka item harus dipilih.'
+                ];
+                header("Location: " . $this->base_url . "laporan_stock_opname");
+                exit;
+            } elseif ($kategori == 'pegawai' && !$pegawai) {
+                $_SESSION['alert'] = [
+                    'icon' => 'error',
+                    'title' => 'Gagal!',
+                    'text' => 'Jika memilih filter berdasarkan pegawai, maka pegawai harus dipilih.'
+                ];
+                header("Location: " . $this->base_url . "laporan_stock_opname");
+                exit;
+            } elseif (!$tgl_mulai || !$tgl_selesai) {
+                $_SESSION['alert'] = [
+                    'icon' => 'error',
+                    'title' => 'Gagal!',
+                    'text' => 'Tanggal mulai dan tanggal selesai harus diisi.'
+                ];
+                header("Location: " . $this->base_url . "laporan_stock_opname");
+                exit;
+            }
+
+            // BERDASARKAN ITEM
+            if ($item) {
+                $q_barang = " SELECT nama_barang, merk_barang, satuan, kode_barang FROM tb_barang_bergerak WHERE id = '$item'";
+
+                $q_keluar = "
+                    SELECT 
+                        p.tanggal_disetujui,
+                        p.keperluan,
+                        d.jumlah
+                    FROM tb_detail_permintaan d
+                    JOIN tb_permintaan p ON d.permintaan_id = p.id
+                    JOIN tb_barang_bergerak b ON d.barang_id = b.id
+                    WHERE 
+                        p.tanggal_disetujui IS NOT NULL
+                        AND p.tanggal_disetujui BETWEEN '$tgl_mulai' AND '$tgl_selesai'
+                        AND d.barang_id = '$item'
+                ";
+
+                $q_masuk = "
+                    SELECT 
+                        l.tanggal,
+                        l.keterangan,
+                        l.stok
+                    FROM tb_log_barang_bergerak l
+                    JOIN tb_barang_bergerak b ON l.barang_id = b.id
+                    WHERE 
+                        l.tanggal BETWEEN '$tgl_mulai' AND '$tgl_selesai'
+                        AND l.stok IS NOT NULL
+                        AND l.barang_id = '$item'
+                ";
+
+                $item_keluar = mysqli_query($koneksi, $q_keluar);
+                $item_masuk = mysqli_query($koneksi, $q_masuk);
+                // var_dump($item_k); // mengambil 1 data untuk cek apakah query benar atau tidak
+                // exit;
+                // var_dump($item_m);
+                // exit;
+
+                $data_keluar = [];
+                while ($row = mysqli_fetch_assoc($item_keluar)) {
+                    $data_keluar[] = [
+                        'tanggal' => $row['tanggal_disetujui'],
+                        'jumlah' => $row['jumlah'],
+                        'keterangan' => $row['keperluan'],
+
+                    ];
+                }
+                // var_dump($data_keluar);
+                // exit;
+
+                $data_masuk = [];
+                while ($row = mysqli_fetch_assoc($item_masuk)) {
+                    $data_masuk[] = [
+                        'tanggal' => $row['tanggal'],
+                        'stok' => $row['stok'],
+                        'keterangan' => $row['keterangan'],
+
+                    ];
+                }
+                // var_dump($data_masuk);
+                // exit;
+
+                // gabungkan data masuk dan keluar berdasarkan tanggal
+                $data_gabungan = array_merge($data_keluar, $data_masuk);
+                usort($data_gabungan, function ($a, $b) {
+                    return strtotime($a['tanggal']) - strtotime($b['tanggal']);
+                });
+
+                $data = [
+                    'kategori' => 'item',
+                    'data_barang' => mysqli_fetch_assoc(mysqli_query($koneksi, $q_barang)),
+                    'tgl_mulai' => $tgl_mulai,
+                    'tgl_selesai' => $tgl_selesai,
+                ];
+                var_dump($data);
+                exit;
+            }
+
+            require_once '../views/pimpinan/cetak_laporan_stock_opname.php';
+        }
+    }
+
+    // public function ajax_load_per_item()
+    // {
+    //     require __DIR__ . '/../config/koneksi.php';
+
+    //     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+    //         $bulan = $_POST['bulan_angka_post'];
+    //         $tahun = $_POST['tahun_angka_post'];
+
+    //         $query = mysqli_query($koneksi, "
+    //             SELECT 
+    //                 b.kode_barang,
+    //                 b.merk_barang,
+    //                 b.nama_barang,
+    //                 b.satuan,
+    //                 SUM(d.jumlah) AS total_keluar
+    //             FROM tb_detail_permintaan d
+    //             JOIN tb_permintaan p ON d.permintaan_id = p.id
+    //             JOIN tb_barang_bergerak b ON d.barang_id = b.id
+    //             WHERE 
+    //                 p.tanggal_disetujui IS NOT NULL
+    //                 AND MONTH(p.tanggal_disetujui) = '$bulan'
+    //                 AND YEAR(p.tanggal_disetujui) = '$tahun'
+    //             GROUP BY d.barang_id
+    //         ");
+
+    //         $no = 1;
+    //         while ($row = mysqli_fetch_assoc($query)) {
+    //             echo "
+    //             <tr>
+    //                 <td style='text-align:center'>{$no}</td>
+    //                 <td>{$row['kode_barang']}</td>
+    //                 <td>{$row['merk_barang']}</td>
+    //                 <td>{$row['nama_barang']}</td>
+    //                 <td style='text-align:center; font-size:1.1em; color:green; font-weight:bold'>
+    //                     {$row['total_keluar']}
+    //                 </td>
+    //                 <td style='text-align:center'>{$row['satuan']}</td>
+    //             </tr>";
+    //             $no++;
+    //         }
+    //         exit;
+    //     }
+    // }
+
+    // public function ajax_load_per_orang()
+    // {
+    //     require __DIR__ . '/../config/koneksi.php';
+
+    //     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+    //         $bulan = $_POST['bulan_angka_post'];
+    //         $tahun = $_POST['tahun_angka_post'];
+
+    //         $query = mysqli_query($koneksi, "
+    //         SELECT 
+    //             p.*, 
+    //             u.nama AS nama_pemohon, 
+    //             a.nama AS nama_admin
+    //         FROM tb_permintaan p
+    //         JOIN tb_user u ON p.user_id = u.id
+    //         LEFT JOIN tb_user a ON p.admin_id = a.id
+    //         WHERE 
+    //             p.status = 'disetujui'
+    //             AND p.tanggal_disetujui IS NOT NULL
+    //             AND MONTH(p.tanggal_disetujui) = '$bulan'
+    //             AND YEAR(p.tanggal_disetujui) = '$tahun'
+    //         ORDER BY p.tanggal_disetujui DESC
+    //     ");
+
+    //         $no = 1;
+    //         while ($row = mysqli_fetch_assoc($query)) {
+    //             $id_req = $row['id'];
+
+    //             // DETAIL BARANG
+    //             $q_detail = mysqli_query($koneksi, "
+    //                 SELECT d.jumlah, d.satuan, b.nama_barang, b.merk_barang
+    //                 FROM tb_detail_permintaan d
+    //                 JOIN tb_barang_bergerak b ON d.barang_id = b.id
+    //                 WHERE d.permintaan_id = '$id_req'
+    //             ");
+
+    //             $barang = $jumlah = $satuan = [];
+
+    //             while ($item = mysqli_fetch_assoc($q_detail)) {
+    //                 $barang[] = $item['nama_barang'] . ' (' . $item['merk_barang'] . ')';
+    //                 $jumlah[] = $item['jumlah'];
+    //                 $satuan[] = $item['satuan'];
+    //             }
+
+    //             // OUTPUT HTML
+    //             echo "<tr>
+    //                 <td style='text-align:center;'>{$no}</td>
+    //                 <td style='text-align:center;'>" . date('d-m-Y', strtotime($row['tanggal_disetujui'])) . "</td>
+    //                 <td>{$row['nama_pemohon']}</td>
+
+    //                 <td><ul style='margin:0;padding-left:18px;'>";
+    //             foreach ($barang as $b) {
+    //                 echo "<li>$b</li>";
+    //             }
+    //             echo "</ul></td>
+
+    //                 <td style='text-align:center;'><ul style='margin:0;list-style:none;padding-left:0;'>";
+    //             foreach ($jumlah as $j) {
+    //                 echo "<li>$j</li>";
+    //             }
+    //             echo "</ul></td>
+
+    //                 <td style='text-align:center;'><ul style='margin:0;list-style:none;padding-left:0;'>";
+    //             foreach ($satuan as $s) {
+    //                 echo "<li>$s</li>";
+    //             }
+    //             echo "</ul></td>
+
+    //                 <td>{$row['nama_admin']}</td>
+    //             </tr>";
+
+    //             $no++;
+    //         }
+    //         exit;
+    //     }
+    // }
+
 
     public function laporan_stok_page()
     {
@@ -169,7 +463,8 @@ class PimpinanController
             // echo "<script>alert('Akses Ditolak!'); window.location='index.php';</script>";
             $_SESSION['alert'] = [
                 'icon' => 'error',
-                'title' => 'Akses Ditolak!',
+                'title' => 'Gagal!',
+                'text' => 'Akses Ditolak!',
             ];
             header("Location: index.php");
             exit;
@@ -253,7 +548,8 @@ class PimpinanController
             // echo "<script>alert('Akses Ditolak!'); window.location='index.php';</script>";
             $_SESSION['alert'] = [
                 'icon' => 'error',
-                'title' => 'Akses Ditolak!',
+                'title' => 'Gagal!',
+                'text' => 'Akses Ditolak!',
             ];
             header("Location: index.php");
             exit;

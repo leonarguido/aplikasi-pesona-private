@@ -65,15 +65,6 @@
                                 </table>
                             </div>
 
-                            <div class="row mt-5 d-none d-print-block">
-                                <div class="col-4 offset-8 text-center">
-                                    <p>Denpasar, <?= date('d F Y'); ?></p>
-                                    <p>Mengetahui,</p>
-                                    <br><br><br>
-                                    <p><strong>( Pimpinan )</strong></p>
-                                </div>
-                            </div>
-
                         </div>
                     </div>
 
@@ -82,7 +73,7 @@
         </div>
     </div>
 
-    <?php require '../views/layout/footer.php'; ?>
+    <?php require __DIR__ . '/../layout/footer.php'; ?>
 
     <script>
         function load_laporan_permintaan($status_permintaan) {
@@ -139,10 +130,7 @@
             load_laporan_permintaan($status_permintaan);
         });
 
-        if (window.innerHeight <= 700) {
-            document.getElementById('accordionSidebar')
-                .style.height = '100vh';
-        }
+         
     </script>
 </body>
 

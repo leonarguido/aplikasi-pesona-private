@@ -15,7 +15,8 @@
                     <div class="card-body p-0">
                         <div class="p-5">
                             <div class="text-center">
-                                <h1 class="h4 text-gray-900 mb-4">Login Logistik</h1>
+                                <h1 class="text-gray-900">PESONA</h1>
+                                <H5 class="text-gray-900 mb-4">Penata Usahaan Stok Opname</H5>
                             </div>
 
                             <?php if (isset($error)) : ?>
@@ -47,9 +48,9 @@
                             </form>
 
                             <hr>
-                            <div class="text-center">
+                            <!-- <div class="text-center">
                                 <small class="text-muted">Gunakan akun: <b>admin</b> / <b>admin123</b></small>
-                            </div>
+                            </div> -->
                         </div>
                     </div>
                 </div>
