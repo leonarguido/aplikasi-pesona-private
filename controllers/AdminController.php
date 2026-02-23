@@ -61,7 +61,7 @@ class AdminController
                     // LOG BARANG
                     $id_admin = $_SESSION['user_id'];
                     $id_barang = mysqli_insert_id($koneksi);
-                    $log_barang->proses_log_barang($id_admin, $id_barang, "tambah");
+                    $log_barang->proses_log_barang($id_admin, $id_barang, "tambah barang");
 
                     $_SESSION['alert'] = [
                         'icon' => 'success',
@@ -104,7 +104,7 @@ class AdminController
                 // LOG BARANG
                 $id_admin = $_SESSION['user_id'];
                 $id_barang = $id;
-                $log_barang->proses_log_barang($id_admin, $id_barang, "edit");
+                $log_barang->proses_log_barang($id_admin, $id_barang, "edit barang");
 
                 $_SESSION['alert'] = [
                     'icon' => 'success',
@@ -131,7 +131,7 @@ class AdminController
                 // LOG BARANG
                 $id_admin = $_SESSION['user_id'];
                 $id_barang = $id;
-                $log_barang->proses_log_barang($id_admin, $id_barang, "hapus");
+                $log_barang->proses_log_barang($id_admin, $id_barang, "hapus barang");
 
                 $_SESSION['alert'] = [
                     'icon' => 'success',

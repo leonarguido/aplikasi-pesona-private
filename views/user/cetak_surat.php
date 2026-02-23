@@ -148,7 +148,7 @@
         <table class="header-table">
             <tr>
                 <td width="15%" style="text-align: center;">
-                    <img src="<?= ASSETS_URL ?>img/logo_tutwuri.jpg" alt="Logo" class="logo-kop">
+                    <img src="<?= ASSETS_URL ?>img/bpmp/logo_tutwuri.jpg" alt="Logo" class="logo-kop">
                 </td>
                 <td width="85%" class="text-kop">
                     <h2>KEMENTERIAN PENDIDIKAN DASAR<br>DAN MENENGAH</h2>

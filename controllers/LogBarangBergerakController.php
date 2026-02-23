@@ -102,7 +102,7 @@ class LogBarangBergerakController
         session_start();
 
         if ($id_barang != null && $aksi != null) {
-            $query = "INSERT INTO tb_log_barang_bergerak (admin_id, barang_bergerak_id, tanggal, aksi) 
+            $query = "INSERT INTO tb_log_barang_bergerak (admin_id, barang_id, tanggal, aksi) 
                   VALUES ('$id_admin', '$id_barang', NOW(), '$aksi')";
 
             mysqli_query($koneksi, $query);

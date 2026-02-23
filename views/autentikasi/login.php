@@ -10,7 +10,7 @@
 <body>
     <div class="main-pannel">
         <div class="container-scroller">
-            <div class="container-fluid page-body-wrapper full-page-wrapper">
+            <div class="page-body-wrapper full-page-wrapper">
                 <div class="content-wrapper align-items-center auth px-0">
                     <div class="row w-100 mx-0" style="background-image: url('<?= ASSETS_URL ?>img/bpmp/kantor_bpmp_bali_3.jpeg'); background-size: cover; background-repeat: no-repeat;">
                         <div class="col-lg-8 mx-auto">
