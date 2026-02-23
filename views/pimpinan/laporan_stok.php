@@ -54,7 +54,7 @@
                                         <tr>
                                             <th width="5%" style="text-align:center;">No</th>
                                             <th width="10%">Kode Barang</th>
-                                            <th width="10%">Merk Barang</th>
+                                            <th width="10%">Merek Barang</th>
                                             <th>Nama Barang</th>
                                             <th width="15%" style="text-align:center;">Sisa Stok</th>
                                             <th width="10%" style="text-align:center;">Satuan</th>

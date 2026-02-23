@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Laporan Stock Opname ?></title>
+    <title>Laporan Stock Opname</title>
     <?php
     define('BASE_URL', '/aplikasi-pesona-private/routes/web.php/?page=');
     define('ASSETS_URL', '/aplikasi-pesona-private/assets/');
@@ -42,7 +42,7 @@
 
         .text-kop {
             text-align: center;
-            line-height: 1.2;
+            line-height: 1.3;
         }
 
         .text-kop h2 {
@@ -67,7 +67,7 @@
         /* ISI SURAT */
         .content {
             margin-bottom: 15px;
-            line-height: 1.5;
+            line-height: 1.2;
         }
 
         /* TABEL BARANG */
@@ -123,7 +123,8 @@
             }
 
             @page {
-                margin: 2cm;
+                margin: 1cm;
+                size: auto;
             }
         }
 
@@ -166,72 +167,235 @@
             </table>
         </div>
 
-        <div class="content">
-            <table>
-                <tr>
-                    <td width="100%" style="text-align: center;"><strong>KARTU STOCK BARANG</strong></td>
-                    <td></td>
-                </tr>
-            </table>
-        </div>
-
-        <div class="content">
-            <table>
-                <tr>
-                    <td width="160px"><strong>NAMA BARANG</strong></td>
-                    <td>: <strong><?= $data['data_barang']['nama_barang']; ?></strong></td>
-                </tr>
-                <tr>
-                    <td width="160px"><strong>SATUAN</strong></td>
-                    <td>: <strong><?= $data['data_barang']['satuan']; ?></strong></td>
-                </tr>
-                <tr>
-                    <td width="160px"><strong>KODE BARANG</strong></td>
-                    <td>: <strong><?= $data['data_barang']['kode_barang']; ?></strong></td>
-                </tr>
-            </table>
-        </div>
-
-        <div class="content" style="margin-top: 30px;">
-            <table class="table-data">
-                <thead>
+        <?php if ($kategori == 'item'): ?>
+            <div class="content">
+                <table>
                     <tr>
-                        <th>No</th>
-                        <th>Tanggal</th>
-                        <th>Keterangan</th>
-                        <th>Masuk</th>
-                        <th>Keluar</th>
-                        <th>Sisa</th>
+                        <td width="100%" style="text-align: center;"><strong>KARTU STOCK BARANG</strong></td>
+                        <td></td>
                     </tr>
-                </thead>
-                <tbody>
+                </table>
+            </div>
+
+            <div class="content">
+                <table>
                     <tr>
-                        <td style="text-align: center;"></td>
-                        <td style="text-align: center;"><?= $tanggal_saldo_awal; ?></td>
-                        <td>Saldo Awal</td>
-                        <td style="text-align: center;"></td>
-                        <td style="text-align: center;"></td>
-                        <td style="text-align: center;"><?= $saldo_awal != 0 ? $saldo_awal : ''; ?></td>
+                        <td width="160px"><strong>NAMA BARANG</strong></td>
+                        <td>: <strong><?= $data['data_barang']['nama_barang']; ?></strong></td>
                     </tr>
-                    <?php 
-                    $no = 1;
-                    foreach ($hasil as $row): 
-                    ?>
                     <tr>
-                        <td style="text-align: center;"><?= $no++; ?></td>
-                        <td style="text-align: center;"><?= date('d-m-Y', strtotime($row['tanggal'])); ?></td>
-                        <td><?= !empty($row['keterangan']) ? $row['keterangan'] : ''; ?></td>
-                        <td style="text-align: center;"><?= $row['masuk'] != 0 ? $row['masuk'] : ''; ?></td>
-                        <td style="text-align: center;"><?= $row['keluar'] != 0 ? $row['keluar'] : ''; ?></td>
-                        <td style="text-align: center;"><?= $row['sisa'] != 0 ? $row['sisa'] : ''; ?></td>
+                        <td width="160px"><strong>SATUAN</strong></td>
+                        <td>: <strong><?= $data['data_barang']['satuan']; ?></strong></td>
                     </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
-        </div>
+                    <tr>
+                        <td width="160px"><strong>KODE BARANG</strong></td>
+                        <td>: <strong><?= $data['data_barang']['kode_barang']; ?></strong></td>
+                    </tr>
+                </table>
+            </div>
 
+            <div class="content" style="margin-top: 30px;">
+                <table class="table-data">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Tanggal</th>
+                            <th>Keterangan</th>
+                            <th>Masuk</th>
+                            <th>Keluar</th>
+                            <th>Sisa</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="text-align: center;"></td>
+                            <td style="text-align: center;"><?= $tanggal_saldo_awal; ?></td>
+                            <td>Saldo Awal</td>
+                            <td style="text-align: center;"></td>
+                            <td style="text-align: center;"></td>
+                            <td style="text-align: center;"><?= $saldo_awal != 0 ? $saldo_awal : ''; ?></td>
+                        </tr>
+                        <?php
+                        $no = 1;
+                        foreach ($hasil as $row):
+                        ?>
+                            <tr>
+                                <td style="text-align: center;"><?= $no++; ?></td>
+                                <td style="text-align: center;"><?= date('d-m-Y', strtotime($row['tanggal'])); ?></td>
+                                <td><?= !empty($row['keterangan']) ? $row['keterangan'] : ''; ?></td>
+                                <td style="text-align: center;"><?= $row['masuk'] != 0 ? $row['masuk'] : ''; ?></td>
+                                <td style="text-align: center;"><?= $row['keluar'] != 0 ? $row['keluar'] : ''; ?></td>
+                                <td style="text-align: center;"><?= $row['sisa'] != 0 ? $row['sisa'] : ''; ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
 
+        <?php elseif ($kategori == 'pegawai'): ?>
+            <div class="content">
+                <table>
+                    <tr>
+                        <td width="100%" style="text-align: center;"><strong>KARTU PENGELUARAN BARANG</strong></td>
+                        <td></td>
+                    </tr>
+                </table>
+            </div>
 
+            <div class="content">
+                <table>
+                    <tr>
+                        <td width="160px"><strong>NAMA PEGAWAI</strong></td>
+                        <td>: <strong><?= $data_pegawai['nama']; ?></strong></td>
+                    </tr>
+                    <tr>
+                        <td width="160px"><strong>NIP</strong></td>
+                        <td>: <strong><?= $data_pegawai['nip']; ?></strong></td>
+                    </tr>
+                    <tr>
+                        <td width="160px"><strong>JABATAN</strong></td>
+                        <td>: <strong><?= $data_pegawai['role']; ?></strong></td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="content" style="margin-top: 30px;">
+                <table class="table-data">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Tanggal</th>
+                            <th>Pemohon</th>
+                            <th>Rincian Barang (Disetujui)</th>
+                            <th>Jumlah</th>
+                            <th>Satuan</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        $no = 1;
+                        while ($row = mysqli_fetch_assoc($query)):
+                            $id_req = $row['id'];
+
+                            // DETAIL BARANG
+                            $q_detail = mysqli_query($koneksi, "
+                            SELECT d.jumlah, d.satuan, b.nama_barang, b.merek_barang
+                            FROM tb_detail_permintaan d
+                            JOIN tb_barang_bergerak b ON d.barang_id = b.id
+                            WHERE d.permintaan_id = '$id_req'
+                        ");
+
+                            $barang = [];
+                            $jumlah = [];
+                            $satuan = [];
+
+                            while ($item = mysqli_fetch_assoc($q_detail)) {
+                                $barang[] = $item['nama_barang'] . ' (' . $item['merek_barang'] . ')';
+                                $jumlah[] = $item['jumlah'];
+                                $satuan[] = $item['satuan'];
+                            }
+                        ?>
+
+                            <tr>
+                                <td style="text-align:center;"><?= $no ?></td>
+                                <td style="text-align:center;"><?= date('d-m-Y', strtotime($row['tanggal_disetujui'])) ?></td>
+                                <td><?= $row['nama_pemohon'] ?></td>
+
+                                <td>
+                                    <ul style="margin:0;padding-left:18px;">
+                                        <?php foreach ($barang as $b): ?>
+                                            <li><?= $b ?></li>
+                                        <?php endforeach; ?>
+                                    </ul>
+                                </td>
+
+                                <td style="text-align:center;">
+                                    <ul style="margin:0;list-style:none;padding-left:0;">
+                                        <?php foreach ($jumlah as $j): ?>
+                                            <li><?= $j ?></li>
+                                        <?php endforeach; ?>
+                                    </ul>
+                                </td>
+
+                                <td style="text-align:center;">
+                                    <ul style="margin:0;list-style:none;padding-left:0;">
+                                        <?php foreach ($satuan as $s): ?>
+                                            <li><?= $s ?></li>
+                                        <?php endforeach; ?>
+                                    </ul>
+                                </td>
+                            </tr>
+
+                        <?php
+                            $no++;
+                        endwhile;
+                        ?>
+                    </tbody>
+                </table>
+            </div>
+
+        <?php elseif ($kategori == 'tanggal'): ?>
+            <div class="content">
+                <table>
+                    <tr>
+                        <td width="100%" style="text-align: center;"><strong>KARTU PENGELUARAN BARANG</strong></td>
+                        <td></td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="content">
+                <table>
+                    <tr>
+                        <td width="50px">Tanggal</td>
+                        <td>: <?= date('d-m-Y', strtotime($tgl_mulai)) ?> s.d <?= date('d-m-Y', strtotime($tgl_selesai)) ?></td>
+                    </tr>
+                </table>
+                
+                <table class="table-data" style="margin: 0;">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Kode Barang</th>
+                            <th>Merek Barang</th>
+                            <th>Nama Barang</th>
+                            <th>Total Barang Keluar</th>
+                            <th>Satuan</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        $no = 1;
+                        while ($row = mysqli_fetch_assoc($query)):
+                        ?>
+                            <tr>
+                                <td style="text-align:center;"><?= $no ?></td>
+                                <td><?= $row['kode_barang'] ?></td>
+                                <td><?= $row['merek_barang'] ?></td>
+                                <td><?= $row['nama_barang'] ?></td>
+                                <td style='text-align:center;'><?= $row['total_keluar'] ?></td>
+                                <td style='text-align:center'><?= $row['satuan'] ?></td>
+                            </tr>
+                        <?php
+                            $no++;
+                        endwhile;
+                        ?>
+                    </tbody>
+                </table>
+            </div>
+
+        <?php else: ?>
+            <div class="content">
+                <table>
+                    <tr>
+                        <td width="100%" style="text-align: center;"><strong>KARTU STOCK BARANG</strong></td>
+                        <td></td>
+                    </tr>
+                </table>
+
+                <p style="text-align: center; margin-top: 50px;"><em>Data tidak ditemukan</em></p>
+            </div>
+        <?php endif; ?>
     </div>
 
 </body>

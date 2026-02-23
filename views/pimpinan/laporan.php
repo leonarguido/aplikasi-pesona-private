@@ -15,7 +15,7 @@
             <div class="col-md-10">
                 <?php require __DIR__ . '/../layout/topbar.php'; ?>
                 <div class="container-fluid mt-4">
-                    <div class="row">
+                    <!-- <div class="row">
                         <div class="col-lg-8 mb-4">
                             <div class="card shadow h-100">
                                 <div class="card-header py-3 border-bottom-primary">
@@ -58,7 +58,7 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
 
                     <!-- LAPORAN BARANG KELUAR -->
                     <div class="row">
@@ -82,7 +82,7 @@
                                                 <tr>
                                                     <th width="5%" style="text-align:center;">No</th>
                                                     <th width="10%">Kode Barang</th>
-                                                    <th width="10%">Merk Barang</th>
+                                                    <th width="10%">Merek Barang</th>
                                                     <th width="20%">Nama Barang</th>
                                                     <th width="15%" style="text-align:center;">Total Barang Keluar</th>
                                                     <th width="10%" style="text-align:center;">Satuan</th>

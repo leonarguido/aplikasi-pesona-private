@@ -141,7 +141,7 @@
 
                             <?php
                             $q_detail = mysqli_query($koneksi, "
-                                SELECT d.jumlah, d.satuan, b.nama_barang, b.merk_barang
+                                SELECT d.jumlah, d.satuan, b.nama_barang, b.merek_barang
                                 FROM tb_detail_permintaan d
                                 JOIN tb_barang_bergerak b ON d.barang_id = b.id
                                 WHERE d.permintaan_id = '$id_req'
@@ -152,7 +152,7 @@
                             $satuan = [];
 
                             while ($item = mysqli_fetch_assoc($q_detail)) {
-                                $barang[] = "{$item['nama_barang']} ({$item['merk_barang']})";
+                                $barang[] = "{$item['nama_barang']} ({$item['merek_barang']})";
                                 $jumlah[] = $item['jumlah'];
                                 $satuan[] = $item['satuan'];
                             }

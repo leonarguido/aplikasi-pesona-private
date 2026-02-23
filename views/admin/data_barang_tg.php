@@ -55,7 +55,7 @@
                                             <th>No</th>
                                             <th>Penanggung Jawab</th>
                                             <th>Kode & Nama Barang</th>
-                                            <th>Merk</th>
+                                            <th>Merek</th>
                                             <th>Jumlah</th>
                                             <th>Berita Acara</th>
                                             <?php if ($_SESSION['role'] != 'pimpinan'): ?>
@@ -87,7 +87,7 @@
                                                     <b><?= $row['nama_barang']; ?></b><br>
                                                     <small class="text-muted"><?= $row['kode_barang'] ? $row['kode_barang'] : 'Tanpa Kode'; ?></small>
                                                 </td>
-                                                <td><?= $row['merk_barang'] ? $row['merk_barang'] : '-'; ?></td>
+                                                <td><?= $row['merek_barang'] ? $row['merek_barang'] : '-'; ?></td>
                                                 <td><?= $row['jumlah']; ?> <?= $row['satuan']; ?></td>
                                                 <td class="text-center">
                                                     <?php if ($row['berkas']): ?>
@@ -137,7 +137,7 @@
                                                                     <div class=" form-group"><label>Kode Barang</label><input type="text" name="kode_barang" class="form-control" value="<?= $row['kode_barang']; ?>">
                                                                     </div>
                                                                     <div class="form-group"><label>Nama Barang</label><input type="text" name="nama_barang" class="form-control" value="<?= $row['nama_barang']; ?>" required></div>
-                                                                    <div class="form-group"><label>Merk</label><input type="text" name="merk_barang" class="form-control" value="<?= $row['merk_barang']; ?>"></div>
+                                                                    <div class="form-group"><label>Merek</label><input type="text" name="merek_barang" class="form-control" value="<?= $row['merek_barang']; ?>"></div>
                                                                     <div class="row">
                                                                         <div class="col-md-6">
                                                                             <div class="form-group"><label>Jumlah</label><input type="number" name="jumlah" class="form-control" value="<?= $row['jumlah']; ?>" required></div>
@@ -194,7 +194,7 @@
                             </div>
                             <div class="form-group"><label>Kode Barang (Opsional)</label><input type="text" name="kode_barang" class="form-control" placeholder="Contoh: INV-LAP-01"></div>
                             <div class="form-group"><label>Nama Barang</label><input type="text" name="nama_barang" class="form-control" required placeholder="Contoh: Laptop"></div>
-                            <div class="form-group"><label>Merk</label><input type="text" name="merk_barang" class="form-control" placeholder="Contoh: Asus / Lenovo"></div>
+                            <div class="form-group"><label>Merek</label><input type="text" name="merek_barang" class="form-control" placeholder="Contoh: Asus / Lenovo"></div>
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group"><label>Jumlah</label><input type="number" name="jumlah" class="form-control" required></div>

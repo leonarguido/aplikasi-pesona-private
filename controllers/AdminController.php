@@ -38,7 +38,7 @@ class AdminController
 
         if (isset($_POST['tambah'])) {
             $kode   = $_POST['kode_barang'];
-            $merk   = $_POST['merk_barang'];
+            $merek   = $_POST['merek_barang'];
             $nama   = $_POST['nama_barang'];
             $satuan = $_POST['satuan'];
             $desc   = $_POST['keterangan'];
@@ -55,8 +55,8 @@ class AdminController
                 header("Location: " . $this->base_url . "data_barang");
                 exit;
             } else {
-                $query = "INSERT INTO tb_barang_bergerak (kode_barang, merk_barang, nama_barang, satuan, keterangan, stok) 
-                  VALUES ('$kode', '$merk', '$nama', '$satuan', '$desc', '$stok')";
+                $query = "INSERT INTO tb_barang_bergerak (kode_barang, merek_barang, nama_barang, satuan, keterangan, stok) 
+                  VALUES ('$kode', '$merek', '$nama', '$satuan', '$desc', '$stok')";
 
                 if (mysqli_query($koneksi, $query)) {
                     // LOG BARANG DILAKUKAN SETELAH EKSEKUSI
@@ -103,17 +103,17 @@ class AdminController
         if (isset($_POST['edit'])) {
             $id     = $_POST['id'];
             $nama   = $_POST['nama_barang'];
-            $merk   = $_POST['merk_barang'];
+            $merek   = $_POST['merek_barang'];
             $satuan = $_POST['satuan'];
             $desc   = $_POST['keterangan'];
 
             // KEBUTUHAN LOG BARANG
-            $kolom = ['nama_barang', 'merk_barang', 'satuan', 'keterangan'];
+            $kolom = ['nama_barang', 'merek_barang', 'satuan', 'keterangan'];
             $data_baru = $_POST;
             $q = mysqli_query($koneksi, "SELECT * FROM tb_barang_bergerak WHERE id='$id'");
             $data_lama = mysqli_fetch_assoc($q);
 
-            $query = "UPDATE tb_barang_bergerak SET merk_barang='$merk', nama_barang='$nama', satuan='$satuan', keterangan='$desc' WHERE id='$id'";
+            $query = "UPDATE tb_barang_bergerak SET merek_barang='$merek', nama_barang='$nama', satuan='$satuan', keterangan='$desc' WHERE id='$id'";
             if (mysqli_query($koneksi, $query)) {
                 // LOG BARANG DILAKUKAN SETELAH EKSEKUSI
                 $id_admin = $_SESSION['user_id'];
@@ -248,10 +248,10 @@ class AdminController
 
                     while (($data = fgetcsv($file, 10000, ",")) !== FALSE) {
                         // Mapping Data dari Excel/CSV ke Variabel
-                        // Kolom 0: Kode,  1: Nama, 2: Merk, 3: Satuan, 4: Stok, 5: Ket
+                        // Kolom 0: Kode,  1: Nama, 2: Merek, 3: Satuan, 4: Stok, 5: Ket
                         $kode   = mysqli_real_escape_string($koneksi, $data[0]);
                         $nama   = mysqli_real_escape_string($koneksi, $data[1]);
-                        $merk   = mysqli_real_escape_string($koneksi, $data[2]);
+                        $merek   = mysqli_real_escape_string($koneksi, $data[2]);
                         $satuan = mysqli_real_escape_string($koneksi, $data[3]);
                         $stok   = (int) $data[4];
                         $desc   = mysqli_real_escape_string($koneksi, $data[5]);
@@ -261,8 +261,8 @@ class AdminController
 
                         if (mysqli_num_rows($cek) == 0 && !empty($kode)) {
                             // Jika kode belum ada, Insert Baru
-                            $query = "INSERT INTO tb_barang_bergerak (kode_barang, merk_barang, nama_barang, satuan, stok, keterangan) 
-                              VALUES ('$kode', '$merk', '$nama', '$satuan', '$stok', '$desc')";
+                            $query = "INSERT INTO tb_barang_bergerak (kode_barang, merek_barang, nama_barang, satuan, stok, keterangan) 
+                              VALUES ('$kode', '$merek', '$nama', '$satuan', '$stok', '$desc')";
                             mysqli_query($koneksi, $query);
                             $count++;
                         }
@@ -333,7 +333,7 @@ class AdminController
             $nip    = mysqli_real_escape_string($koneksi, $_POST['nip']);
             $nama   = mysqli_real_escape_string($koneksi, $_POST['nama_barang']);
             $kode   = mysqli_real_escape_string($koneksi, $_POST['kode_barang']);
-            $merk   = mysqli_real_escape_string($koneksi, $_POST['merk_barang']);
+            $merek   = mysqli_real_escape_string($koneksi, $_POST['merek_barang']);
             $satuan = $_POST['satuan'];
             $jumlah = $_POST['jumlah'];
             $ket    = mysqli_real_escape_string($koneksi, $_POST['keterangan']);
@@ -354,8 +354,8 @@ class AdminController
             $data_user = mysqli_fetch_assoc($row);
             $id_user = $data_user['id'];
 
-            $q = "INSERT INTO tb_barang_tidak_bergerak (user_id, nip, nama_barang, kode_barang, merk_barang, satuan, jumlah, keterangan, berkas) 
-            VALUES ('$id_user', '$nip', '$nama', '$kode', '$merk', '$satuan', '$jumlah', '$ket', '$nama_file')";
+            $q = "INSERT INTO tb_barang_tidak_bergerak (user_id, nip, nama_barang, kode_barang, merek_barang, satuan, jumlah, keterangan, berkas) 
+            VALUES ('$id_user', '$nip', '$nama', '$kode', '$merek', '$satuan', '$jumlah', '$ket', '$nama_file')";
 
             if (mysqli_query($koneksi, $q)) {
                 // LOG BARANG DILAKUKAN SETELAH EKSEKUSI
@@ -397,7 +397,7 @@ class AdminController
             $nip    = mysqli_real_escape_string($koneksi, $_POST['nip']);
             $nama   = mysqli_real_escape_string($koneksi, $_POST['nama_barang']);
             $kode   = mysqli_real_escape_string($koneksi, $_POST['kode_barang']);
-            $merk   = mysqli_real_escape_string($koneksi, $_POST['merk_barang']);
+            $merek   = mysqli_real_escape_string($koneksi, $_POST['merek_barang']);
             $satuan = $_POST['satuan'];
             $jumlah = $_POST['jumlah'];
             $ket    = mysqli_real_escape_string($koneksi, $_POST['keterangan']);
@@ -416,7 +416,7 @@ class AdminController
             $id_user = $data_user['id'];
 
             $q = "UPDATE tb_barang_tidak_bergerak SET 
-            user_id='$id_user', nip='$nip', nama_barang='$nama', kode_barang='$kode', merk_barang='$merk', 
+            user_id='$id_user', nip='$nip', nama_barang='$nama', kode_barang='$kode', merek_barang='$merek', 
             satuan='$satuan', jumlah='$jumlah', keterangan='$ket' $query_file 
             WHERE id='$id'";
 

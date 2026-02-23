@@ -113,7 +113,7 @@
                                         </div>
                                         <hr>
                                         <button type="submit" name="proses_stock_opname" class="btn btn-primary btn-block shadow-sm">
-                                            <i class="fas fa-search fa-sm text-white-50"></i> Submit
+                                            <i class="fas fa-print fa-sm text-white-50"></i> Cetak Laporan
                                         </button>
                                 </div>
                                 </form>

@@ -7,7 +7,7 @@ header('Content-Disposition: attachment; filename="template_import_barang.csv"')
 $output = fopen('php://output', 'w');
 
 // 1. Tulis Baris Judul (Header) - JANGAN DIUBAH URUTANNYA
-fputcsv($output, array('Kode Barang', 'Nama Barang', 'Merk Barang', 'Satuan', 'Stok', 'Keterangan'));
+fputcsv($output, array('Kode Barang', 'Nama Barang', 'Merek Barang', 'Satuan', 'Stok', 'Keterangan'));
 
 // 2. Tulis Contoh Data (Dummy) sebagai panduan user
 fputcsv($output, array('BRG-001', 'Contoh Laptop ASUS', 'Toshiba', 'Unit', '10', 'Laptop Admin'));

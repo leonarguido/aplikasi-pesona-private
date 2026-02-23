@@ -72,10 +72,10 @@
                 <div id="collapseDataLaporan" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">Pilih Kategori:</h6>
-                        <a class="collapse-item" href="<?= BASE_URL ?>laporan_stok">Laporan Stok Barang</a>
                         <a class="collapse-item" href="<?= BASE_URL ?>laporan_stock_opname">Laporan Stock Opname</a>
-                        <a class="collapse-item" href="<?= BASE_URL ?>laporan_permintaan">Laporan Permintaan</a>
                         <a class="collapse-item" href="<?= BASE_URL ?>laporan">Laporan Transaksi Berhasil</a>
+                        <a class="collapse-item" href="<?= BASE_URL ?>laporan_stok">Laporan Stok Barang</a>
+                        <a class="collapse-item" href="<?= BASE_URL ?>laporan_permintaan">Laporan Permintaan</a>
                     </div>
                 </div>
             </li>
@@ -121,10 +121,10 @@
                 <div id="collapseDataLaporan" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">Pilih Kategori:</h6>
-                        <a class="collapse-item" href="<?= BASE_URL ?>laporan_stok">Laporan Stok Barang</a>
                         <a class="collapse-item" href="<?= BASE_URL ?>laporan_stock_opname">Laporan Stock Opname</a>
-                        <a class="collapse-item" href="<?= BASE_URL ?>laporan_permintaan">Laporan Permintaan</a>
                         <a class="collapse-item" href="<?= BASE_URL ?>laporan">Laporan Transaksi Berhasil</a>
+                        <a class="collapse-item" href="<?= BASE_URL ?>laporan_stok">Laporan Stok Barang</a>
+                        <a class="collapse-item" href="<?= BASE_URL ?>laporan_permintaan">Laporan Permintaan</a>
                     </div>
                 </div>
             </li>

@@ -44,7 +44,7 @@ class PimpinanController
             $query = mysqli_query($koneksi, "
                 SELECT 
                     b.kode_barang,
-                    b.merk_barang,
+                    b.merek_barang,
                     b.nama_barang,
                     b.satuan,
                     SUM(d.jumlah) AS total_keluar
@@ -64,7 +64,7 @@ class PimpinanController
                 <tr>
                     <td style='text-align:center'>{$no}</td>
                     <td>{$row['kode_barang']}</td>
-                    <td>{$row['merk_barang']}</td>
+                    <td>{$row['merek_barang']}</td>
                     <td>{$row['nama_barang']}</td>
                     <td style='text-align:center; font-size:1.1em; color:green; font-weight:bold'>
                         {$row['total_keluar']}
@@ -108,7 +108,7 @@ class PimpinanController
 
                 // DETAIL BARANG
                 $q_detail = mysqli_query($koneksi, "
-                    SELECT d.jumlah, d.satuan, b.nama_barang, b.merk_barang
+                    SELECT d.jumlah, d.satuan, b.nama_barang, b.merek_barang
                     FROM tb_detail_permintaan d
                     JOIN tb_barang_bergerak b ON d.barang_id = b.id
                     WHERE d.permintaan_id = '$id_req'
@@ -117,7 +117,7 @@ class PimpinanController
                 $barang = $jumlah = $satuan = [];
 
                 while ($item = mysqli_fetch_assoc($q_detail)) {
-                    $barang[] = $item['nama_barang'] . ' (' . $item['merk_barang'] . ')';
+                    $barang[] = $item['nama_barang'] . ' (' . $item['merek_barang'] . ')';
                     $jumlah[] = $item['jumlah'];
                     $satuan[] = $item['satuan'];
                 }
@@ -189,7 +189,7 @@ class PimpinanController
 
         // AMBIL DATA PEGAWAI (UNTUK DROPDOWN)
         $list_pegawai = [];
-        $q_pgw = mysqli_query($koneksi, "SELECT id, nip, nama FROM tb_user WHERE nip IS NOT NULL AND nip != '' ORDER BY nama ASC");
+        $q_pgw = mysqli_query($koneksi, "SELECT id, nip, nama FROM tb_user WHERE role = 'staff' OR role = 'pimpinan' AND nip IS NOT NULL AND nip != '' ORDER BY nama ASC");
         while ($p = mysqli_fetch_assoc($q_pgw)) {
             $list_pegawai[] = $p;
         }
@@ -221,7 +221,7 @@ class PimpinanController
                 $_SESSION['alert'] = [
                     'icon' => 'error',
                     'title' => 'Gagal!',
-                    'text' => 'Jika memilih filter berdasarkan item, maka item harus dipilih.'
+                    'text' => 'Pilih item terlebih dahulu!'
                 ];
                 header("Location: " . $this->base_url . "laporan_stock_opname");
                 exit;
@@ -229,7 +229,7 @@ class PimpinanController
                 $_SESSION['alert'] = [
                     'icon' => 'error',
                     'title' => 'Gagal!',
-                    'text' => 'Jika memilih filter berdasarkan pegawai, maka pegawai harus dipilih.'
+                    'text' => 'Pilih pegawai terlebih dahulu!'
                 ];
                 header("Location: " . $this->base_url . "laporan_stock_opname");
                 exit;
@@ -244,8 +244,8 @@ class PimpinanController
             }
 
             // BERDASARKAN ITEM
-            if ($item) {
-                $q_barang = " SELECT nama_barang, merk_barang, satuan, kode_barang, stok FROM tb_barang_bergerak WHERE id = '$item'";
+            if ($kategori == 'item') {
+                $q_barang = " SELECT nama_barang, merek_barang, satuan, kode_barang, stok FROM tb_barang_bergerak WHERE id = '$item'";
 
                 $q_keluar = "
                     SELECT 
@@ -276,6 +276,17 @@ class PimpinanController
 
                 $item_keluar = mysqli_query($koneksi, $q_keluar);
                 $item_masuk = mysqli_query($koneksi, $q_masuk);
+
+                
+                if (mysqli_num_rows($item_keluar) == 0 && mysqli_num_rows($item_masuk) == 0) {
+                    $_SESSION['alert'] = [
+                        'icon' => 'error',
+                        'title' => 'Gagal!',
+                        'text' => 'Tidak ada data transaksi untuk barang ini pada periode yang dipilih.'
+                    ];
+                    header("Location: " . $this->base_url . "laporan_stock_opname");
+                    exit;
+                }
 
                 $data_keluar = [];
                 while ($row = mysqli_fetch_assoc($item_keluar)) {
@@ -340,135 +351,50 @@ class PimpinanController
                 $hasil = array_reverse($filtered_results);
                 $saldo_awal = $hasil[0]['sisa'] - $hasil[0]['masuk'] + $hasil[0]['keluar'];
                 $tanggal_saldo_awal = date('d-m-Y', strtotime($hasil[0]['tanggal']));
+
+
+                // BERDASARKAN PEGAWAI
+            } elseif ($kategori == 'pegawai') {
+                $query = mysqli_query($koneksi, "
+                        SELECT 
+                            p.*, 
+                            u.nama AS nama_pemohon, 
+                            a.nama AS nama_admin
+                        FROM tb_permintaan p
+                        JOIN tb_user u ON p.user_id = u.id
+                        LEFT JOIN tb_user a ON p.admin_id = a.id
+                        WHERE 
+                            p.status = 'disetujui'
+                            AND p.tanggal_disetujui IS NOT NULL
+                            AND p.tanggal_disetujui BETWEEN '$tgl_mulai' AND '$tgl_selesai'
+                            AND (p.user_id = '$pegawai' OR p.admin_id = '$pegawai')
+                        ORDER BY p.tanggal_disetujui DESC
+                    ");
+
+                $data_pegawai = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT id, nip, nama, role FROM tb_user WHERE id = '$pegawai'"));
+
+                // BERDASARKAN TANGGAL
+            } elseif ($kategori == 'tanggal') {
+                $query = mysqli_query($koneksi, "
+                        SELECT 
+                            b.kode_barang,
+                            b.merek_barang,
+                            b.nama_barang,
+                            b.satuan,
+                            SUM(d.jumlah) AS total_keluar
+                        FROM tb_detail_permintaan d
+                        JOIN tb_permintaan p ON d.permintaan_id = p.id
+                        JOIN tb_barang_bergerak b ON d.barang_id = b.id
+                        WHERE 
+                            p.tanggal_disetujui IS NOT NULL
+                            AND p.tanggal_disetujui BETWEEN '$tgl_mulai' AND '$tgl_selesai'
+                        GROUP BY d.barang_id
+                    ");
             }
 
             require_once '../views/pimpinan/cetak_laporan_stock_opname.php';
         }
     }
-
-    // public function ajax_load_per_item()
-    // {
-    //     require __DIR__ . '/../config/koneksi.php';
-
-    //     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
-    //         $bulan = $_POST['bulan_angka_post'];
-    //         $tahun = $_POST['tahun_angka_post'];
-
-    //         $query = mysqli_query($koneksi, "
-    //             SELECT 
-    //                 b.kode_barang,
-    //                 b.merk_barang,
-    //                 b.nama_barang,
-    //                 b.satuan,
-    //                 SUM(d.jumlah) AS total_keluar
-    //             FROM tb_detail_permintaan d
-    //             JOIN tb_permintaan p ON d.permintaan_id = p.id
-    //             JOIN tb_barang_bergerak b ON d.barang_id = b.id
-    //             WHERE 
-    //                 p.tanggal_disetujui IS NOT NULL
-    //                 AND MONTH(p.tanggal_disetujui) = '$bulan'
-    //                 AND YEAR(p.tanggal_disetujui) = '$tahun'
-    //             GROUP BY d.barang_id
-    //         ");
-
-    //         $no = 1;
-    //         while ($row = mysqli_fetch_assoc($query)) {
-    //             echo "
-    //             <tr>
-    //                 <td style='text-align:center'>{$no}</td>
-    //                 <td>{$row['kode_barang']}</td>
-    //                 <td>{$row['merk_barang']}</td>
-    //                 <td>{$row['nama_barang']}</td>
-    //                 <td style='text-align:center; font-size:1.1em; color:green; font-weight:bold'>
-    //                     {$row['total_keluar']}
-    //                 </td>
-    //                 <td style='text-align:center'>{$row['satuan']}</td>
-    //             </tr>";
-    //             $no++;
-    //         }
-    //         exit;
-    //     }
-    // }
-
-    // public function ajax_load_per_orang()
-    // {
-    //     require __DIR__ . '/../config/koneksi.php';
-
-    //     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
-    //         $bulan = $_POST['bulan_angka_post'];
-    //         $tahun = $_POST['tahun_angka_post'];
-
-    //         $query = mysqli_query($koneksi, "
-    //         SELECT 
-    //             p.*, 
-    //             u.nama AS nama_pemohon, 
-    //             a.nama AS nama_admin
-    //         FROM tb_permintaan p
-    //         JOIN tb_user u ON p.user_id = u.id
-    //         LEFT JOIN tb_user a ON p.admin_id = a.id
-    //         WHERE 
-    //             p.status = 'disetujui'
-    //             AND p.tanggal_disetujui IS NOT NULL
-    //             AND MONTH(p.tanggal_disetujui) = '$bulan'
-    //             AND YEAR(p.tanggal_disetujui) = '$tahun'
-    //         ORDER BY p.tanggal_disetujui DESC
-    //     ");
-
-    //         $no = 1;
-    //         while ($row = mysqli_fetch_assoc($query)) {
-    //             $id_req = $row['id'];
-
-    //             // DETAIL BARANG
-    //             $q_detail = mysqli_query($koneksi, "
-    //                 SELECT d.jumlah, d.satuan, b.nama_barang, b.merk_barang
-    //                 FROM tb_detail_permintaan d
-    //                 JOIN tb_barang_bergerak b ON d.barang_id = b.id
-    //                 WHERE d.permintaan_id = '$id_req'
-    //             ");
-
-    //             $barang = $jumlah = $satuan = [];
-
-    //             while ($item = mysqli_fetch_assoc($q_detail)) {
-    //                 $barang[] = $item['nama_barang'] . ' (' . $item['merk_barang'] . ')';
-    //                 $jumlah[] = $item['jumlah'];
-    //                 $satuan[] = $item['satuan'];
-    //             }
-
-    //             // OUTPUT HTML
-    //             echo "<tr>
-    //                 <td style='text-align:center;'>{$no}</td>
-    //                 <td style='text-align:center;'>" . date('d-m-Y', strtotime($row['tanggal_disetujui'])) . "</td>
-    //                 <td>{$row['nama_pemohon']}</td>
-
-    //                 <td><ul style='margin:0;padding-left:18px;'>";
-    //             foreach ($barang as $b) {
-    //                 echo "<li>$b</li>";
-    //             }
-    //             echo "</ul></td>
-
-    //                 <td style='text-align:center;'><ul style='margin:0;list-style:none;padding-left:0;'>";
-    //             foreach ($jumlah as $j) {
-    //                 echo "<li>$j</li>";
-    //             }
-    //             echo "</ul></td>
-
-    //                 <td style='text-align:center;'><ul style='margin:0;list-style:none;padding-left:0;'>";
-    //             foreach ($satuan as $s) {
-    //                 echo "<li>$s</li>";
-    //             }
-    //             echo "</ul></td>
-
-    //                 <td>{$row['nama_admin']}</td>
-    //             </tr>";
-
-    //             $no++;
-    //         }
-    //         exit;
-    //     }
-    // }
-
 
     public function laporan_stok_page()
     {
@@ -541,7 +467,7 @@ class PimpinanController
                 <tr>
                     <td style='text-align:center;'>{$no}</td>
                     <td>{$row['kode_barang']}</td>
-                    <td>{$row['merk_barang']}</td>
+                    <td>{$row['merek_barang']}</td>
                     <td>{$row['nama_barang']}</td>
                     <td style='text-align:center; font-size: 1.1em; {$class_stok}'>
                         {$row['stok']}
@@ -622,13 +548,13 @@ class PimpinanController
                     <td>
                         <ul class='pl-3 mb-0' style='font-size: 0.9rem;'>
                             ";
-                $q_detail_hist = mysqli_query($koneksi, "SELECT d.jumlah, d.satuan, b.nama_barang, b.satuan, b.merk_barang
+                $q_detail_hist = mysqli_query($koneksi, "SELECT d.jumlah, d.satuan, b.nama_barang, b.satuan, b.merek_barang
                                                     FROM tb_detail_permintaan d 
                                                     JOIN tb_barang_bergerak b ON d.barang_id = b.id 
                                                     WHERE d.permintaan_id = '$id_hist'");
 
                 while ($dh = mysqli_fetch_assoc($q_detail_hist)) {
-                    echo "<li class='mb-1'>{$dh['nama_barang']} ({$dh['merk_barang']}) : <b>{$dh['jumlah']} {$dh['satuan']}</b></li>";
+                    echo "<li class='mb-1'>{$dh['nama_barang']} ({$dh['merek_barang']}) : <b>{$dh['jumlah']} {$dh['satuan']}</b></li>";
                 };
                 echo "
                         </ul>

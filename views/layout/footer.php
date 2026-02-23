@@ -67,12 +67,24 @@
             title: '<?= $_SESSION['alert']['title']; ?>',
             text: '<?= $_SESSION['alert']['text']; ?>',
             showConfirmButton: false,
-            timer: 1500,
+            timer: setTimerBasedOnText('<?= $_SESSION['alert']['text']; ?>'),
             timerProgressBar: true,
             width: '420px',
             padding: '2em',
             // confirmButtonColor: '#4e73df'
         });
+
+        function setTimerBasedOnText(text) {
+            const words = text.trim().split(/\s+/).filter(Boolean).length;
+            const count = words>4 ? words*6 : words;
+
+            const baseTime = 1200;
+            const timePerWord = 10; // tambahan per kata (ms)
+            const maxTime = 12000;
+
+            const duration = baseTime + (count * timePerWord);
+            return Math.min(duration, maxTime);
+        }
     </script>
 <?php unset($_SESSION['alert']);
 endif; ?>

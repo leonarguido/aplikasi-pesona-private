@@ -42,7 +42,7 @@
                                                 <th width="5%">No</th>
                                                 <th>Kode Barang</th>
                                                 <th>Nama Barang</th>
-                                                <th>Merk</th>
+                                                <th>Merek</th>
                                                 <th>Jumlah</th>
                                                 <th>Lokasi / Keterangan</th>
                                                 <th class="text-center">Berita Acara</th>
@@ -64,7 +64,7 @@
                                                             <td><?= $no++; ?></td>
                                                             <td><span class="badge badge-secondary"><?= $row['kode_barang'] ? $row['kode_barang'] : '-'; ?></span></td>
                                                             <td class="font-weight-bold text-primary"><?= $row['nama_barang']; ?></td>
-                                                            <td><?= $row['merk_barang'] ? $row['merk_barang'] : '-'; ?></td>
+                                                            <td><?= $row['merek_barang'] ? $row['merek_barang'] : '-'; ?></td>
                                                             <td><?= $row['jumlah']; ?> <?= $row['satuan']; ?></td>
                                                             <td><?= $row['keterangan']; ?></td>
                                                             <td class="text-center">
