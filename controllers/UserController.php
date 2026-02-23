@@ -66,7 +66,7 @@ class UserController
             // echo "<script>alert('Barang masuk keranjang!'); window.location='" . $this->base_url . "daftar_barang';</script>";
             $_SESSION['alert'] = [
                 'icon' => 'success',
-'title' => 'Berhasil!',
+                'title' => 'Berhasil!',
                 'text' => 'Barang masuk keranjang!',
             ];
             header("Location: " . $this->base_url . "daftar_barang");
@@ -120,7 +120,7 @@ class UserController
                 // echo "<script>alert('Keranjang kosong!'); window.location='" . $this->base_url . "daftar_barang';</script>";
                 $_SESSION['alert'] = [
                     'icon' => 'success',
-'title' => 'Berhasil!',
+                    'title' => 'Berhasil!',
                     'text' => 'Keranjang kosong!',
                 ];
                 header("Location: " . $this->base_url . "daftar_barang");
@@ -157,7 +157,7 @@ class UserController
                     // echo "<script>alert('Permintaan berhasil diajukan! Satu surat untuk semua barang.'); window.location='" . $this->base_url . "permintaan_saya';</script>";
                     $_SESSION['alert'] = [
                         'icon' => 'success',
-'title' => 'Berhasil!',
+                        'title' => 'Berhasil!',
                         'text' => 'Permintaan berhasil diajukan! Satu surat untuk semua barang',
                     ];
                     header("Location: " . $this->base_url . "permintaan_saya");
@@ -166,7 +166,7 @@ class UserController
                     // echo "<script>alert('Gagal menyimpan detail barang.');</script>";
                     $_SESSION['alert'] = [
                         'icon' => 'error',
-'title' => 'Gagal!',
+                        'title' => 'Gagal!',
                         'text' => 'Gagal menyimpan detail barang',
                     ];
                     header("Location: " . $this->base_url . "permintaan_saya");
@@ -176,7 +176,7 @@ class UserController
                 // echo "<script>alert('Gagal membuat permintaan: " . mysqli_error($koneksi) . "');</script>";
                 $_SESSION['alert'] = [
                     'icon' => 'error',
-'title' => 'Gagal!',
+                    'title' => 'Gagal!',
                     'text' => 'Gagal membuat permintaan' + mysqli_error($koneksi),
                 ];
                 header("Location: " . $this->base_url . "permintaan_saya");
@@ -225,7 +225,7 @@ class UserController
                 // echo "<script>alert('Permintaan berhasil dibatalkan.'); window.location='" . $this->base_url . "permintaan_saya';</script>";
                 $_SESSION['alert'] = [
                     'icon' => 'success',
-'title' => 'Berhasil!',
+                    'title' => 'Berhasil!',
                     'text' => 'Permintaan berhasil dibatalkan!',
                 ];
                 header("Location: " . $this->base_url . "permintaan_saya");
@@ -234,7 +234,7 @@ class UserController
                 // echo "<script>alert('Gagal! Permintaan tidak bisa dibatalkan.'); window.location='" . $this->base_url . "permintaan_saya';</script>";
                 $_SESSION['alert'] = [
                     'icon' => 'error',
-'title' => 'Gagal!',
+                    'title' => 'Gagal!',
                     'text' => 'Gagal! Permintaan tidak bisa dibatalkan',
                 ];
                 header("Location: " . $this->base_url . "permintaan_saya");
@@ -298,7 +298,7 @@ class UserController
 
             $_SESSION['alert'] = [
                 'icon' => 'success',
-'title' => 'Berhasil!',
+                'title' => 'Berhasil!',
                 'text' => 'Perubahan berhasil disimpan!',
             ];
             header("Location: " . $this->base_url . "permintaan_saya");
@@ -335,7 +335,7 @@ class UserController
             // echo "<script>alert('Surat belum bisa dicetak karena status belum disetujui!'); window.close();</script>";
             $_SESSION['alert'] = [
                 'icon' => 'error',
-'title' => 'Gagal!',
+                'title' => 'Gagal!',
                 'text' => 'Surat belum bisa dicetak karena status belum disetujui!',
             ];
             header("Location: " . $this->base_url . "cetak_surat");
@@ -396,6 +396,141 @@ class UserController
     // MASUK HALAMAN PROFIL PENGGUNA
     public function profil_page()
     {
-        require_once '../views/pengguna/profil.php';
+        require __DIR__ . '/../config/koneksi.php';
+        session_start();
+
+        // Ambil Role & ID User
+        $role    = $_SESSION['role'];
+        $id_user = $_SESSION['user_id'];
+        $data = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT * FROM tb_user WHERE id = '$id_user'"));
+
+        require_once '../views/user/profil.php';
+    }
+
+    public function ganti_password()
+    {
+        require __DIR__ . '/../config/koneksi.php';
+        session_start();
+
+        if (isset($_POST['ganti_password'])) {
+            $id_user = $_SESSION['user_id'];
+            $pass_lama = $_POST['password_lama'];
+            $pass_baru = $_POST['password_baru'];
+            $pass_konf = $_POST['konfirmasi_password_baru'];
+
+
+            // // konfirmasi password agar 8 karakter, ada huruf besar, kecil, angka, dan simbol
+            // $pattern = "/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/";
+            // if (!preg_match($pattern, $pass_baru)) {
+            //     $_SESSION['alert'] = [
+            //         'icon' => 'error',
+            //         'title' => 'Password baru harus minimal 8 karakter, mengandung huruf besar, kecil, angka, dan simbol!',
+            //     ];
+            //     header("Location: " . $this->base_url . "profil_saya");
+            //     exit;
+            // }
+
+            // Ambil password saat ini dari database
+            $query = mysqli_query($koneksi, "SELECT password FROM tb_user WHERE id='$id_user'");
+            $data = mysqli_fetch_assoc($query);
+
+            // Validasi password lama
+            if (!password_verify($pass_lama, $data['password'])) {
+                $_SESSION['alert'] = [
+                    'icon' => 'error',
+                    'title' => 'Gagal!',
+                    'text' => 'Password lama salah!',
+                ];
+                header("Location: " . $this->base_url . "profil_saya");
+                exit;
+            }
+
+            // Validasi konfirmasi password baru harus minimal 6 karakter saja (biar gak ribet, karena ini aplikasi internal)
+            if (strlen($pass_baru) < 6) {
+                $_SESSION['alert'] = [
+                    'icon' => 'error',
+                    'title' => 'Gagal!',
+                    'text' => 'Password baru harus minimal 6 karakter!',
+                ];
+                header("Location: " . $this->base_url . "profil_saya");
+                exit;
+            }
+
+            // Validasi konfirmasi password baru
+            if ($pass_baru !== $pass_konf) {
+                $_SESSION['alert'] = [
+                    'icon' => 'error',
+                    'title' => 'Gagal!',
+                    'text' => 'Konfirmasi password baru tidak cocok!',
+                ];
+                header("Location: " . $this->base_url . "profil_saya");
+                exit;
+            }
+
+            // Update password baru (hash terlebih dahulu)
+            $pass_baru_hashed = password_hash($pass_baru, PASSWORD_DEFAULT);
+            mysqli_query($koneksi, "UPDATE tb_user SET password='$pass_baru_hashed' WHERE id='$id_user'");
+
+            $_SESSION['alert'] = [
+                'icon' => 'success',
+                'title' => 'Berhasil!',
+                'text' => 'Password berhasil diubah!',
+            ];
+            header("Location: " . $this->base_url . "profil_saya");
+            exit;
+        }
+    }
+
+    public function upload_paraf()
+    {
+        require __DIR__ . '/../config/koneksi.php';
+        session_start();
+        $id_user = $_SESSION['user_id'];
+
+        // Upload Tanda Tangan
+        if (isset($_POST['upload_paraf'])) {
+            $paraf_name = null;
+            if (!empty($_FILES['paraf']['name'])) {
+                $filename   = $_FILES['paraf']['name'];
+                $filesize   = $_FILES['paraf']['size'];
+                $ext        = pathinfo($filename, PATHINFO_EXTENSION);
+                $allowed    = ['png', 'jpg', 'jpeg'];
+
+                if (!in_array(strtolower($ext), $allowed)) {
+                    $_SESSION['alert'] = [
+                        'icon' => 'error',
+                        'title' => 'Gagal!',
+                        'text' => 'Format TTD harus PNG, JPG, atau JPEG!',
+                    ];
+                    header("Location: " . $this->base_url . "profil_saya");
+                    exit;
+                }
+                if ($filesize > 2000000) {
+                    $_SESSION['alert'] = [
+                        'icon' => 'error',
+                        'title' => 'Gagal!',
+                        'text' => 'Ukuran file TTD terlalu besar (Max 2MB)!',
+                    ];
+                    header("Location: " . $this->base_url . "profil_saya");
+                    exit;
+                }
+
+                $paraf_name = date('Ymd_His') . '_' . uniqid() . '.' . $ext;
+                $target_dir = __DIR__ . '/../assets/img/ttd/';
+                $target_path = $target_dir . $paraf_name;
+                move_uploaded_file($_FILES['paraf']['tmp_name'], $target_path);
+            }
+
+            // Update database dengan nama file paraf
+            mysqli_query($koneksi, "UPDATE tb_user SET paraf='$paraf_name' WHERE id='$id_user'");
+
+            $_SESSION['alert'] = [
+                'icon' => 'success',
+                'title' => 'Berhasil!',
+                'text' => 'Tanda tangan berhasil diupload!',
+            ];
+            header("Location: " . $this->base_url . "profil_saya");
+            exit;
+        }
     }
 }

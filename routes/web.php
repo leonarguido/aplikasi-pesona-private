@@ -143,6 +143,12 @@ if (isset($_GET['page'])) {
         case 'aset_saya':
             $user->aset_saya();
             break;
+        case 'ganti_password':
+            $user->ganti_password();
+            break;
+        case 'upload_paraf':
+            $user->upload_paraf();
+            break;
 
         // PROFIL PENGGUNA
         case 'profil':
@@ -183,12 +189,6 @@ if (isset($_GET['page'])) {
             break;
         case 'proses_stock_opname':
             $pimpinan->proses_stock_opname();
-            break;
-        case 'ajax_load_per_orang':
-            $pimpinan->ajax_load_per_orang();
-            break;
-        case 'ajax_load_per_item':
-            $pimpinan->ajax_load_per_item();
             break;
 
 
