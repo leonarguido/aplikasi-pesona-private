@@ -4,7 +4,7 @@
 $server   = "localhost";
 $username = "root";      // Sesuaikan dengan user database kamu
 $password = "";          // Sesuaikan dengan password database kamu
-$database = "pesona"; // Sesuaikan dengan nama database yang sudah kamu buat
+$database = "db_pesona"; // Sesuaikan dengan nama database yang sudah kamu buat
 
 $koneksi = mysqli_connect($server, $username, $password, $database);
 

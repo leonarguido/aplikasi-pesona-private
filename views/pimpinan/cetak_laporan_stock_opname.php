@@ -128,6 +128,15 @@
             }
         }
 
+        .btn-back {
+            background: #e74a3b;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+
         .btn-print {
             background: #4e73df;
             color: white;
@@ -135,7 +144,6 @@
             padding: 10px 20px;
             border-radius: 5px;
             cursor: pointer;
-            margin-bottom: 20px;
             font-weight: bold;
         }
     </style>
@@ -144,7 +152,10 @@
 <body>
 
     <div class="container">
-        <button onclick="window.print()" class="no-print btn-print">🖨️ Cetak Surat</button>
+        <div class="no-print" style="margin-bottom: 20px;">
+            <a href="<?= BASE_URL ?>laporan_stock_opname" class="btn-back">⬅ Kembali</a>
+            <button onclick="window.print()" class="btn-print">🖨️ Cetak / Simpan PDF</button>
+        </div>
 
         <div class="content">
             <table>

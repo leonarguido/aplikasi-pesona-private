@@ -277,12 +277,12 @@ class PimpinanController
                 $item_keluar = mysqli_query($koneksi, $q_keluar);
                 $item_masuk = mysqli_query($koneksi, $q_masuk);
 
-                
+
                 if (mysqli_num_rows($item_keluar) == 0 && mysqli_num_rows($item_masuk) == 0) {
                     $_SESSION['alert'] = [
                         'icon' => 'error',
                         'title' => 'Gagal!',
-                        'text' => 'Tidak ada data transaksi untuk barang ini pada periode yang dipilih.'
+                        'text' => 'Tidak ada data transaksi untuk barang ini pada periode terpilih.'
                     ];
                     header("Location: " . $this->base_url . "laporan_stock_opname");
                     exit;
@@ -371,6 +371,16 @@ class PimpinanController
                         ORDER BY p.tanggal_disetujui DESC
                     ");
 
+                if (mysqli_num_rows($query) == 0) {
+                    $_SESSION['alert'] = [
+                        'icon' => 'error',
+                        'title' => 'Gagal!',
+                        'text' => 'Tidak ada data transaksi untuk pegawai ini pada periode terpilih.'
+                    ];
+                    header("Location: " . $this->base_url . "laporan_stock_opname");
+                    exit;
+                }
+
                 $data_pegawai = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT id, nip, nama, role FROM tb_user WHERE id = '$pegawai'"));
 
                 // BERDASARKAN TANGGAL
@@ -390,6 +400,16 @@ class PimpinanController
                             AND p.tanggal_disetujui BETWEEN '$tgl_mulai' AND '$tgl_selesai'
                         GROUP BY d.barang_id
                     ");
+
+                if (mysqli_num_rows($query) == 0) {
+                    $_SESSION['alert'] = [
+                        'icon' => 'error',
+                        'title' => 'Gagal!',
+                        'text' => 'Tidak ada data transaksi pada periode terpilih.'
+                    ];
+                    header("Location: " . $this->base_url . "laporan_stock_opname");
+                    exit;
+                }
             }
 
             require_once '../views/pimpinan/cetak_laporan_stock_opname.php';

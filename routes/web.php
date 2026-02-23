@@ -151,7 +151,7 @@ if (isset($_GET['page'])) {
             break;
 
         // PROFIL PENGGUNA
-        case 'profil':
+        case 'profil_saya':
             $user->profil_page();
             break;
 

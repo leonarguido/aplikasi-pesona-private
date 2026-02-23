@@ -148,7 +148,7 @@
         <table class="header-table">
             <tr>
                 <td width="15%" style="text-align: center;">
-                    <img src="<?= ASSETS_URL ?>img/logo_tutwuri.jpg" alt="Logo" class="logo-kop">
+                    <img src="<?= ASSETS_URL ?>img/bpmp/logo_tutwuri.jpg" alt="Logo" class="logo-kop">
                 </td>
                 <td width="85%" class="text-kop">
                     <h2>KEMENTERIAN PENDIDIKAN DASAR<br>DAN MENENGAH</h2>
@@ -181,49 +181,27 @@
                 </tr>
             </table>
 
-            <div class="content">
-                <p><strong>Nomor Surat :</strong> #REQ-<?= sprintf("%04d", $data['id']); ?></p>
-                <p><strong>Perihal :</strong> Bukti Serah Terima Barang (ATK)</p>
+            <p>Telah menerima barang dengan rincian sebagai berikut:</p>
 
-                <br>
-                <p>Yang bertanda tangan di bawah ini:</p>
-                <table style="width: 100%; margin-left: 20px; margin-bottom: 10px;">
+            <table class="table-data">
+                <thead>
                     <tr>
-                        <td width="150">Nama</td>
-                        <td>: <?= $data['nama_pemohon']; ?></td>
+                        <th width="5%">No</th>
+                        <th>Nama Barang</th>
+                        <th width="15%">Jumlah</th>
+                        <th width="15%">Satuan</th>
+                        <th>Keterangan</th>
                     </tr>
-                    </thead>
-                    <tbody>
-                        <?php
-                        // QUERY 2: AMBIL DETAIL BARANG
-                        $q_detail = mysqli_query($koneksi, "SELECT d.*, b.nama_barang, b.satuan, b.kode_barang, b.merek_barang 
+                </thead>
+                <tbody>
+                    <?php
+                    // QUERY 2: AMBIL DETAIL BARANG
+                    $q_detail = mysqli_query($koneksi, "SELECT d.*, b.nama_barang, b.satuan, b.kode_barang, b.merek_barang 
                                                     FROM tb_detail_permintaan d
                                                     JOIN tb_barang_bergerak b ON d.barang_id = b.id
                                                     WHERE d.permintaan_id = '$id_permintaan'");
-                        $no = 1;
-                        while ($item = mysqli_fetch_assoc($q_detail)):
-                        ?>
-                            <tr>
-                                <td style="text-align: center;"><?= $no++; ?></td>
-                                <td><?= $item['nama_barang']; ?> (<?= $item['merk_barang']; ?>) <br><small>Kode: <?= $item['kode_barang']; ?></small></td>
-                                <td style="text-align: center;"><?= $item['jumlah']; ?></td>
-                                <td style="text-align: center;"><?= $item['satuan']; ?></td>
-                                <td><?= !empty($data['catatan']) ? $data['catatan'] : '-'; ?></td>
-                            </tr>
-                        <?php endwhile; ?>
-                    </tbody>
-                </table>
-
-                <p>Demikian berita acara serah terima barang ini dibuat untuk dipergunakan sebagaimana mestinya.</p>
-            </div>
-
-            <div class="ttd-wrapper">
-                <div class="ttd-box">
-                    <br>
-                    <p>Yang Menerima,</p>
-
-                    <?php
-                    if (!empty($data['ttd_pemohon'])):
+                    $no = 1;
+                    while ($item = mysqli_fetch_assoc($q_detail)):
                     ?>
                         <tr>
                             <td style="text-align: center;"><?= $no++; ?></td>
@@ -232,47 +210,45 @@
                             <td style="text-align: center;"><?= $item['satuan']; ?></td>
                             <td><?= !empty($data['catatan']) ? $data['catatan'] : '-'; ?></td>
                         </tr>
-                    <?php endif; ?>
-                    </tbody>
-                    </table>
+                    <?php endwhile; ?>
+                </tbody>
+            </table>
 
-                    <strong>( <?= $data['nama_pemohon']; ?> )</strong><br>
-                    NIP. <?= !empty($data['nip_pemohon']) ? $data['nip_pemohon'] : '-'; ?>
-                </div>
+            <p>Demikian berita acara serah terima barang ini dibuat untuk dipergunakan sebagaimana mestinya.</p>
+        </div>
 
-                <div class="ttd-wrapper">
-                    <div class="ttd-box">
-                        <br>
-                        <p>Yang Menerima,</p>
+        <div class="ttd-wrapper">
+            <div class="ttd-box">
+                <br>
+                <p>Yang Menerima,</p>
 
-                        <?php
-                        $path_ttd_pemohon = ASSETS_URL . 'img/ttd/' . $data['ttd_pemohon'];
-                        if (!empty($data['ttd_pemohon'])):
-                        ?>
-                            <img src="<?= ASSETS_URL ?>img/ttd/<?= $data['ttd_pemohon']; ?>" class="img-ttd">
-                        <?php else: ?>
-                            <div class="space-ttd"></div>
-                        <?php endif; ?>
+                <?php
+                if (!empty($data['ttd_pemohon'])):
+                ?>
+                    <img src="<?= ASSETS_URL ?>img/ttd/<?= $data['ttd_pemohon']; ?>" class="img-ttd">
+                <?php else: ?>
+                    <div class="space-ttd"></div>
+                <?php endif; ?>
 
-                        <strong>( <?= $data['nama_pemohon']; ?> )</strong><br>
-                        NIP. <?= !empty($data['nip_pemohon']) ? $data['nip_pemohon'] : '-'; ?>
-                    </div>
-
-                    <div class="ttd-box">
-                        <p>Denpasar, <?= $tanggal_indonesia; ?>,<br>Admin Gudang</p>
-                        <?php
-                        if (!empty($data['ttd_admin'])):
-                        ?>
-                            <img src="<?= ASSETS_URL ?>img/ttd/<?= $data['ttd_admin']; ?>" class="img-ttd">
-                        <?php else: ?>
-                            <div class="space-ttd"></div>
-                        <?php endif; ?>
-
-                        <strong>( <?= $data['nama_admin']; ?> )</strong><br>
-                        NIP. <?= !empty($data['nip_admin']) ? $data['nip_admin'] : '-'; ?>
-                    </div>
-                </div>
+                <strong>( <?= $data['nama_pemohon']; ?> )</strong><br>
+                NIP. <?= !empty($data['nip_pemohon']) ? $data['nip_pemohon'] : '-'; ?>
             </div>
+
+            <div class="ttd-box">
+                <p>Denpasar, <?= $tanggal_indonesia; ?>,<br>Yang Menyetujui,</p>
+                <?php
+                if (!empty($data['ttd_admin'])):
+                ?>
+                    <img src="<?= ASSETS_URL ?>img/ttd/<?= $data['ttd_admin']; ?>" class="img-ttd">
+                <?php else: ?>
+                    <div class="space-ttd"></div>
+                <?php endif; ?>
+
+                <strong>( <?= $data['nama_admin']; ?> )</strong><br>
+                NIP. <?= !empty($data['nip_admin']) ? $data['nip_admin'] : '-'; ?>
+            </div>
+        </div>
+    </div>
 
 </body>
 
