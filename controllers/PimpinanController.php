@@ -245,7 +245,7 @@ class PimpinanController
 
             // BERDASARKAN ITEM
             if ($item) {
-                $q_barang = " SELECT nama_barang, merk_barang, satuan, kode_barang FROM tb_barang_bergerak WHERE id = '$item'";
+                $q_barang = " SELECT nama_barang, merk_barang, satuan, kode_barang, stok FROM tb_barang_bergerak WHERE id = '$item'";
 
                 $q_keluar = "
                     SELECT 
@@ -257,7 +257,7 @@ class PimpinanController
                     JOIN tb_barang_bergerak b ON d.barang_id = b.id
                     WHERE 
                         p.tanggal_disetujui IS NOT NULL
-                        AND p.tanggal_disetujui BETWEEN '$tgl_mulai' AND '$tgl_selesai'
+                        AND p.tanggal_disetujui BETWEEN '$tgl_mulai' AND CURDATE()
                         AND d.barang_id = '$item'
                 ";
 
@@ -269,17 +269,13 @@ class PimpinanController
                     FROM tb_log_barang_bergerak l
                     JOIN tb_barang_bergerak b ON l.barang_id = b.id
                     WHERE 
-                        l.tanggal BETWEEN '$tgl_mulai' AND '$tgl_selesai'
+                        l.tanggal BETWEEN '$tgl_mulai' AND CURDATE()
                         AND l.stok IS NOT NULL
                         AND l.barang_id = '$item'
                 ";
 
                 $item_keluar = mysqli_query($koneksi, $q_keluar);
                 $item_masuk = mysqli_query($koneksi, $q_masuk);
-                // var_dump($item_k); // mengambil 1 data untuk cek apakah query benar atau tidak
-                // exit;
-                // var_dump($item_m);
-                // exit;
 
                 $data_keluar = [];
                 while ($row = mysqli_fetch_assoc($item_keluar)) {
@@ -287,11 +283,8 @@ class PimpinanController
                         'tanggal' => $row['tanggal_disetujui'],
                         'jumlah' => $row['jumlah'],
                         'keterangan' => $row['keperluan'],
-
                     ];
                 }
-                // var_dump($data_keluar);
-                // exit;
 
                 $data_masuk = [];
                 while ($row = mysqli_fetch_assoc($item_masuk)) {
@@ -299,16 +292,15 @@ class PimpinanController
                         'tanggal' => $row['tanggal'],
                         'stok' => $row['stok'],
                         'keterangan' => $row['keterangan'],
-
                     ];
                 }
-                // var_dump($data_masuk);
-                // exit;
-
-                // gabungkan data masuk dan keluar berdasarkan tanggal
+                $data_keluar = array_reverse($data_keluar);
+                $data_masuk = array_reverse($data_masuk);
                 $data_gabungan = array_merge($data_keluar, $data_masuk);
+
+                // Urutkan berdasarkan tanggal terbaru → terlama
                 usort($data_gabungan, function ($a, $b) {
-                    return strtotime($a['tanggal']) - strtotime($b['tanggal']);
+                    return strtotime($b['tanggal']) - strtotime($a['tanggal']);
                 });
 
                 $data = [
@@ -317,8 +309,37 @@ class PimpinanController
                     'tgl_mulai' => $tgl_mulai,
                     'tgl_selesai' => $tgl_selesai,
                 ];
-                var_dump($data);
-                exit;
+
+                $sisa = $data['data_barang']['stok'];
+                $hasil = [];
+
+                foreach ($data_gabungan as $row) {
+
+                    $masuk = isset($row['stok']) ? (int)$row['stok'] : 0;
+                    $keluar = isset($row['jumlah']) ? (int)$row['jumlah'] : 0;
+
+                    $saldo_sebelum = $sisa;
+                    $sisa = $sisa - $masuk + $keluar;
+
+                    $hasil[] = [
+                        'tanggal' => $row['tanggal'],
+                        'masuk' => $masuk,
+                        'keluar' => $keluar,
+                        'sisa' => $saldo_sebelum,
+                        'keterangan' => $row['keterangan']
+                    ];
+                }
+
+                // ambil data berdasarkan tgl_mulai dan tgl_selesai
+                $filtered_results = [];
+                foreach ($hasil as $entry) {
+                    if ($entry['tanggal'] >= $tgl_mulai && $entry['tanggal'] <= $tgl_selesai) {
+                        $filtered_results[] = $entry;
+                    }
+                }
+                $hasil = array_reverse($filtered_results);
+                $saldo_awal = $hasil[0]['sisa'] - $hasil[0]['masuk'] + $hasil[0]['keluar'];
+                $tanggal_saldo_awal = date('d-m-Y', strtotime($hasil[0]['tanggal']));
             }
 
             require_once '../views/pimpinan/cetak_laporan_stock_opname.php';
