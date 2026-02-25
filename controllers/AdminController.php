@@ -656,6 +656,449 @@ class AdminController
         }
     }
 
+    // MASUK HALAMAN PEMINJAMAN ASET BMN
+    public function input_peminjaman_barang_page()
+    {
+        require __DIR__ . '/../config/koneksi.php';
+        session_start();
+
+        if (!isset($_SESSION['user_id']) || ($_SESSION['role'] != 'admin' && $_SESSION['role'] != 'admin gudang' && $_SESSION['role'] != 'super_admin')) {
+            header("Location: index.php");
+            exit;
+        }
+
+        // 1. AMBIL DATA STAF (Untuk Dropdown Peminjam)
+        $list_pegawai = [];
+        // Ambil user yang role-nya BUKAN admin
+        $q_pgw = mysqli_query($koneksi, "SELECT id, nip, nama FROM tb_user WHERE role != 'admin' AND role != 'super_admin' ORDER BY nama ASC");
+        while ($p = mysqli_fetch_assoc($q_pgw)) {
+            $list_pegawai[] = $p;
+        }
+
+        require_once '../views/admin/input_peminjaman_barang.php';
+    }
+
+    // A. TAMBAH PENGAJUAN BARU (Admin Input)
+    public function ajukan_pinjaman()
+    {
+        require __DIR__ . '/../config/koneksi.php';
+        session_start();
+        $id_admin_login = $_SESSION['user_id'];
+
+        if (isset($_POST['ajukan_pinjam'])) {
+            $nama_barang    = mysqli_real_escape_string($koneksi, $_POST['nama_barang']);
+            $merek          = mysqli_real_escape_string($koneksi, $_POST['merek']);
+            $kode_barang    = mysqli_real_escape_string($koneksi, $_POST['kode_barang']);
+            $nup            = mysqli_real_escape_string($koneksi, $_POST['nup']);
+            $tahun_perolehan = mysqli_real_escape_string($koneksi, $_POST['tahun_perolehan']);
+
+            $id_penerima    = $_POST['id_penerima']; // ID Staf
+            $tgl_serah      = $_POST['tgl_serah_terima'];
+
+            // LOGIKA TANGGAL KEMBALI
+            if (isset($_POST['jangka_panjang'])) {
+                $tgl_kembali_sql = "NULL";
+            } else {
+                $tgl_kembali_input = $_POST['tgl_kembali'];
+                $tgl_kembali_sql = "'$tgl_kembali_input'";
+            }
+
+            if (empty($id_penerima) || empty($nama_barang)) {
+                $_SESSION['alert'] = [
+                    'icon' => 'error',
+                    'title' => 'Gagal!',
+                    'text' => 'Harap lengkapi nama barang dan penerima!',
+                ];
+                header("Location: " . $this->base_url . "input_peminjaman_barang");
+                exit;
+            } else {
+                $query = "INSERT INTO tb_peminjaman 
+                  (admin_id, user_id, nama_barang, merek, kode_barang, nup, tahun_perolehan, tgl_serah_terima, tgl_kembali, status)
+                  VALUES 
+                  ('$id_admin_login', '$id_penerima', '$nama_barang', '$merek', '$kode_barang', '$nup', '$tahun_perolehan', '$tgl_serah', $tgl_kembali_sql, 'menunggu_persetujuan')";
+
+                if (mysqli_query($koneksi, $query)) {
+                    $_SESSION['alert'] = [
+                        'icon' => 'success',
+                        'title' => 'Berhasil!',
+                        'text' => 'Pengajuan berhasil dibuat! Menunggu persetujuan staf.',
+                    ];
+                    header("Location: " . $this->base_url . "input_peminjaman_barang");
+                    exit;
+                } else {
+                    $_SESSION['alert'] = [
+                        'icon' => 'error',
+                        'title' => 'Gagal!',
+                        'text' => 'Gagal membuat pengajuan: ' . mysqli_error($koneksi),
+                    ];
+                    header("Location: " . $this->base_url . "input_peminjaman_barang");
+                    exit;
+                }
+            }
+        }
+    }
+
+    // B. EDIT PENGAJUAN (UPDATE DATA) - BARU DITAMBAHKAN
+    public function update_pinjaman()
+    {
+        require __DIR__ . '/../config/koneksi.php';
+        session_start();
+
+        if (isset($_POST['update_pinjam'])) {
+            $id_edit        = $_POST['id_edit'];
+            $nama_barang    = mysqli_real_escape_string($koneksi, $_POST['nama_barang']);
+            $merek          = mysqli_real_escape_string($koneksi, $_POST['merek']);
+            $kode_barang    = mysqli_real_escape_string($koneksi, $_POST['kode_barang']);
+            $nup            = mysqli_real_escape_string($koneksi, $_POST['nup']);
+            $tahun_perolehan = mysqli_real_escape_string($koneksi, $_POST['tahun_perolehan']);
+
+            $id_penerima    = $_POST['id_penerima'];
+            $tgl_serah      = $_POST['tgl_serah_terima'];
+
+            // LOGIKA TANGGAL KEMBALI (SAMA SEPERTI INPUT)
+            if (isset($_POST['jangka_panjang'])) {
+                $tgl_kembali_sql = "NULL";
+            } else {
+                $tgl_kembali_input = $_POST['tgl_kembali'];
+                $tgl_kembali_sql = "'$tgl_kembali_input'";
+            }
+
+            $query_update = "UPDATE tb_peminjaman SET 
+                     user_id='$id_penerima', 
+                     nama_barang='$nama_barang', 
+                     merek='$merek', 
+                     kode_barang='$kode_barang', 
+                     nup='$nup', 
+                     tahun_perolehan='$tahun_perolehan', 
+                     tgl_serah_terima='$tgl_serah', 
+                     tgl_kembali=$tgl_kembali_sql 
+                     WHERE id='$id_edit'";
+
+            if (mysqli_query($koneksi, $query_update)) {
+                $_SESSION['alert'] = [
+                    'icon' => 'success',
+                    'title' => 'Berhasil!',
+                    'text' => 'Data Pengajuan Berhasil Diupdate!',
+                ];
+                header("Location: " . $this->base_url . "input_peminjaman_barang");
+                exit;
+            } else {
+                $_SESSION['alert'] = [
+                    'icon' => 'error',
+                    'title' => 'Gagal!',
+                    'text' => 'Gagal Update: ' . mysqli_error($koneksi),
+                ];
+                header("Location: " . $this->base_url . "input_peminjaman_barang");
+                exit;
+            }
+        }
+    }
+
+    // C. HAPUS DATA
+    public function hapus_pinjaman()
+    {
+        require __DIR__ . '/../config/koneksi.php';
+        session_start();
+
+        if (isset($_GET['hapus'])) {
+            $id = $_GET['hapus'];
+            mysqli_query($koneksi, "DELETE FROM tb_peminjaman WHERE id='$id'");
+            $_SESSION['alert'] = [
+                'icon' => 'success',
+                'title' => 'Berhasil!',
+                'text' => 'Data Peminjaman Dihapus!',
+            ];
+            header("Location: " . $this->base_url . "input_peminjaman_barang");
+            exit;
+        }
+    }
+
+    // D. CETAK BERITA ACARA (PDF)
+    public function cetak_berita_acara()
+    {
+        require __DIR__ . '/../config/koneksi.php';
+        session_start();
+
+        if (!isset($_SESSION['user_id']) || !isset($_GET['id'])) {
+            header("Location: index.php");
+            exit;
+        }
+
+        $id_pinjam = $_GET['id'];
+
+        // ============================================
+        // 1. AMBIL DATA PEMINJAMAN
+        // ============================================
+        $query = "SELECT p.*, 
+          u_admin.nama AS nama_admin, u_admin.nip AS nip_admin,
+          u_user.nama AS nama_user, u_user.nip AS nip_user,
+          u_user.paraf AS paraf_user
+          FROM tb_peminjaman p
+          LEFT JOIN tb_user u_admin ON p.admin_id = u_admin.id
+          LEFT JOIN tb_user u_user ON p.user_id = u_user.id
+          WHERE p.id = '$id_pinjam'";
+
+        $result = mysqli_query($koneksi, $query);
+        $data = mysqli_fetch_assoc($result);
+
+        if (!$data) {
+            die("Data tidak ditemukan.");
+        }
+
+        // ============================================
+        // 2. DATA PIMPINAN
+        // ============================================
+        $q_pimpinan = mysqli_query($koneksi, "SELECT nama, nip FROM tb_user WHERE role='pimpinan' LIMIT 1");
+        $pimpinan = mysqli_fetch_assoc($q_pimpinan);
+
+        $nama_kasubbag = $pimpinan ? $pimpinan['nama'] : "........................................";
+        $nip_kasubbag  = $pimpinan ? $pimpinan['nip'] : ".......................";
+
+        // ============================================
+        // 3. FUNGSI TANGGAL
+        // ============================================
+        function hariIndo($tanggal)
+        {
+            $hari = date('D', strtotime($tanggal));
+            $list = ['Sun' => 'Minggu', 'Mon' => 'Senin', 'Tue' => 'Selasa', 'Wed' => 'Rabu', 'Thu' => 'Kamis', 'Fri' => 'Jumat', 'Sat' => 'Sabtu'];
+            return $list[$hari];
+        }
+        function bulanIndo($tanggal)
+        {
+            $bulan = date('m', strtotime($tanggal));
+            $list = ['01' => 'Januari', '02' => 'Februari', '03' => 'Maret', '04' => 'April', '05' => 'Mei', '06' => 'Juni', '07' => 'Juli', '08' => 'Agustus', '09' => 'September', '10' => 'Oktober', '11' => 'November', '12' => 'Desember'];
+            return $list[$bulan];
+        }
+
+        $tgl_transaksi = $data['tgl_serah_terima'];
+        $hari_ini  = hariIndo($tgl_transaksi);
+        $tgl_angka = date('d', strtotime($tgl_transaksi));
+        $bln_nama  = bulanIndo($tgl_transaksi);
+        $thn_angka = date('Y', strtotime($tgl_transaksi));
+
+        require_once '../views/admin/cetak_berita_acara.php';
+    }
+
+    // E. UPLOAD ARSIP (FINALISASI)
+    public function upload_arsip_pinjaman()
+    {
+        require __DIR__ . '/../config/koneksi.php';
+        session_start();
+
+        if (isset($_POST['upload_arsip'])) {
+            $id_pinjam = $_POST['id'];
+            $target_dir = __DIR__ . '/../assets/arsip/';
+
+            // Upload Berita Acara (PDF)
+            $ba_name = null;
+            if (!empty($_FILES['file_ba']['name'])) {
+                $ba_tmp = $_FILES['file_ba']['tmp_name'];
+                $ba_name = time() . "_BA_" . $_FILES['file_ba']['name'];
+
+                $target_path = $target_dir . $ba_name;
+                move_uploaded_file($ba_tmp, $target_path);
+            }
+
+            // Upload Foto Bukti (JPG)
+            $foto_name = null;
+            if (!empty($_FILES['foto_bukti']['name'])) {
+                $foto_tmp = $_FILES['foto_bukti']['tmp_name'];
+                $foto_name = time() . "_FOTO_" . $_FILES['foto_bukti']['name'];
+
+                $target_path = $target_dir . $foto_name;
+                move_uploaded_file($foto_tmp, $target_path);
+            }
+
+            // Update DB -> Status Selesai
+            $q_update = "UPDATE tb_peminjaman SET file_ba_signed='$ba_name', foto_bukti='$foto_name', status='selesai' WHERE id='$id_pinjam'";
+
+            if (mysqli_query($koneksi, $q_update)) {
+                $_SESSION['alert'] = [
+                    'icon' => 'success',
+                    'title' => 'Berhasil!',
+                    'text' => 'Arsip Berhasil Diupload! Transaksi Selesai.',
+                ];
+                header("Location: " . $this->base_url . "input_peminjaman_barang");
+                exit;
+            }
+        }
+    }
+
+    // PENGEMBALIAN BARANG
+    public function pengembalian_barang_page()
+    {
+        require __DIR__ . '/../config/koneksi.php';
+        session_start();
+
+        // CEK AKSES: HANYA ADMIN
+        if (!isset($_SESSION['user_id']) || ($_SESSION['role'] != 'admin' && $_SESSION['role'] != 'admin gudang' && $_SESSION['role'] != 'super_admin')) {
+            header("Location: index.php");
+            exit;
+        }
+
+        require_once '../views/admin/pengembalian_barang.php';
+    }
+
+    // A. SIMPAN DATA KONDISI & TANGGAL KEMBALI (Tahap 1)
+    public function simpan_kondisi()
+    {
+        require __DIR__ . '/../config/koneksi.php';
+        session_start();
+
+        if (isset($_POST['simpan_kondisi'])) {
+            $id_pinjam = $_POST['id'];
+            $tgl_kembali_aktual = $_POST['tgl_dikembalikan'];
+            $kondisi = mysqli_real_escape_string($koneksi, $_POST['kondisi_kembali']);
+
+            // Update data kondisi, tapi status tetap 'selesai' sementara waktu sampai arsip diupload
+            $query = "UPDATE tb_peminjaman SET tgl_dikembalikan='$tgl_kembali_aktual', kondisi_kembali='$kondisi' WHERE id='$id_pinjam'";
+
+            if (mysqli_query($koneksi, $query)) {
+                $_SESSION['alert'] = [
+                    'icon' => 'success',
+                    'title' => 'Berhasil!',
+                    'text' => 'Data kondisi tersimpan! Silakan cetak BA Pengembalian lalu upload arsipnya.',
+                ];
+                header("Location: " . $this->base_url . "pengembalian_barang");
+                exit;
+            } else {
+                $_SESSION['alert'] = [
+                    'icon' => 'error',
+                    'title' => 'Gagal!',
+                    'text' => 'Gagal menyimpan data kondisi: ' . mysqli_error($koneksi),
+                ];
+                header("Location: " . $this->base_url . "pengembalian_barang");
+                exit;
+            }
+        }
+    }
+
+    // B. CETAK BERITA ACARA PENGEMBALIAN
+    public function cetak_ba_kembali()
+    {
+        require __DIR__ . '/../config/koneksi.php';
+        session_start();
+
+        if (!isset($_SESSION['user_id']) || !isset($_GET['id'])) {
+            header("Location: index.php");
+            exit;
+        }
+
+        $id_pinjam = $_GET['id'];
+
+        // ============================================
+        // 1. AMBIL DATA PEMINJAMAN
+        // ============================================
+        $query = "SELECT p.*, 
+          u_admin.nama AS nama_admin, u_admin.nip AS nip_admin,
+          u_user.nama AS nama_user, u_user.nip AS nip_user,
+          u_user.paraf AS paraf_user
+          FROM tb_peminjaman p
+          LEFT JOIN tb_user u_admin ON p.admin_id = u_admin.id
+          LEFT JOIN tb_user u_user ON p.user_id = u_user.id
+          WHERE p.id = '$id_pinjam'";
+
+        $result = mysqli_query($koneksi, $query);
+        $data = mysqli_fetch_assoc($result);
+
+        if (!$data) {
+            die("Data tidak ditemukan.");
+        }
+
+        // ============================================
+        // 2. DATA PIMPINAN (KASUBBAG UMUM)
+        // ============================================
+        $q_pimpinan = mysqli_query($koneksi, "SELECT nama, nip FROM tb_user WHERE role='pimpinan' LIMIT 1");
+        $pimpinan = mysqli_fetch_assoc($q_pimpinan);
+
+        $nama_kasubbag = $pimpinan ? $pimpinan['nama'] : "........................................";
+        $nip_kasubbag  = $pimpinan ? $pimpinan['nip'] : ".......................";
+
+        // ============================================
+        // 3. FUNGSI TANGGAL
+        // ============================================
+        $tgl_transaksi = !empty($data['tgl_dikembalikan']) ? $data['tgl_dikembalikan'] : date('Y-m-d');
+
+        function hariIndo($tanggal)
+        {
+            $hari = date('D', strtotime($tanggal));
+            $list = ['Sun' => 'Minggu', 'Mon' => 'Senin', 'Tue' => 'Selasa', 'Wed' => 'Rabu', 'Thu' => 'Kamis', 'Fri' => 'Jumat', 'Sat' => 'Sabtu'];
+            return $list[$hari];
+        }
+        function bulanIndo($tanggal)
+        {
+            $bulan = date('m', strtotime($tanggal));
+            $list = ['01' => 'Januari', '02' => 'Februari', '03' => 'Maret', '04' => 'April', '05' => 'Mei', '06' => 'Juni', '07' => 'Juli', '08' => 'Agustus', '09' => 'September', '10' => 'Oktober', '11' => 'November', '12' => 'Desember'];
+            return $list[$bulan];
+        }
+
+        $hari_ini  = hariIndo($tgl_transaksi);
+        $tgl_angka = date('d', strtotime($tgl_transaksi));
+        $bln_nama  = bulanIndo($tgl_transaksi);
+        $thn_angka = date('Y', strtotime($tgl_transaksi)); // Tahun Angka (2026)
+
+        require_once '../views/admin/cetak_ba_kembali.php';
+    }
+
+    // C. UPLOAD ARSIP PENGEMBALIAN & FOTO BUKTI (Tahap 2 - FINALISASI)
+    public function upload_arsip_kembali()
+    {
+        require __DIR__ . '/../config/koneksi.php';
+        session_start();
+
+        if (isset($_POST['upload_arsip_kembali'])) {
+            $id_pinjam = $_POST['id'];
+            $target_dir = __DIR__ . '/../assets/arsip/';
+
+            // 1. Upload Berita Acara (PDF)
+            $ba_name = null;
+            if (!empty($_FILES['file_ba_kembali']['name'])) {
+                $ba_tmp = $_FILES['file_ba_kembali']['tmp_name'];
+                $ba_name = time() . "_BA_KEMBALI_" . $_FILES['file_ba_kembali']['name'];
+
+                if (!is_dir("assets/arsip/")) {
+                    mkdir("assets/arsip/", 0777, true);
+                }
+                $target_path = $target_dir . $ba_name;
+                move_uploaded_file($ba_tmp, $target_path);
+            }
+
+            // 2. Upload Foto Bukti Pengembalian (JPG/PNG) - BARU DITAMBAHKAN
+            $foto_name = null;
+            if (!empty($_FILES['foto_bukti_kembali']['name'])) {
+                $foto_tmp = $_FILES['foto_bukti_kembali']['tmp_name'];
+                $foto_name = time() . "_FOTO_KEMBALI_" . $_FILES['foto_bukti_kembali']['name'];
+
+                if (!is_dir("assets/arsip/")) {
+                    mkdir("assets/arsip/", 0777, true);
+                }
+                $target_path = $target_dir . $foto_name;
+                move_uploaded_file($foto_tmp, $target_path);
+            }
+
+            // Update DB: Simpan kedua file dan ubah status jadi 'dikembalikan'
+            $q_update = "UPDATE tb_peminjaman SET file_ba_kembali='$ba_name', foto_bukti_kembali='$foto_name', status='dikembalikan' WHERE id='$id_pinjam'";
+
+            if (mysqli_query($koneksi, $q_update)) {
+                $_SESSION['alert'] = [
+                    'icon' => 'success',
+                    'title' => 'Berhasil!',
+                    'text' => 'Pengembalian Selesai! Arsip dan Foto Bukti berhasil disimpan.',
+                ];
+                header("Location: " . $this->base_url . "pengembalian_barang");
+                exit;
+            } else {
+                $_SESSION['alert'] = [
+                    'icon' => 'error',
+                    'title' => 'Gagal!',
+                    'text' => 'Gagal menyimpan data pengembalian: ' . mysqli_error($koneksi),
+                ];
+                header("Location: " . $this->base_url . "pengembalian_barang");
+                exit;
+            }
+        }
+    }
+
     // MASUK HALAMAN DATA PENGGUNA
     public function data_pengguna_page()
     {

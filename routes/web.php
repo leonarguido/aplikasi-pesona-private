@@ -90,6 +90,38 @@ if (isset($_GET['page'])) {
             $admin->proses_penolakan();
             break;
 
+        // DATA BARANG TIDAK BERGERAK
+        case 'input_peminjaman_barang':
+            $admin->input_peminjaman_barang_page();
+            break;
+        case 'ajukan_pinjaman':
+            $admin->ajukan_pinjaman();
+            break;
+        case 'update_pinjaman':
+            $admin->update_pinjaman();
+            break;
+        case 'hapus_pinjaman':
+            $admin->hapus_pinjaman();
+            break;
+        case 'upload_arsip_pinjaman':
+            $admin->upload_arsip_pinjaman();
+            break;
+        case 'cetak_berita_acara':
+            $admin->cetak_berita_acara();
+            break;
+        case 'pengembalian_barang':
+            $admin->pengembalian_barang_page();
+            break;
+        case 'simpan_kondisi':
+            $admin->simpan_kondisi();
+            break;
+        case 'upload_arsip_kembali':
+            $admin->upload_arsip_kembali();
+            break;
+        case 'cetak_ba_kembali':
+            $admin->cetak_ba_kembali();
+            break;
+
         // USER MANAGEMENT
         case 'data_pengguna':
             $admin->data_pengguna_page();
@@ -137,6 +169,17 @@ if (isset($_GET['page'])) {
             break;
         case 'cetak_surat':
             $user->cetak_surat();
+            break;
+
+        // PEMINJAMAN ASET BMN
+        case 'peminjaman_saya':
+            $user->peminjaman_saya_page();
+            break;
+        case 'aksi_setuju':
+            $user->aksi_setuju();
+            break;
+        case 'aksi_tolak':
+            $user->aksi_tolak();
             break;
 
         // ASET SAYA

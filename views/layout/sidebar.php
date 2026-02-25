@@ -28,7 +28,7 @@
             </li>
 
             <hr class="sidebar-divider">
-            
+
             <div class="sidebar-heading">Inventaris</div>
 
             <li class="nav-item">
@@ -82,21 +82,26 @@
 
 
         <?php if ($_SESSION['role'] == 'admin gudang' || $_SESSION['role'] == 'admin'): ?>
-            <div class="sidebar-heading">Inventaris</div>
+            <div class="sidebar-heading">Aset BMN</div>
 
             <li class="nav-item">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseDataBarang"
-                    aria-expanded="true" aria-controls="collapseDataBarang">
-                    <i class="fas fa-fw fa-boxes"></i>
-                    <span>Data Barang</span>
-                </a>
-                <div id="collapseDataBarang" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded">
-                        <h6 class="collapse-header">Pilih Kategori:</h6>
-                        <a class="collapse-item" href="<?= BASE_URL ?>data_barang">Barang Bergerak</a>
-                        <a class="collapse-item" href="<?= BASE_URL ?>data_barang_tg">Brg Tidak Bergerak</a>
-                    </div>
-                </div>
+                <a class="nav-link" href="<?= BASE_URL ?>input_peminjaman_barang">
+                    <i class="fas fa-fw fa-file-alt"></i> <span>Input Peminjaman Barang</span></a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" href="<?= BASE_URL ?>pengembalian_barang">
+                    <i class="fas fa-fw fa-undo"></i>
+                    <span>Pengembalian Barang</span></a>
+            </li>
+
+            <hr class="sidebar-divider">
+
+            <div class="sidebar-heading">Barang Habis Pakai</div>
+
+            <li class="nav-item">
+                <a class="nav-link" href="<?= BASE_URL ?>data_barang">
+                    <i class="fas fa-fw fa-dolly"></i> <span>Data Barang Habis Pakai</span></a>
             </li>
 
             <li class="nav-item">
@@ -135,7 +140,17 @@
 
 
         <?php if ($_SESSION['role'] == 'user' || $_SESSION['role'] == 'staff'): ?>
-            <div class="sidebar-heading">Permintaan</div>
+            <div class="sidebar-heading">Barang BMN</div>
+
+            <li class="nav-item">
+                <a class="nav-link" href="<?= BASE_URL ?>peminjaman_saya">
+                    <i class="fas fa-fw fa-cube"></i>
+                    <span>Peminjaman Saya</span></a>
+            </li>
+
+            <hr class="sidebar-divider my-2">
+
+            <div class="sidebar-heading">Permintaan Barang Habis Pakai</div>
 
             <li class="nav-item">
                 <a class="nav-link" href="<?= BASE_URL ?>daftar_barang">
@@ -149,7 +164,7 @@
                     <span>Riwayat Permintaan</span></a>
             </li>
 
-            <hr class="sidebar-divider">
+            <!-- <hr class="sidebar-divider">
 
             <div class="sidebar-heading">Aset Saya</div>
 
@@ -157,7 +172,7 @@
                 <a class="nav-link" href="<?= BASE_URL ?>aset_saya">
                     <i class="fas fa-fw fa-file-pdf"></i>
                     <span>Aset Saya</span></a>
-            </li>
+            </li> -->
         <?php endif; ?>
 
 

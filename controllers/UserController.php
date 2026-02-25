@@ -533,4 +533,75 @@ class UserController
             exit;
         }
     }
+
+    public function peminjaman_saya_page()
+    {
+        require __DIR__ . '/../config/koneksi.php';
+        session_start();
+
+        if (!isset($_SESSION['user_id']) || ($_SESSION['role'] != 'user' && $_SESSION['role'] != 'staff')) {
+            header("Location: index.php");
+            exit;
+        }
+
+        require_once '../views/user/peminjaman_saya.php';
+    }
+
+    // A. JIKA KLIK SETUJU
+    public function aksi_setuju()
+    {
+        require __DIR__ . '/../config/koneksi.php';
+        session_start();
+        $id_staf_login = $_SESSION['user_id'];
+
+        if (isset($_POST['aksi_setuju'])) {
+            $id_pinjam = $_POST['id'];
+
+            // Update status jadi 'disetujui' SAJA. 
+            $query = "UPDATE tb_peminjaman SET status='disetujui' WHERE id='$id_pinjam' AND user_id='$id_staf_login'";
+
+            if (mysqli_query($koneksi, $query)) {
+                $_SESSION['alert'] = [
+                    'icon' => 'success',
+                    'title' => 'Berhasil!',
+                    'text' => 'Anda telah MENYETUJUI peminjaman ini. Silakan cetak Berita Acara.',
+                ];
+                header("Location: " . $this->base_url . "peminjaman_saya");
+                exit;
+            } else {
+                $_SESSION['alert'] = [
+                    'icon' => 'error',
+                    'title' => 'Gagal!',
+                    'text' => 'Terjadi kesalahan saat memperbarui status peminjaman: ' . mysqli_error($koneksi),
+                ];
+                header("Location: " . $this->base_url . "peminjaman_saya");
+                exit;
+            }
+        }
+    }
+
+    // B. JIKA KLIK TOLAK
+    public function aksi_tolak()
+    {
+        require __DIR__ . '/../config/koneksi.php';
+        session_start();
+        $id_staf_login = $_SESSION['user_id'];
+
+        if (isset($_POST['aksi_tolak'])) {
+            $id_pinjam = $_POST['id'];
+
+            // Update status jadi 'ditolak'
+            $query = "UPDATE tb_peminjaman SET status='ditolak' WHERE id='$id_pinjam' AND user_id='$id_staf_login'";
+
+            if (mysqli_query($koneksi, $query)) {
+                $_SESSION['alert'] = [
+                    'icon' => 'success',
+                    'title' => 'Berhasil!',
+                    'text' => 'Anda MENOLAK pengajuan ini.',
+                ];
+                header("Location: " . $this->base_url . "peminjaman_saya");
+                exit;
+            }
+        }
+    }
 }

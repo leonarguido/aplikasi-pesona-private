@@ -9,9 +9,10 @@
     define('ASSETS_URL', '/aplikasi-pesona-private/assets/');
     ?>
     <style>
+        /* UTAMA */
         body {
             font-family: 'Times New Roman', serif;
-            font-size: 12pt;
+            font-size: 11pt;
             margin: 0;
             padding: 20px;
             color: #000;
@@ -27,8 +28,8 @@
         .header-table {
             width: 100%;
             border-bottom: 3px double black;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
+            margin-bottom: 15px;
+            padding-bottom: 5px;
         }
 
         .header-table td {
@@ -36,27 +37,25 @@
         }
 
         .logo-kop {
-            width: 100px;
+            width: 90px;
             height: auto;
         }
 
         .text-kop {
             text-align: center;
-            line-height: 1.2;
+            line-height: 1.1;
         }
 
         .text-kop h2 {
             margin: 0;
             font-size: 14pt;
             font-weight: normal;
-            font-family: 'Times New Roman', serif;
         }
 
         .text-kop h1 {
-            margin: 5px 0;
+            margin: 2px 0;
             font-size: 16pt;
             font-weight: bold;
-            font-family: 'Times New Roman', serif;
         }
 
         .text-kop p {
@@ -64,24 +63,23 @@
             font-size: 10pt;
         }
 
-        /* ISI SURAT */
+        /* ISI */
         .content {
-            margin-bottom: 30px;
-            line-height: 1.5;
+            margin-bottom: 15px;
+            line-height: 1.3;
         }
 
-        /* TABEL BARANG */
         .table-data {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 15px;
-            margin-bottom: 20px;
+            margin-top: 10px;
+            margin-bottom: 10px;
         }
 
         .table-data th,
         .table-data td {
             border: 1px solid black;
-            padding: 8px;
+            padding: 5px;
             text-align: left;
             vertical-align: top;
         }
@@ -91,11 +89,13 @@
             text-align: center;
         }
 
-        /* TANDA TANGAN */
+        /* TANDA TANGAN (PERBAIKAN AGAR SEJAJAR) */
         .ttd-wrapper {
             width: 100%;
             display: table;
-            margin-top: 50px;
+            margin-top: 20px;
+            page-break-inside: avoid;
+            /* Jangan potong tanda tangan */
         }
 
         .ttd-box {
@@ -103,27 +103,41 @@
             width: 50%;
             text-align: center;
             vertical-align: top;
+            /* Pastikan semua mulai dari atas */
         }
 
+        /* Perbaikan: Tinggi Gambar Fixed 80px agar nama di bawahnya sejajar */
         .img-ttd {
             width: 100px;
-            height: auto;
+            height: 80px;
+            /* TINGGI DIKUNCI */
+            object-fit: contain;
+            /* Agar gambar tidak gepeng */
             display: block;
-            margin: 10px auto;
+            margin: 5px auto;
         }
 
         .space-ttd {
+            width: 100px;
             height: 80px;
+            /* TINGGI DIKUNCI SAMA */
+            display: block;
+            margin: 5px auto;
         }
 
-        /* TOMBOL PRINT */
+        /* PRINT SETTINGS */
         @media print {
             .no-print {
                 display: none;
             }
 
             @page {
-                margin: 2cm;
+                margin: 0;
+                size: auto;
+            }
+
+            body {
+                margin: 1.5cm 2cm;
             }
         }
 
@@ -137,6 +151,14 @@
             margin-bottom: 20px;
             font-weight: bold;
         }
+
+        /* Helper untuk meratakan baris teks header ttd */
+        .ttd-header {
+            min-height: 40px;
+            /* Minimal tinggi header teks (2 baris) */
+            line-height: 1.5;
+            margin-bottom: 5px;
+        }
     </style>
 </head>
 
@@ -148,7 +170,7 @@
         <table class="header-table">
             <tr>
                 <td width="15%" style="text-align: center;">
-                    <img src="<?= ASSETS_URL ?>img/bpmp/logo_tutwuri.jpg" alt="Logo" class="logo-kop">
+                    <img src="<?= ASSETS_URL ?>Img/logo_tutwuri.jpg" alt="Logo" class="logo-kop" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/b/b3/Logo_Tut_Wuri_Handayani.png'">
                 </td>
                 <td width="85%" class="text-kop">
                     <h2>KEMENTERIAN PENDIDIKAN DASAR<br>DAN MENENGAH</h2>
@@ -195,8 +217,7 @@
                 </thead>
                 <tbody>
                     <?php
-                    // QUERY 2: AMBIL DETAIL BARANG
-                    $q_detail = mysqli_query($koneksi, "SELECT d.*, b.nama_barang, b.satuan, b.kode_barang, b.merek_barang 
+                    $q_detail = mysqli_query($koneksi, "SELECT d.*, b.nama_barang, b.satuan, b.kode_barang 
                                                     FROM tb_detail_permintaan d
                                                     JOIN tb_barang_bergerak b ON d.barang_id = b.id
                                                     WHERE d.permintaan_id = '$id_permintaan'");
@@ -205,7 +226,7 @@
                     ?>
                         <tr>
                             <td style="text-align: center;"><?= $no++; ?></td>
-                            <td><?= $item['nama_barang']; ?> (<?= $item['merek_barang']; ?>) <br><small>Kode: <?= $item['kode_barang']; ?></small></td>
+                            <td><?= $item['nama_barang']; ?> <br><small>Kode: <?= $item['kode_barang']; ?></small></td>
                             <td style="text-align: center;"><?= $item['jumlah']; ?></td>
                             <td style="text-align: center;"><?= $item['satuan']; ?></td>
                             <td><?= !empty($data['catatan']) ? $data['catatan'] : '-'; ?></td>
@@ -213,36 +234,29 @@
                     <?php endwhile; ?>
                 </tbody>
             </table>
-
             <p>Demikian berita acara serah terima barang ini dibuat untuk dipergunakan sebagaimana mestinya.</p>
         </div>
 
         <div class="ttd-wrapper">
             <div class="ttd-box">
-                <br>
-                <p>Yang Menerima,</p>
+                <div class="ttd-header">
+                    &nbsp;<br>
+                    Yang Menerima,
+                </div>
 
-                <?php
-                if (!empty($data['ttd_pemohon'])):
-                ?>
-                    <img src="<?= ASSETS_URL ?>img/ttd/<?= $data['ttd_pemohon']; ?>" class="img-ttd">
-                <?php else: ?>
-                    <div class="space-ttd"></div>
-                <?php endif; ?>
+                <img src="<?= ASSETS_URL ?>img/ttd/<?= $data['ttd_pemohon']; ?>" class="img-ttd">
 
                 <strong>( <?= $data['nama_pemohon']; ?> )</strong><br>
                 NIP. <?= !empty($data['nip_pemohon']) ? $data['nip_pemohon'] : '-'; ?>
             </div>
 
             <div class="ttd-box">
-                <p>Denpasar, <?= $tanggal_indonesia; ?>,<br>Yang Menyetujui,</p>
-                <?php
-                if (!empty($data['ttd_admin'])):
-                ?>
-                    <img src="<?= ASSETS_URL ?>img/ttd/<?= $data['ttd_admin']; ?>" class="img-ttd">
-                <?php else: ?>
-                    <div class="space-ttd"></div>
-                <?php endif; ?>
+                <div class="ttd-header">
+                    Denpasar, <?= $tanggal_indonesia; ?><br>
+                    Admin Gudang
+                </div>
+
+                <img src="<?= ASSETS_URL ?>img/ttd/<?= $data['ttd_admin']; ?>" class="img-ttd">
 
                 <strong>( <?= $data['nama_admin']; ?> )</strong><br>
                 NIP. <?= !empty($data['nip_admin']) ? $data['nip_admin'] : '-'; ?>
