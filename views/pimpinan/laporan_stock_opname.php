@@ -131,6 +131,8 @@
 
     <script>
         $(document).ready(function() {
+            $('#selectItemFilter').attr('required', 'required');
+                                                                    
             $('.select2-item').select2({
                 dropdownParent: $('#selectItemFilter').parent(),
                 placeholder: "Pilih Item...",
@@ -152,6 +154,8 @@
             if (kategori === 'item') {
                 $('#kolom_item').show();
                 $('#kolom_pegawai').hide();
+                $('#selectItemFilter').attr('required', 'required');
+                $('#selectPegawaiFilter').removeAttr('required');
 
                 $('.select2-item').select2({
                     dropdownParent: $('#selectItemFilter').parent(),
@@ -161,6 +165,8 @@
             } else if (kategori === 'pegawai') {
                 $('#kolom_item').hide();
                 $('#kolom_pegawai').show();
+                $('#selectPegawaiFilter').attr('required', 'required');
+                $('#selectItemFilter').removeAttr('required');
 
                 $('.select2-pegawai').select2({
                     dropdownParent: $('#selectPegawaiFilter').parent(),
@@ -170,6 +176,8 @@
             } else if (kategori === 'tanggal') {
                 $('#kolom_item').hide();
                 $('#kolom_pegawai').hide();
+                $('#selectItemFilter').removeAttr('required');
+                $('#selectPegawaiFilter').removeAttr('required');
             }
         });
     </script>
