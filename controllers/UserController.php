@@ -2,7 +2,7 @@
 
 class UserController
 {
-    protected $base_url = '/aplikasi-pesona-private/routes/web.php/?page=';
+    protected $base_url = 'https://pesona.bpmpbali.id/routes/web.php/?page=';
 
     // MASUK HALAMAN DAFTAR BARANG
     public function daftar_barang_page()
