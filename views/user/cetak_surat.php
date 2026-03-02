@@ -5,8 +5,8 @@
     <meta charset="UTF-8">
     <title>Surat Permintaan Barang - <?= $data['id']; ?></title>
     <?php
-    define('BASE_URL', 'https://pesona.bpmpbali.id//routes/web.php/?page=');
-    define('ASSETS_URL', 'https://pesona.bpmpbali.id//assets/');
+    define('BASE_URL', '/aplikasi-pesona-private/routes/web.php/?page=');
+    define('ASSETS_URL', '/aplikasi-pesona-private/assets/');
     ?>
     <style>
         /* UTAMA */
@@ -26,45 +26,77 @@
 
         /* KOP SURAT */
         .header-table {
+            font-family: 'Monserrat', sans-serif;
             width: 100%;
-            border-bottom: 3px double black;
             margin-bottom: 15px;
-            padding-bottom: 5px;
         }
 
-        .header-table td {
-            vertical-align: middle;
+        .header-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .logo-area {
+            text-align: center;
         }
 
         .logo-kop {
-            width: 90px;
-            height: auto;
-        }
-
-        .text-kop {
-            text-align: center;
-            line-height: 1.1;
-        }
-
-        .text-kop h2 {
-            margin: 0;
-            font-size: 14pt;
-            font-weight: normal;
+            width: 70px;
         }
 
         .text-kop h1 {
-            margin: 2px 0;
-            font-size: 16pt;
-            font-weight: bold;
+            margin: 0;
+            font-size: 20.5pt;
+            padding-right: 15px;
         }
 
-        .text-kop p {
+        .info-kop {
+            border-left: 3px solid #067AC1;
+            padding-left: 15px;
+        }
+
+        .info-kop h2 {
             margin: 0;
+            font-size: 12pt;
+        }
+
+        .info-kop p {
+            margin: 2px 0;
             font-size: 10pt;
         }
 
-        /* ISI */
+        .bold {
+            font-weight: bold;
+        }
+
+        .keterangan-kop {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin: 2px 0;
+        }
+
+        .logo-simbol {
+            width: 14px;
+        }
+
+        .kontak {
+            display: flex;
+            gap: 20px;
+        }
+
+        .biru {
+            color: #067AC1;
+        }
+
+        .oranye {
+            color: #F58220;
+        }
+
+        /* ISI SURAT */
         .content {
+            width: 80%;
+            margin: auto;
             margin-bottom: 15px;
             line-height: 1.3;
         }
@@ -89,13 +121,11 @@
             text-align: center;
         }
 
-        /* TANDA TANGAN (PERBAIKAN AGAR SEJAJAR) */
         .ttd-wrapper {
             width: 100%;
             display: table;
             margin-top: 20px;
             page-break-inside: avoid;
-            /* Jangan potong tanda tangan */
         }
 
         .ttd-box {
@@ -103,16 +133,12 @@
             width: 50%;
             text-align: center;
             vertical-align: top;
-            /* Pastikan semua mulai dari atas */
         }
 
-        /* Perbaikan: Tinggi Gambar Fixed 80px agar nama di bawahnya sejajar */
         .img-ttd {
             width: 100px;
             height: 80px;
-            /* TINGGI DIKUNCI */
             object-fit: contain;
-            /* Agar gambar tidak gepeng */
             display: block;
             margin: 5px auto;
         }
@@ -120,7 +146,6 @@
         .space-ttd {
             width: 100px;
             height: 80px;
-            /* TINGGI DIKUNCI SAMA */
             display: block;
             margin: 5px auto;
         }
@@ -131,13 +156,24 @@
                 display: none;
             }
 
+            .header-table {
+                width: 100%;
+            }
+
+            .content {
+                width: 80%;
+                margin: auto;
+            }
+
             @page {
+                paper: A4;
                 margin: 0;
+                padding: 0;
                 size: auto;
             }
 
             body {
-                margin: 1.5cm 2cm;
+                margin: 1cm 0.5cm;
             }
         }
 
@@ -155,7 +191,6 @@
         /* Helper untuk meratakan baris teks header ttd */
         .ttd-header {
             min-height: 40px;
-            /* Minimal tinggi header teks (2 baris) */
             line-height: 1.5;
             margin-bottom: 5px;
         }
@@ -169,15 +204,35 @@
 
         <table class="header-table">
             <tr>
-                <td width="15%" style="text-align: center;">
-                    <img src="<?= ASSETS_URL ?>Img/logo_tutwuri.jpg" alt="Logo" class="logo-kop" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/b/b3/Logo_Tut_Wuri_Handayani.png'">
+                <td width="10%" class="logo-area">
+                    <img src="<?= ASSETS_URL ?>img/logo_tut_wuri_handayani.png"
+                        class="logo-kop"
+                        onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/b/b3/Logo_Tut_Wuri_Handayani.png'">
                 </td>
-                <td width="85%" class="text-kop">
-                    <h2>KEMENTERIAN PENDIDIKAN DASAR<br>DAN MENENGAH</h2>
-                    <h1>BALAI PENJAMINAN MUTU PENDIDIKAN PROVINSI BALI</h1>
-                    <p>Jalan Letda Tantular Nomor 14 Niti Mandala, Denpasar</p>
-                    <p>Telp. (0361) 225666, Fax. (0361) 246682</p>
-                    <p>Pos el: bpmpbali@kemdikbud.go.id, Laman: www.bpmpbali.kemdikdasmen.go.id</p>
+
+                <td width="25%" class="text-kop">
+                    <h1>
+                        <span class="biru">Kemen</span><span class="oranye">dikdasmen</span>
+                    </h1>
+                </td>
+
+                <td width="65%" class="info-kop">
+                    <h2 class="biru">Kementerian Pendidikan Dasar dan Menengah</h2>
+                    <p class="bold">Balai Penjaminan Mutu Pendidikan Provinsi Bali</p>
+                    <p>Jalan Letda Tantular Nomor 14 Niti Mandala Renon, Denpasar Timur, Denpasar, 80234</p>
+                    <p class="keterangan-kop"><img src="<?= ASSETS_URL ?>img/simbol_web.png" class="logo-simbol">
+                        <span>www.kemendikdasmen.go.id</span>
+                    </p>
+                    <div class="kontak">
+                        <p class="keterangan-kop">
+                            <img src="<?= ASSETS_URL ?>img/simbol_question.png" class="logo-simbol">
+                            <span>(0361) 225666</span>
+                        </p>
+                        <p class="keterangan-kop">
+                            <img src="<?= ASSETS_URL ?>img/simbol_call.png" class="logo-simbol">
+                            <span>177</span>
+                        </p>
+                    </div>
                 </td>
             </tr>
         </table>
@@ -186,7 +241,6 @@
             <p><strong>Nomor Surat :</strong> #REQ-<?= sprintf("%04d", $data['id']); ?></p>
             <p><strong>Perihal :</strong> Bukti Serah Terima Barang (ATK)</p>
 
-            <br>
             <p>Yang bertanda tangan di bawah ini:</p>
             <table style="width: 100%; margin-left: 20px; margin-bottom: 10px;">
                 <tr>

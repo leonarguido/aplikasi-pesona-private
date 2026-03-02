@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Laporan Transaksi <?= $tgl_mulai; ?> sd <?= $tgl_selesai; ?></title>
-    <?php define('BASE_URL', 'https://pesona.bpmpbali.id//routes/web.php/?page='); ?>
+    <?php define('BASE_URL', '/aplikasi-pesona-private/routes/web.php/?page='); ?>
     <style>
         /* CSS untuk Tampilan Cetak */
         body {
@@ -143,7 +143,7 @@
                             $q_detail = mysqli_query($koneksi, "
                                 SELECT d.jumlah, d.satuan, b.nama_barang, b.merek_barang
                                 FROM tb_detail_permintaan d
-                                JOIN tb_barang_habis_pakai b ON d.barang_id = b.id
+                                JOIN tb_barang_bergerak b ON d.barang_id = b.id
                                 WHERE d.permintaan_id = '$id_req'
                             ");
 

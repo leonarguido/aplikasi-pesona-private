@@ -2,7 +2,7 @@
 
 class AdminController
 {
-    protected $base_url = 'https://pesona.bpmpbali.id//routes/web.php/?page=';
+    protected $base_url = '/aplikasi-pesona-private/routes/web.php/?page=';
     protected $assets_path = __DIR__ . '/../assets/img/'; // direktori penyimpanan file paraf
 
     // MASUK HALAMAN DATA BARANG
