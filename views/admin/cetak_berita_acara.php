@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <title>Berita Acara - <?= $data['nama_barang']; ?></title>
     <?php
-    define('BASE_URL', '/aplikasi-pesona-private/routes/web.php/?page=');
-    define('ASSETS_URL', '/aplikasi-pesona-private/assets/');
+    define('BASE_URL', 'https://pesona.bpmpbali.id//routes/web.php/?page=');
+    define('ASSETS_URL', 'https://pesona.bpmpbali.id//assets/');
     ?>
     <style>
         /* CSS UTAMA */

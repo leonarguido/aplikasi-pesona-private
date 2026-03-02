@@ -1,8 +1,8 @@
 <!-- Define BASE_URL -->
 <?php 
-define('BASE_URL', '/aplikasi-pesona-private/routes/web.php/?page='); 
-// define('BASE_URL', '/aplikasi-pesona-private/');
-define('ASSETS_URL', '/aplikasi-pesona-private/assets/');
+define('BASE_URL', 'https://pesona.bpmpbali.id//routes/web.php/?page='); 
+// define('BASE_URL', 'https://pesona.bpmpbali.id//');
+define('ASSETS_URL', 'https://pesona.bpmpbali.id//assets/');
 ?>
     
     <meta charset="utf-8">

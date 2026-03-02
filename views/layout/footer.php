@@ -54,7 +54,11 @@
         });
     });
 
-    if (window.innerHeight <= 700) {
+    // ambil elemen dengan class "content-wrapper" dan ukur tinggi kontennya
+    const content_wrapper_height = document.querySelector('.content-wrapper').offsetHeight;
+    const sidebar = document.getElementById('accordionSidebar');
+    // jika tinggi konten kurang dari atau sama dengan 700px, atur tinggi sidebar menjadi 100vh
+    if (content_wrapper_height <= 700) {
         document.getElementById('accordionSidebar')
             .style.height = '100vh';
     }

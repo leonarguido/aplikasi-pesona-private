@@ -46,7 +46,7 @@ class AutentikasiController
                     }
 
                     // Redirect ke dashboard
-                    header('Location: /aplikasi-pesona-private/');
+                    header('Location: https://pesona.bpmpbali.id//');
                     exit;
                 }
             } else {

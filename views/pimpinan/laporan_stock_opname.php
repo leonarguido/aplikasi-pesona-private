@@ -23,116 +23,118 @@
 </head>
 
 <body id="page-top">
-    <div id="content-wrapper" class="d-flex flex-column">
-        <div id="content" class="row">
-            <div class="col-md-2">
-                <?php require __DIR__ . '/../layout/sidebar.php'; ?>
-            </div>
-            <div class="col-md-10">
-                <?php require __DIR__ . '/../layout/topbar.php'; ?>
-                <div class="container-fluid mt-4">
-                    <div class="row">
-                        <div class="col-lg-12 mb-4">
-                            <div class="card shadow h-100">
-                                <div class="card-header py-3 border-bottom-primary">
-                                    <h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-filter"></i> Filter Laporan Stock Opname Berdasarkan:</h6>
-                                </div>
-                                <div class="card-body">
-                                    <form action="<?= BASE_URL ?>proses_stock_opname" method="POST">
+    <div id="wrapper">
+        <?php require __DIR__ . '/../layout/sidebar.php'; ?>
+        <div id="content-wrapper" class="d-flex flex-column">
+            <div id="content">
+                <div class="row">
+                    <div class="col-md-12">
+                        <?php require __DIR__ . '/../layout/topbar.php'; ?>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="container-fluid mt-4">
+                        <div class="row">
+                            <div class="col-lg-12 mb-4">
+                                <div class="card shadow h-100">
+                                    <div class="card-header py-3 border-bottom-primary">
+                                        <h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-filter"></i> Filter Laporan Stock Opname Berdasarkan:</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <form action="<?= BASE_URL ?>proses_stock_opname" method="POST">
 
-                                        <div class="row">
-                                            <div class="col">
+                                            <div class="row">
+                                                <div class="col">
 
-                                                <div class="form-group">
-                                                    <label class="font-weight-bold small text-secondary text-uppercase">Pilih Filter:</label>
-                                                    <label class="ml-3">
-                                                        <input type="radio" name="kategori" value="item" checked> Item
-                                                    </label>
-                                                    <label class="ml-3">
-                                                        <input type="radio" name="kategori" value="pegawai"> Pegawai
-                                                    </label>
-                                                    <label class="ml-3">
-                                                        <input type="radio" name="kategori" value="tanggal"> Tanggal
-                                                    </label>
-                                                </div>
-                                                <div class="row">
-                                                    <div class="col" id="kolom_item">
-                                                        <div class="form-group">
-                                                            <label class="font-weight-bold small text-secondary text-uppercase">Pilih Item</label>
-                                                            <select name="item" id="selectItemFilter" class="form-control select2-item">
-                                                                <option value="">-- Pilih Item --</option>
-                                                                <?php foreach ($list_barang as $brg): ?>
-                                                                    <option value="<?= $brg['id']; ?>">
-                                                                        <?= $brg['kode_barang']; ?> (<?= $brg['nama_barang']; ?>)
-                                                                    </option>
-                                                                <?php endforeach; ?>
-                                                            </select>
-                                                        </div>
+                                                    <div class="form-group">
+                                                        <label class="font-weight-bold small text-secondary text-uppercase">Pilih Filter:</label>
+                                                        <label class="ml-3">
+                                                            <input type="radio" name="kategori" value="item" checked> Item
+                                                        </label>
+                                                        <label class="ml-3">
+                                                            <input type="radio" name="kategori" value="pegawai"> Pegawai
+                                                        </label>
+                                                        <label class="ml-3">
+                                                            <input type="radio" name="kategori" value="tanggal"> Tanggal
+                                                        </label>
                                                     </div>
-                                                    <div class="col" id="kolom_pegawai" style="display:none;">
-                                                        <div class="form-group">
-                                                            <label class="font-weight-bold small text-secondary text-uppercase">Pilih Pegawai</label>
-                                                            <select name="pegawai" id="selectPegawaiFilter" class="form-control select2-pegawai">
-                                                                <option value="">-- Pilih Pegawai --</option>
-                                                                <?php foreach ($list_pegawai as $pgw): ?>
-                                                                    <option value="<?= $pgw['id']; ?>">
-                                                                        <?= $pgw['nip']; ?> (<?= $pgw['nama']; ?>)
-                                                                    </option>
-                                                                <?php endforeach; ?>
-                                                            </select>
+                                                    <div class="row">
+                                                        <div class="col" id="kolom_item">
+                                                            <div class="form-group">
+                                                                <label class="font-weight-bold small text-secondary text-uppercase">Pilih Item</label>
+                                                                <select name="item" id="selectItemFilter" class="form-control select2-item">
+                                                                    <option value="">-- Pilih Item --</option>
+                                                                    <?php foreach ($list_barang as $brg): ?>
+                                                                        <option value="<?= $brg['id']; ?>">
+                                                                            <?= $brg['kode_barang']; ?> (<?= $brg['nama_barang']; ?>)
+                                                                        </option>
+                                                                    <?php endforeach; ?>
+                                                                </select>
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                </div>
-                                                <div class="row" id="kolom_tanggal">
-                                                    <div class="col">
-                                                        <div class="form-group">
-                                                            <label class="font-weight-bold small text-secondary text-uppercase">Dari Tanggal</label>
-                                                            <div class="input-group">
-                                                                <div class="input-group-prepend">
-                                                                    <span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
-                                                                </div>
-                                                                <input type="date" name="tgl_mulai" class="form-control bg-light border-0 small"
-                                                                    value="<?= date('Y-m-01'); ?>">
+                                                        <div class="col" id="kolom_pegawai" style="display:none;">
+                                                            <div class="form-group">
+                                                                <label class="font-weight-bold small text-secondary text-uppercase">Pilih Pegawai</label>
+                                                                <select name="pegawai" id="selectPegawaiFilter" class="form-control select2-pegawai">
+                                                                    <option value="">-- Pilih Pegawai --</option>
+                                                                    <?php foreach ($list_pegawai as $pgw): ?>
+                                                                        <option value="<?= $pgw['id']; ?>">
+                                                                            <?= $pgw['nip']; ?> (<?= $pgw['nama']; ?>)
+                                                                        </option>
+                                                                    <?php endforeach; ?>
+                                                                </select>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div class="col">
-                                                        <div class="form-group">
-                                                            <label class="font-weight-bold small text-secondary text-uppercase">Sampai Tanggal</label>
-                                                            <div class="input-group">
-                                                                <div class="input-group-prepend">
-                                                                    <span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
+                                                    <div class="row" id="kolom_tanggal">
+                                                        <div class="col">
+                                                            <div class="form-group">
+                                                                <label class="font-weight-bold small text-secondary text-uppercase">Dari Tanggal</label>
+                                                                <div class="input-group">
+                                                                    <div class="input-group-prepend">
+                                                                        <span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
+                                                                    </div>
+                                                                    <input type="date" name="tgl_mulai" class="form-control bg-light border-0 small"
+                                                                        value="<?= date('Y-m-01'); ?>">
                                                                 </div>
-                                                                <input type="date" name="tgl_selesai" class="form-control bg-light border-0 small" required
-                                                                    value="<?= date('Y-m-d'); ?>">
+                                                            </div>
+                                                        </div>
+                                                        <div class="col">
+                                                            <div class="form-group">
+                                                                <label class="font-weight-bold small text-secondary text-uppercase">Sampai Tanggal</label>
+                                                                <div class="input-group">
+                                                                    <div class="input-group-prepend">
+                                                                        <span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
+                                                                    </div>
+                                                                    <input type="date" name="tgl_selesai" class="form-control bg-light border-0 small" required
+                                                                        value="<?= date('Y-m-d'); ?>">
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <hr>
-                                        <button type="submit" name="proses_stock_opname" class="btn btn-primary btn-block shadow-sm">
-                                            <i class="fas fa-print fa-sm text-white-50"></i> Cetak Laporan
-                                        </button>
+                                            <hr>
+                                            <button type="submit" name="proses_stock_opname" class="btn btn-primary btn-block shadow-sm">
+                                                <i class="fas fa-print fa-sm text-white-50"></i> Cetak Laporan
+                                            </button>
+                                    </div>
+                                    </form>
                                 </div>
-                                </form>
                             </div>
                         </div>
                     </div>
-                </div>
 
+                </div>
+                <?php require __DIR__ . '/../layout/footer.php'; ?>
             </div>
         </div>
     </div>
-    </div>
-
-    <?php require __DIR__ . '/../layout/footer.php'; ?>
 
     <script>
         $(document).ready(function() {
             $('#selectItemFilter').attr('required', 'required');
-                                                                    
+
             $('.select2-item').select2({
                 dropdownParent: $('#selectItemFilter').parent(),
                 placeholder: "Pilih Item...",

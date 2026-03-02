@@ -7,14 +7,16 @@
 </head>
 
 <body id="page-top">
-    <div id="content-wrapper" class="d-flex flex-column">
-        <div id="content">
-            <div class="row">
-                <div class="col-md-2">
-                    <?php require __DIR__ . '/../layout/sidebar.php'; ?>
+    <div id="wrapper">
+        <?php require __DIR__ . '/../layout/sidebar.php'; ?>
+        <div id="content-wrapper" class="d-flex flex-column">
+            <div id="content">
+                <div class="row">
+                    <div class="col-md-12">
+                        <?php require __DIR__ . '/../layout/topbar.php'; ?>
+                    </div>
                 </div>
-                <div class="col-md-10">
-                    <?php require __DIR__ . '/../layout/topbar.php'; ?>
+                <div class="row">
                     <div class="container-fluid mt-4">
 
                         <div class="alert alert-info shadow-sm border-left-info" role="alert">
@@ -93,11 +95,10 @@
                         </div>
                     </div>
                 </div>
+            <?php require __DIR__ . '/../layout/footer.php'; ?>
             </div>
         </div>
     </div>
-
-    <?php require __DIR__ . '/../layout/footer.php'; ?>
 
     <script>
         $(document).ready(function() {

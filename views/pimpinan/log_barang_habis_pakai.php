@@ -7,88 +7,91 @@
 </head>
 
 <body id="page-top">
-    <div id="content-wrapper" class="d-flex flex-column">
-        <div id="content" class="row">
-            <div class="col-md-2">
-                <?php require __DIR__ . '/../layout/sidebar.php'; ?>
-            </div>
-            <div class="col-md-10">
-                <?php require __DIR__ . '/../layout/topbar.php'; ?>
-                <div class="container-fluid mt-4">
-                    <div class="row">
-                        <div class="col-lg-12 mb-4">
-                            <div class="card shadow mb-4" id="printableArea">
-                                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+    <div id="wrapper">
+        <?php require __DIR__ . '/../layout/sidebar.php'; ?>
+        <div id="content-wrapper" class="d-flex flex-column">
+            <div id="content">
+                <div class="row">
+                    <div class="col-md-12">
+                        <?php require __DIR__ . '/../layout/topbar.php'; ?>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="container-fluid mt-4">
+                        <div class="row">
+                            <div class="col-lg-12 mb-4">
+                                <div class="card shadow mb-4" id="printableArea">
+                                    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
 
-                                    <div class="d-flex align-items-center justify-content-between">
-                                        <button id="bulan_lalu_log" class="btn btn-sm btn-outline-primary mr-2">&laquo;</button>
-                                        <h6 class="m-0 font-weight-bold text-primary" id="bulan_ini_log">
-                                            Log Barang per Bulan: <?= date('F', mktime(0, 0, 0, $bulan_angka, 10)) . " " . $tahun_angka; ?>
-                                        </h6>
-                                        <button id="bulan_depan_log" class="btn btn-sm btn-outline-primary ml-2">&raquo;</button>
+                                        <div class="d-flex align-items-center justify-content-between">
+                                            <button id="bulan_lalu_log" class="btn btn-sm btn-outline-primary mr-2">&laquo;</button>
+                                            <h6 class="m-0 font-weight-bold text-primary" id="bulan_ini_log">
+                                                Log Barang per Bulan: <?= date('F', mktime(0, 0, 0, $bulan_angka, 10)) . " " . $tahun_angka; ?>
+                                            </h6>
+                                            <button id="bulan_depan_log" class="btn btn-sm btn-outline-primary ml-2">&raquo;</button>
+                                        </div>
+                                        <input type="text" name="kalender" id="kalender_log" value="<?= $tahun_angka ?>-<?= $bulan_angka ?>" class="d-none d-sm-inline-block btn btn-sm btn-outline-primary shadow-sm" readonly>
                                     </div>
-                                    <input type="text" name="kalender" id="kalender_log" value="<?= $tahun_angka ?>-<?= $bulan_angka ?>" class="d-none d-sm-inline-block btn btn-sm btn-outline-primary shadow-sm" readonly>
-                                </div>
-                                <div class="card-body">
-                                    <div class="table-responsive">
-                                        <table class="table table-bordered table-striped" id="dataTableLog" width="100%" cellspacing="0">
-                                            <thead class="bg-dark text-white">
-                                                <tr>
-                                                    <th width="10%">Tanggal</th>
-                                                    <th width="10%">Admin</th>
-                                                    <th width="10%">Kode Barang</th>
-                                                    <th width="10%" style="text-align:center;">Nama Barang</th>
-                                                    <th width="10%" style="text-align:center;">Histori Aksi</th>
-                                                    <th width="20%" style="text-align:center;">Keterangan</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="tabel_log">
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-
-                                <div class="modal fade" id="modalEdit" tabindex="-1">
-                                    <div class="modal-dialog">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title">Edit Log Stok Barang</h5>
-                                                <button class="close" data-dismiss="modal">&times;</button>
-                                            </div>
-                                            <form method="POST" id="formEdit" action="">
-                                                <div class="modal-body">
-                                                    <input type="hidden" name="id" id="editId">
-                                                    <input type="hidden" name="stok_lama" id="stokLama">
-                                                    <input type="hidden" name="kode_barang" id="editKode">
-                                                    
-                                                    <div class="form-group">
-                                                        <label>Stok</label>
-                                                        <input type="number" class="form-control" name="stok_baru" min="1" id="editStok">
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label>Keterangan</label>
-                                                        <textarea class="form-control" name="keterangan" id="editKet"></textarea>
-                                                    </div>
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                                                    <button type="submit" name="edit_log" class="btn btn-primary">Simpan</button>
-                                                </div>
-                                            </form>
+                                    <div class="card-body">
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered table-striped" id="dataTableLog" width="100%" cellspacing="0">
+                                                <thead class="bg-dark text-white">
+                                                    <tr>
+                                                        <th width="10%">Tanggal</th>
+                                                        <th width="10%">Admin</th>
+                                                        <th width="10%">Kode Barang</th>
+                                                        <th width="10%" style="text-align:center;">Nama Barang</th>
+                                                        <th width="10%" style="text-align:center;">Histori Aksi</th>
+                                                        <th width="20%" style="text-align:center;">Keterangan</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="tabel_log">
+                                                </tbody>
+                                            </table>
                                         </div>
                                     </div>
-                                </div>
 
+                                    <div class="modal fade" id="modalEdit" tabindex="-1">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title">Edit Log Stok Barang</h5>
+                                                    <button class="close" data-dismiss="modal">&times;</button>
+                                                </div>
+                                                <form method="POST" id="formEdit" action="">
+                                                    <div class="modal-body">
+                                                        <input type="hidden" name="id" id="editId">
+                                                        <input type="hidden" name="stok_lama" id="stokLama">
+                                                        <input type="hidden" name="kode_barang" id="editKode">
+
+                                                        <div class="form-group">
+                                                            <label>Stok</label>
+                                                            <input type="number" class="form-control" name="stok_baru" min="1" id="editStok">
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label>Keterangan</label>
+                                                            <textarea class="form-control" name="keterangan" id="editKet"></textarea>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                                                        <button type="submit" name="edit_log" class="btn btn-primary">Simpan</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
                             </div>
                         </div>
-                    </div>
 
+                    </div>
                 </div>
+            <?php require __DIR__ . '/../layout/footer.php'; ?>
             </div>
         </div>
     </div>
-
-    <?php require __DIR__ . '/../layout/footer.php'; ?>
 
     <script>
         // ==========================================

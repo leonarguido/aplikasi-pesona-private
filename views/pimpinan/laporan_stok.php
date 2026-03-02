@@ -7,73 +7,76 @@
 </head>
 
 <body id="page-top">
-    <div id="content-wrapper" class="d-flex flex-column">
-        <div id="content" class="row">
-            <div class="col-md-2">
-                <?php require __DIR__ . '/../layout/sidebar.php'; ?>
-            </div>
-            <div class="col-md-10">
-                <?php require __DIR__ . '/../layout/topbar.php'; ?>
-                <div class="container-fluid mt-4">
+    <div id="wrapper">
+        <?php require __DIR__ . '/../layout/sidebar.php'; ?>
+        <div id="content-wrapper" class="d-flex flex-column">
+            <div id="content">
+                <div class="row">
+                    <div class="col-md-12">
+                        <?php require __DIR__ . '/../layout/topbar.php'; ?>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="container-fluid mt-4">
 
-                    <style>
-                        @media print {
-                            body * {
-                                visibility: hidden;
+                        <style>
+                            @media print {
+                                body * {
+                                    visibility: hidden;
+                                }
+
+                                #printableArea,
+                                #printableArea * {
+                                    visibility: visible;
+                                }
+
+                                #printableArea {
+                                    position: absolute;
+                                    left: 0;
+                                    top: 0;
+                                    width: 100%;
+                                }
+
+                                .no-print {
+                                    display: none;
+                                }
                             }
+                        </style>
 
-                            #printableArea,
-                            #printableArea * {
-                                visibility: visible;
-                            }
-
-                            #printableArea {
-                                position: absolute;
-                                left: 0;
-                                top: 0;
-                                width: 100%;
-                            }
-
-                            .no-print {
-                                display: none;
-                            }
-                        }
-                    </style>
-
-                    <div class="card shadow mb-4" id="printableArea">
-                        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                            <h6 class="m-0 font-weight-bold text-primary">Data Stok per Tanggal: <?= date('d F Y'); ?></h6>
-                            <!-- <button onclick="window.print()" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+                        <div class="card shadow mb-4" id="printableArea">
+                            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                <h6 class="m-0 font-weight-bold text-primary">Data Stok per Tanggal: <?= date('d F Y'); ?></h6>
+                                <!-- <button onclick="window.print()" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
                                 <i class="fas fa-print fa-sm text-white-50"></i> Cetak / Simpan PDF
                             </button> -->
-                        </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-bordered table-striped" id="dataTable" width="100%" cellspacing="0">
-                                    <thead class="bg-dark text-white">
-                                        <tr>
-                                            <th width="5%" style="text-align:center;">No</th>
-                                            <th width="10%">Kode Barang</th>
-                                            <th width="10%">Merek Barang</th>
-                                            <th>Nama Barang</th>
-                                            <th width="15%" style="text-align:center;">Sisa Stok</th>
-                                            <th width="10%" style="text-align:center;">Satuan</th>
-                                            <th width="15%" class="no-print">Status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="tabel_laporan_stok_barang">
-                                    </tbody>
-                                </table>
                             </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-striped" id="dataTable" width="100%" cellspacing="0">
+                                        <thead class="bg-dark text-white">
+                                            <tr>
+                                                <th width="5%" style="text-align:center;">No</th>
+                                                <th width="10%">Kode Barang</th>
+                                                <th width="10%">Merek Barang</th>
+                                                <th>Nama Barang</th>
+                                                <th width="15%" style="text-align:center;">Sisa Stok</th>
+                                                <th width="10%" style="text-align:center;">Satuan</th>
+                                                <th width="15%" class="no-print">Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tabel_laporan_stok_barang">
+                                        </tbody>
+                                    </table>
+                                </div>
 
+                            </div>
                         </div>
                     </div>
                 </div>
+            <?php require __DIR__ . '/../layout/footer.php'; ?>
             </div>
         </div>
     </div>
-
-    <?php require __DIR__ . '/../layout/footer.php'; ?>
 
     <script>
         function load_laporan_stok_barang($status_stok) {
@@ -104,7 +107,7 @@
                                 }
                             }
                         });
-    
+
                         $('#dataTable_filter').append(`
                         Filter:
                             <label>
@@ -127,8 +130,6 @@
             $status_stok = this.value;
             load_laporan_stok_barang($status_stok);
         });
-
-         
     </script>
 </body>
 

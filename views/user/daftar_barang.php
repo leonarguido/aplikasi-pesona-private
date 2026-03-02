@@ -4,18 +4,20 @@
 <head>
     <?php require __DIR__ . '/../layout/header.php'; ?>
     <?php $judul_halaman = "Daftar Barang"; ?>
+    <?php $jml_item_keranjang = count($_SESSION['keranjang']); ?>
 </head>
 
 <body id="page-top">
-    <?php $jml_item_keranjang = count($_SESSION['keranjang']); ?>
-    <div id="content-wrapper" class="d-flex flex-column">
-        <div id="content">
-            <div class="row">
-                <div class="col-md-2">
-                    <?php require __DIR__ . '/../layout/sidebar.php'; ?>
+    <div id="wrapper">
+        <?php require __DIR__ . '/../layout/sidebar.php'; ?>
+        <div id="content-wrapper" class="d-flex flex-column">
+            <div id="content">
+                <div class="row">
+                    <div class="col-md-12">
+                        <?php require __DIR__ . '/../layout/topbar.php'; ?>
+                    </div>
                 </div>
-                <div class="col-md-10">
-                    <?php require __DIR__ . '/../layout/topbar.php'; ?>
+                <div class="row">
                     <div class="container-fluid mt-4">
 
                         <div class="card shadow mb-4">
@@ -111,11 +113,10 @@
                         </div>
                     </div>
                 </div>
+            <?php require __DIR__ . '/../layout/footer.php'; ?>
             </div>
         </div>
     </div>
-
-    <?php require __DIR__ . '/../layout/footer.php'; ?>
 
     <script>
         $(document).ready(function() {
@@ -138,8 +139,6 @@
                 });
             }
         });
-
-         
     </script>
 </body>
 
