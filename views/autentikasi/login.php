@@ -34,12 +34,16 @@
                                                 <form class="user" method="POST" action="<?= BASE_URL ?>autentikasi">
 
                                                     <div class="form-group">
-                                                        <input type="text" name="username" class="form-control form-control-user" placeholder="Masukkan Username..." required>
+                                                        <label>Username <span class="text-danger">*</span></label>
+                                                        <div class="input-group">
+                                                            <input type="text" name="username" class="form-control form-control-user" placeholder="Masukkan Username..." style="font-size: 12pt;" required>
+                                                        </div>
                                                     </div>
 
                                                     <div class="form-group">
+                                                        <label>Password <span class="text-danger">*</span></label>
                                                         <div class="input-group">
-                                                            <input type="password" name="password" class="form-control" id="passwordInput" placeholder="Password" style="border-top-left-radius: 10rem; border-bottom-left-radius: 10rem; height: 3.1rem; padding: 1.5rem 1rem;" required>
+                                                            <input type="password" name="password" class="form-control" id="passwordInput" placeholder="Masukkan Password..." style="border-top-left-radius: 10rem; border-bottom-left-radius: 10rem; height: 3.1rem; padding: 1.5rem 1rem;" required>
                                                             <div class="input-group-append">
                                                                 <span class="input-group-text bg-white border-left-0" style="border-top-right-radius: 10rem; border-bottom-right-radius: 10rem; cursor: pointer;" onclick="togglePassword()">
                                                                     <i class="fas fa-eye text-gray-500" id="toggleIcon"></i>

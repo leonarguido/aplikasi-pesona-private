@@ -8,11 +8,9 @@
 
 <body id="page-top">
     <div id="content-wrapper" class="d-flex flex-column">
-        <div id="content" class="row">
-            <div class="col-md-2">
+        <div id="wrapper">
+            <div id="content" class="row">
                 <?php require __DIR__ . '/../layout/sidebar.php'; ?>
-            </div>
-            <div class="col-md-10">
                 <?php require __DIR__ . '/../layout/topbar.php'; ?>
                 <div class="container-fluid mt-4">
 
@@ -190,9 +188,9 @@
                 </div>
             </div>
         </div>
-    </div>
 
-    <?php require __DIR__ . '/../layout/footer.php'; ?>
+        <?php require __DIR__ . '/../layout/footer.php'; ?>
+    </div>
 
     <script>
         $(document).ready(function() {
