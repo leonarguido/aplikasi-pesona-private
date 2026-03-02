@@ -2,7 +2,7 @@
 
 class PimpinanController
 {
-    protected $base_url = 'https://pesona.bpmpbali.id/routes/web.php/?page=';
+    protected $base_url = '/aplikasi-pesona-private/routes/web.php/?page=';
 
     public function laporan_page()
     {
@@ -50,7 +50,7 @@ class PimpinanController
                     SUM(d.jumlah) AS total_keluar
                 FROM tb_detail_permintaan d
                 JOIN tb_permintaan p ON d.permintaan_id = p.id
-                JOIN tb_barang_bergerak b ON d.barang_id = b.id
+                JOIN tb_barang_habis_pakai b ON d.barang_id = b.id
                 WHERE 
                     p.tanggal_disetujui IS NOT NULL
                     AND MONTH(p.tanggal_disetujui) = '$bulan'
@@ -110,7 +110,7 @@ class PimpinanController
                 $q_detail = mysqli_query($koneksi, "
                     SELECT d.jumlah, d.satuan, b.nama_barang, b.merek_barang
                     FROM tb_detail_permintaan d
-                    JOIN tb_barang_bergerak b ON d.barang_id = b.id
+                    JOIN tb_barang_habis_pakai b ON d.barang_id = b.id
                     WHERE d.permintaan_id = '$id_req'
                 ");
 
@@ -182,7 +182,7 @@ class PimpinanController
 
         // AMBIL DATA BARANG (UNTUK DROPDOWN)
         $list_barang = [];
-        $q_brg = mysqli_query($koneksi, "SELECT id, kode_barang, nama_barang FROM tb_barang_bergerak WHERE is_deleted = 0 ORDER BY nama_barang ASC");
+        $q_brg = mysqli_query($koneksi, "SELECT id, kode_barang, nama_barang FROM tb_barang_habis_pakai WHERE is_deleted = 0 ORDER BY nama_barang ASC");
         while ($b = mysqli_fetch_assoc($q_brg)) {
             $list_barang[] = $b;
         }
@@ -245,7 +245,7 @@ class PimpinanController
 
             // BERDASARKAN ITEM
             if ($kategori == 'item') {
-                $q_barang = " SELECT nama_barang, merek_barang, satuan, kode_barang, stok FROM tb_barang_bergerak WHERE id = '$item'";
+                $q_barang = " SELECT nama_barang, merek_barang, satuan, kode_barang, stok FROM tb_barang_habis_pakai WHERE id = '$item'";
 
                 $q_keluar = "
                     SELECT 
@@ -254,7 +254,7 @@ class PimpinanController
                         d.jumlah
                     FROM tb_detail_permintaan d
                     JOIN tb_permintaan p ON d.permintaan_id = p.id
-                    JOIN tb_barang_bergerak b ON d.barang_id = b.id
+                    JOIN tb_barang_habis_pakai b ON d.barang_id = b.id
                     WHERE 
                         p.tanggal_disetujui IS NOT NULL
                         AND p.tanggal_disetujui BETWEEN '$tgl_mulai' AND CURDATE()
@@ -266,8 +266,8 @@ class PimpinanController
                         l.tanggal,
                         l.keterangan,
                         l.stok
-                    FROM tb_log_barang_bergerak l
-                    JOIN tb_barang_bergerak b ON l.barang_id = b.id
+                    FROM tb_log_barang_habis_pakai l
+                    JOIN tb_barang_habis_pakai b ON l.barang_id = b.id
                     WHERE 
                         l.tanggal BETWEEN '$tgl_mulai' AND CURDATE()
                         AND l.stok IS NOT NULL
@@ -394,7 +394,7 @@ class PimpinanController
                             SUM(d.jumlah) AS total_keluar
                         FROM tb_detail_permintaan d
                         JOIN tb_permintaan p ON d.permintaan_id = p.id
-                        JOIN tb_barang_bergerak b ON d.barang_id = b.id
+                        JOIN tb_barang_habis_pakai b ON d.barang_id = b.id
                         WHERE 
                             p.tanggal_disetujui IS NOT NULL
                             AND p.tanggal_disetujui BETWEEN '$tgl_mulai' AND '$tgl_selesai'
@@ -459,13 +459,13 @@ class PimpinanController
             }
 
             if ($status_stok == "habis") {
-                $query = mysqli_query($koneksi, "SELECT * FROM tb_barang_bergerak WHERE is_deleted=0 AND stok=0 ORDER BY nama_barang ASC");
+                $query = mysqli_query($koneksi, "SELECT * FROM tb_barang_habis_pakai WHERE is_deleted=0 AND stok=0 ORDER BY nama_barang ASC");
             } else if ($status_stok == "menipis") {
-                $query = mysqli_query($koneksi, "SELECT * FROM tb_barang_bergerak WHERE is_deleted=0 AND stok>0 AND stok<=10 ORDER BY nama_barang ASC");
+                $query = mysqli_query($koneksi, "SELECT * FROM tb_barang_habis_pakai WHERE is_deleted=0 AND stok>0 AND stok<=10 ORDER BY nama_barang ASC");
             } else if ($status_stok == "aman") {
-                $query = mysqli_query($koneksi, "SELECT * FROM tb_barang_bergerak WHERE is_deleted=0 AND stok>10 ORDER BY nama_barang ASC");
+                $query = mysqli_query($koneksi, "SELECT * FROM tb_barang_habis_pakai WHERE is_deleted=0 AND stok>10 ORDER BY nama_barang ASC");
             } else {
-                $query = mysqli_query($koneksi, "SELECT * FROM tb_barang_bergerak WHERE is_deleted=0 ORDER BY nama_barang ASC");
+                $query = mysqli_query($koneksi, "SELECT * FROM tb_barang_habis_pakai WHERE is_deleted=0 ORDER BY nama_barang ASC");
             }
 
             $no = 1;
@@ -570,7 +570,7 @@ class PimpinanController
                             ";
                 $q_detail_hist = mysqli_query($koneksi, "SELECT d.jumlah, d.satuan, b.nama_barang, b.satuan, b.merek_barang
                                                     FROM tb_detail_permintaan d 
-                                                    JOIN tb_barang_bergerak b ON d.barang_id = b.id 
+                                                    JOIN tb_barang_habis_pakai b ON d.barang_id = b.id 
                                                     WHERE d.permintaan_id = '$id_hist'");
 
                 while ($dh = mysqli_fetch_assoc($q_detail_hist)) {

@@ -36,7 +36,7 @@ class AutentikasiController
                     $role_db = $data['role'];
 
                     if ($role_db == 'super admin') {
-                        $_SESSION['role'] = 'super_admin';
+                        $_SESSION['role'] = 'super admin';
                     } elseif ($role_db == 'admin gudang') {
                         $_SESSION['role'] = 'admin';
                     } elseif ($role_db == 'staff') {
@@ -46,7 +46,7 @@ class AutentikasiController
                     }
 
                     // Redirect ke dashboard
-                    header('Location: https://pesona.bpmpbali.id/');
+                    header('Location: /aplikasi-pesona-private/');
                     exit;
                 }
             } else {

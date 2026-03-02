@@ -147,7 +147,7 @@
                                                                     <div class="col-md-6 border-right">
                                                                         <h6 class="font-weight-bold text-primary mb-3">Data Barang</h6>
                                                                         <div class="form-group">
-                                                                            <label>Nama Barang</label>
+                                                                            <label>Nama Barang <span class="text-danger">*</span></label>
                                                                             <input type="text" name="nama_barang" class="form-control" value="<?= $row['nama_barang']; ?>" required>
                                                                         </div>
                                                                         <div class="form-group">
@@ -178,7 +178,7 @@
                                                                         <h6 class="font-weight-bold text-primary mb-3">Data Peminjaman</h6>
 
                                                                         <div class="form-group">
-                                                                            <label>Yang Menerima (Staf)</label>
+                                                                            <label>Yang Menerima (Staf) <span class="text-danger">*</span></label>
                                                                             <select name="id_penerima" class="form-control select2-modal-edit" style="width: 100%" required>
                                                                                 <option value="">-- Pilih Staf --</option>
                                                                                 <?php foreach ($list_pegawai as $pgw): ?>
@@ -190,7 +190,7 @@
                                                                         </div>
 
                                                                         <div class="form-group">
-                                                                            <label>Tanggal Serah Terima</label>
+                                                                            <label>Tanggal Serah Terima <span class="text-danger">*</span></label>
                                                                             <input type="date" name="tgl_serah_terima" class="form-control" value="<?= $row['tgl_serah_terima']; ?>" required>
                                                                         </div>
 
@@ -250,11 +250,11 @@
                                                                     Pastikan Berita Acara sudah ditandatangani basah dan distempel sebelum diupload.
                                                                 </div>
                                                                 <div class="form-group">
-                                                                    <label>Scan Berita Acara (PDF)</label>
+                                                                    <label>Scan Berita Acara (PDF) <span class="text-danger">*</span></label>
                                                                     <input type="file" name="file_ba" class="form-control-file" accept=".pdf" required>
                                                                 </div>
                                                                 <div class="form-group">
-                                                                    <label>Foto Bukti Penyerahan (JPG/PNG)</label>
+                                                                    <label>Foto Bukti Penyerahan (JPG/PNG) <span class="text-danger">*</span></label>
                                                                     <input type="file" name="foto_bukti" class="form-control-file" accept="image/*" required>
                                                                 </div>
                                                             </div>
@@ -287,29 +287,29 @@
                                         <div class="col-md-6 border-right">
                                             <h6 class="font-weight-bold text-primary mb-3">Data Barang</h6>
                                             <div class="form-group">
-                                                <label>Nama Barang</label>
+                                                <label>Nama Barang <span class="text-danger">*</span></label>
                                                 <input type="text" name="nama_barang" class="form-control" placeholder="Contoh: Laptop / Proyektor" required>
                                             </div>
                                             <div class="form-group">
-                                                <label>Merek</label>
+                                                <label>Merek <span class="text-danger">*</span></label>
                                                 <input type="text" name="merek" class="form-control" required>
                                             </div>
                                             <div class="row">
                                                 <div class="col-6">
                                                     <div class="form-group">
-                                                        <label>Kode Barang</label>
+                                                        <label>Kode Barang <span class="text-danger">*</span></label>
                                                         <input type="text" name="kode_barang" class="form-control" required>
                                                     </div>
                                                 </div>
                                                 <div class="col-6">
                                                     <div class="form-group">
-                                                        <label>NUP</label>
+                                                        <label>NUP <span class="text-danger">*</span></label>
                                                         <input type="text" name="nup" class="form-control" required>
                                                     </div>
                                                 </div>
                                             </div>
                                             <div class="form-group">
-                                                <label>Tahun Perolehan</label>
+                                                <label>Tahun Perolehan <span class="text-danger">*</span></label>
                                                 <input type="number" name="tahun_perolehan" class="form-control" placeholder="YYYY" required>
                                             </div>
                                         </div>
@@ -323,7 +323,7 @@
                                             </div>
 
                                             <div class="form-group">
-                                                <label>Yang Menerima (Staf)</label>
+                                                <label>Yang Menerima (Staf) <span class="text-danger">*</span></label>
                                                 <select name="id_penerima" class="form-control select2-modal" style="width: 100%" required>
                                                     <option value="">-- Pilih Staf --</option>
                                                     <?php foreach ($list_pegawai as $pgw): ?>
@@ -335,12 +335,12 @@
                                             </div>
 
                                             <div class="form-group">
-                                                <label>Tanggal Serah Terima</label>
+                                                <label>Tanggal Serah Terima <span class="text-danger">*</span></label>
                                                 <input type="date" name="tgl_serah_terima" class="form-control" value="<?= date('Y-m-d'); ?>" required>
                                             </div>
 
                                             <div class="form-group bg-light p-2 rounded border">
-                                                <label>Tanggal Kembali</label>
+                                                <label>Tanggal Kembali <span class="text-danger">*</span></label>
                                                 <div class="custom-control custom-checkbox mb-2">
                                                     <input type="checkbox" class="custom-control-input" id="checkJangkaPanjang" name="jangka_panjang" value="1">
                                                     <label class="custom-control-label small text-primary font-weight-bold" for="checkJangkaPanjang">

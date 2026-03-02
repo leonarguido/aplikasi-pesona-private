@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <title>BA Pengembalian - <?= $data['nama_barang']; ?></title>
     <?php
-    define('BASE_URL', 'https://pesona.bpmpbali.id/routes/web.php/?page=');
-    define('ASSETS_URL', 'https://pesona.bpmpbali.id/assets/');
+    define('BASE_URL', '/aplikasi-pesona-private/routes/web.php/?page=');
+    define('ASSETS_URL', '/aplikasi-pesona-private/assets/');
     ?>
     <style>
         /* CSS LAYAR UTAMA */

@@ -2,9 +2,9 @@
 
 class LogBarangController
 {
-    protected $base_url = 'https://pesona.bpmpbali.id/routes/web.php/?page=';
+    protected $base_url = '/aplikasi-pesona-private/routes/web.php/?page=';
 
-    public function log_barang_bergerak()
+    public function log_barang_habis_pakai()
     {
         require __DIR__ . '/../config/koneksi.php';
         session_start();
@@ -18,7 +18,7 @@ class LogBarangController
             // echo "<script>alert('Akses Ditolak!'); window.location='index.php';</script>";
             $_SESSION['alert'] = [
                 'icon' => 'error',
-'title' => 'Gagal!',
+                'title' => 'Gagal!',
                 'text' => 'Akses Ditolak!',
             ];
             header("Location: index.php");
@@ -35,7 +35,7 @@ class LogBarangController
             $status_permintaan = '';
         }
 
-        require_once '../views/pimpinan/log_barang_bergerak.php';
+        require_once '../views/pimpinan/log_barang_habis_pakai.php';
     }
 
     public function edit_log_stok_barang()
@@ -52,17 +52,17 @@ class LogBarangController
 
             if ($stok_baru < $stok_lama) {
                 $selisih = $stok_lama - $stok_baru;
-                mysqli_query($koneksi, "UPDATE tb_barang_bergerak SET stok= stok-'$selisih' WHERE kode_barang='$kode' AND is_deleted=0");
+                mysqli_query($koneksi, "UPDATE tb_barang_habis_pakai SET stok= stok-'$selisih' WHERE kode_barang='$kode' AND is_deleted=0");
             } else {
                 $selisih = $stok_baru - $stok_lama;
-                mysqli_query($koneksi, "UPDATE tb_barang_bergerak SET stok= stok+'$selisih' WHERE kode_barang='$kode' AND is_deleted=0");
+                mysqli_query($koneksi, "UPDATE tb_barang_habis_pakai SET stok= stok+'$selisih' WHERE kode_barang='$kode' AND is_deleted=0");
             }
 
-            $query = "UPDATE tb_log_barang_bergerak SET stok= '$stok_baru', keterangan='$desc' WHERE id='$id'";
+            $query = "UPDATE tb_log_barang_habis_pakai SET stok= '$stok_baru', keterangan='$desc' WHERE id='$id'";
             if (mysqli_query($koneksi, $query)) {
                 $_SESSION['alert'] = [
                     'icon' => 'success',
-'title' => 'Berhasil!',
+                    'title' => 'Berhasil!',
                     'text' => 'Data log barang berhasil diupdate!',
                 ];
                 header("Location: " . $this->base_url . "log_barang");
@@ -71,7 +71,7 @@ class LogBarangController
         }
     }
 
-    public function ajax_load_log_barang_bergerak()
+    public function ajax_load_log_barang_habis_pakai()
     {
         require __DIR__ . '/../config/koneksi.php';
 
@@ -92,9 +92,9 @@ class LogBarangController
                     l.aksi,
                     l.stok,
                     l.keterangan
-                FROM tb_log_barang_bergerak l
+                FROM tb_log_barang_habis_pakai l
                 JOIN tb_user u ON l.admin_id = u.id
-                JOIN tb_barang_bergerak b ON l.barang_id = b.id
+                JOIN tb_barang_habis_pakai b ON l.barang_id = b.id
                 WHERE MONTH(l.tanggal) = '$bulan' AND YEAR(l.tanggal) = '$tahun'
             ");
 
@@ -160,7 +160,7 @@ class LogBarangController
     }
 
     // PROSES LOG DATA BARANG
-    public function proses_log_barang_bergerak($id_admin, $data, $aksi)
+    public function proses_log_barang_habis_pakai($id_admin, $data, $aksi)
     {
         require __DIR__ . '/../config/koneksi.php';
 
@@ -169,7 +169,7 @@ class LogBarangController
             $data_baru = $data['data_baru'];
             $log = "data {$data_baru['nama_barang']} telah ditambahkan oleh admin";
 
-            $query = "INSERT INTO tb_log_barang_bergerak (admin_id, barang_id, aksi, keterangan, tanggal) 
+            $query = "INSERT INTO tb_log_barang_habis_pakai (admin_id, barang_id, aksi, keterangan, tanggal) 
                       VALUES ('$id_admin', '$id_barang', '$aksi', '$log', NOW())";
 
             mysqli_query($koneksi, $query);
@@ -180,7 +180,7 @@ class LogBarangController
             $data_lama = $data['data_lama'];
 
             if (in_array('stok', $kolom)) {
-                $query = "INSERT INTO tb_log_barang_bergerak (admin_id, barang_id, aksi, stok, keterangan, tanggal) 
+                $query = "INSERT INTO tb_log_barang_habis_pakai (admin_id, barang_id, aksi, stok, keterangan, tanggal) 
                       VALUES ('$id_admin', '$id_barang', '$aksi', '$data_baru[stok]', '$data_baru[keterangan]', NOW())";
 
                 mysqli_query($koneksi, $query);
@@ -206,7 +206,7 @@ class LogBarangController
                 }
                 $log = implode(', ', $perubahan);
 
-                $query = "INSERT INTO tb_log_barang_bergerak (admin_id, barang_id, aksi, keterangan, tanggal) 
+                $query = "INSERT INTO tb_log_barang_habis_pakai (admin_id, barang_id, aksi, keterangan, tanggal) 
                       VALUES ('$id_admin', '$id_barang', '$aksi', '$log', NOW())";
 
                 mysqli_query($koneksi, $query);
@@ -216,14 +216,14 @@ class LogBarangController
             $data_lama = $data['data_lama'];
             $log = "data {$data_lama['nama_barang']} telah dihapus oleh admin";
 
-            $query = "INSERT INTO tb_log_barang_bergerak (admin_id, barang_id, aksi, keterangan, tanggal) 
+            $query = "INSERT INTO tb_log_barang_habis_pakai (admin_id, barang_id, aksi, keterangan, tanggal) 
                       VALUES ('$id_admin', '$id_barang', '$aksi', '$log', NOW())";
 
             mysqli_query($koneksi, $query);
         }
     }
 
-    public function log_barang_tg()
+    public function log_aset_bmn()
     {
         require __DIR__ . '/../config/koneksi.php';
         session_start();
@@ -237,7 +237,7 @@ class LogBarangController
             // echo "<script>alert('Akses Ditolak!'); window.location='index.php';</script>";
             $_SESSION['alert'] = [
                 'icon' => 'error',
-'title' => 'Gagal!',
+                'title' => 'Gagal!',
                 'text' => 'Akses Ditolak!',
             ];
             header("Location: index.php");
@@ -254,11 +254,11 @@ class LogBarangController
             $status_permintaan = '';
         }
 
-        require_once '../views/pimpinan/log_barang_tg.php';
+        require_once '../views/pimpinan/log_aset_bmn.php';
     }
 
 
-    public function ajax_load_log_barang_tg()
+    public function ajax_load_log_aset_bmn()
     {
         require __DIR__ . '/../config/koneksi.php';
 
@@ -276,9 +276,9 @@ class LogBarangController
                     b.kode_barang,
                     b.nama_barang,
                     l.aksi
-                FROM tb_log_barang_tidak_bergerak l
+                FROM tb_log_aset_bmn l
                 JOIN tb_user u ON l.admin_id = u.id
-                JOIN tb_barang_tidak_bergerak b ON l.barang_tidak_bergerak_id = b.id
+                JOIN tb_aset_bmn b ON l.aset_bmn_id = b.id
                 WHERE MONTH(l.tanggal) = '$bulan' AND YEAR(l.tanggal) = '$tahun'
             ");
 
@@ -315,13 +315,13 @@ class LogBarangController
     }
 
     // PROSES LOG DATA BARANG
-    public function proses_log_barang_tg($id_admin, $id_barang, $aksi)
+    public function proses_log_aset_bmn($id_admin, $id_barang, $aksi)
     {
         require __DIR__ . '/../config/koneksi.php';
         session_start();
 
         if ($id_barang != null && $aksi != null) {
-            $query = "INSERT INTO tb_log_barang_tidak_bergerak (admin_id, barang_tidak_bergerak_id, tanggal, aksi) 
+            $query = "INSERT INTO tb_log_aset_bmn (admin_id, aset_bmn_id, tanggal, aksi) 
                   VALUES ('$id_admin', '$id_barang', NOW(), '$aksi')";
 
             mysqli_query($koneksi, $query);

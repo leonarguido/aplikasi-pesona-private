@@ -62,7 +62,7 @@
                                                         <?php
                                                         $q_detail_hist = mysqli_query($koneksi, "SELECT d.jumlah, d.satuan, b.nama_barang, b.satuan, b.merek_barang
                                                                              FROM tb_detail_permintaan d 
-                                                                             JOIN tb_barang_bergerak b ON d.barang_id = b.id 
+                                                                             JOIN tb_barang_habis_pakai b ON d.barang_id = b.id 
                                                                              WHERE d.permintaan_id = '$id_hist'");
 
                                                         while ($dh = mysqli_fetch_assoc($q_detail_hist)) {

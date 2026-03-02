@@ -3,10 +3,10 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Surat Permintaan Barang - #<?= $data['id']; ?></title>
+    <title>Surat Permintaan Barang - <?= $data['id']; ?></title>
     <?php
-    define('BASE_URL', 'https://pesona.bpmpbali.id/routes/web.php/?page=');
-    define('ASSETS_URL', 'https://pesona.bpmpbali.id/assets/');
+    define('BASE_URL', '/aplikasi-pesona-private/routes/web.php/?page=');
+    define('ASSETS_URL', '/aplikasi-pesona-private/assets/');
     ?>
     <style>
         /* UTAMA */
@@ -219,7 +219,7 @@
                     <?php
                     $q_detail = mysqli_query($koneksi, "SELECT d.*, b.nama_barang, b.satuan, b.kode_barang 
                                                     FROM tb_detail_permintaan d
-                                                    JOIN tb_barang_bergerak b ON d.barang_id = b.id
+                                                    JOIN tb_barang_habis_pakai b ON d.barang_id = b.id
                                                     WHERE d.permintaan_id = '$id_permintaan'");
                     $no = 1;
                     while ($item = mysqli_fetch_assoc($q_detail)):

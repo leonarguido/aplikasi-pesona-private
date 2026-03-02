@@ -3,7 +3,7 @@
 
 <head>
     <?php require __DIR__ . '/../layout/header.php'; ?>
-    <?php $judul_halaman = "Barang Tidak Bergerak"; ?>
+    <?php $judul_halaman = "Aset BMN Saya"; ?>
 </head>
 
 <body id="page-top">
@@ -32,7 +32,7 @@
 
                         <div class="card shadow mb-4">
                             <div class="card-header py-3">
-                                <h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-list"></i> Daftar Barang Tidak Bergerak Anda</h6>
+                                <h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-list"></i> Daftar Aset BMN Anda</h6>
                             </div>
                             <div class="card-body">
                                 <div class="table-responsive">
@@ -54,7 +54,7 @@
                                             if (!empty($nip_user)) {
                                                 $no = 1;
                                                 // Query mencari barang berdasarkan NIP user yang login
-                                                $query = mysqli_query($koneksi, "SELECT * FROM tb_barang_tidak_bergerak WHERE nip = $nip_user AND is_deleted=0 ORDER BY nama_barang ASC");
+                                                $query = mysqli_query($koneksi, "SELECT * FROM tb_aset_bmn WHERE nip = $nip_user AND is_deleted=0 ORDER BY nama_barang ASC");
 
                                                 // Cek jika data ditemukan
                                                 if (mysqli_num_rows($query) > 0) {

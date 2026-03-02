@@ -62,18 +62,18 @@ if (isset($_GET['page'])) {
             $admin->hapus_data_barang();
             break;
 
-        // DATA BARANG TIDAK BERGERAK
-        case 'data_barang_tg':
-            $admin->data_barang_tg();
+        // DATA BARANG ASET BMN
+        case 'data_aset_bmn':
+            $admin->data_aset_bmn();
             break;
-        case 'tambah_data_barang_tg':
-            $admin->tambah_data_barang_tg();
+        case 'tambah_data_aset_bmn':
+            $admin->tambah_data_aset_bmn();
             break;
-        case 'edit_data_barang_tg':
-            $admin->edit_data_barang_tg();
+        case 'edit_data_aset_bmn':
+            $admin->edit_data_aset_bmn();
             break;
-        case 'hapus_data_barang_tg':
-            $admin->hapus_data_barang_tg();
+        case 'hapus_data_aset_bmn':
+            $admin->hapus_data_aset_bmn();
             break;
 
         // PROSES PERSETUJUAN ADMIN
@@ -90,7 +90,7 @@ if (isset($_GET['page'])) {
             $admin->proses_penolakan();
             break;
 
-        // DATA BARANG TIDAK BERGERAK
+        // DATA BARANG ASET BMN
         case 'input_peminjaman_barang':
             $admin->input_peminjaman_barang_page();
             break;
@@ -239,19 +239,19 @@ if (isset($_GET['page'])) {
         // RUTE LOG BARANG CONTROLLER
         // ==========================================
         case 'log_barang':
-            $logBarang->log_barang_bergerak();
+            $logBarang->log_barang_habis_pakai();
             break;
         case 'edit_log_stok_barang':
             $logBarang->edit_log_stok_barang();
             break;
-        case 'ajax_load_log_barang_bergerak':
-            $logBarang->ajax_load_log_barang_bergerak();
+        case 'ajax_load_log_barang_habis_pakai':
+            $logBarang->ajax_load_log_barang_habis_pakai();
             break;
-        case 'log_barang_tg':
-            $logBarang->log_barang_tg();
+        case 'log_aset_bmn':
+            $logBarang->log_aset_bmn();
             break;
-        case 'ajax_load_log_barang_tg':
-            $logBarang->ajax_load_log_barang_tg();
+        case 'ajax_load_log_aset_bmn':
+            $logBarang->ajax_load_log_aset_bmn();
             break;
 
         // Default action or 404

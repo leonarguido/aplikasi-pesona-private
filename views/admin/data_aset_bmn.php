@@ -23,7 +23,7 @@
     </style>
 
     <?php require __DIR__ . '/../layout/header.php'; ?>
-    <?php $judul_halaman = "Data Barang Tidak Bergerak"; ?>
+    <?php $judul_halaman = "Data Aset BMN"; ?>
 
 </head>
 
@@ -68,7 +68,7 @@
                                         $no = 1;
                                         $query = mysqli_query($koneksi, "
                                             SELECT b.*, u.nama AS nama_pegawai 
-                                            FROM tb_barang_tidak_bergerak b 
+                                            FROM tb_aset_bmn b 
                                             LEFT JOIN tb_user u ON b.nip = u.nip 
                                             WHERE b.is_deleted=0
                                             ORDER BY b.nama_barang ASC
@@ -104,7 +104,7 @@
                                                         <button class="btn btn-warning btn-sm btn-circle" data-toggle="modal" data-target="#modalEdit<?= $row['id']; ?>" title="Edit">
                                                             <i class="fas fa-edit"></i>
                                                         </button>
-                                                        <a href="<?= BASE_URL ?>hapus_data_barang_tg&hapus=<?= $row['id']; ?>" class="btn btn-danger btn-sm btn-circle" onclick="return confirm('Hapus data ini?')" title="Hapus">
+                                                        <a href="<?= BASE_URL ?>hapus_data_aset_bmn&hapus=<?= $row['id']; ?>" class="btn btn-danger btn-sm btn-circle" onclick="confirmHapus(event, this.href)">
                                                             <i class="fas fa-trash"></i>
                                                         </a>
                                                     </td>
@@ -119,12 +119,12 @@
                                                                 <h5 class="modal-title">Edit Aset</h5>
                                                                 <button class="close" data-dismiss="modal">&times;</button>
                                                             </div>
-                                                            <form method="POST" enctype="multipart/form-data" action="<?= BASE_URL ?>edit_data_barang_tg">
+                                                            <form method="POST" enctype="multipart/form-data" action="<?= BASE_URL ?>edit_data_aset_bmn">
                                                                 <div class="modal-body">
                                                                     <input type="hidden" name="id" value="<?= $row['id']; ?>">
 
                                                                     <div class="form-group">
-                                                                        <label>Penanggung Jawab (NIP)</label>
+                                                                        <label>Penanggung Jawab (NIP) <span class="text-danger">*</span></label>
                                                                         <select name="nip" id="selectNipEdit" class="form-control select2-edit" style="width:100%" required>
                                                                             <option value="">-- Pilih Pegawai --</option>
                                                                             <?php foreach ($list_pegawai as $pgw): ?>
@@ -136,14 +136,14 @@
                                                                     </div>
                                                                     <div class=" form-group"><label>Kode Barang</label><input type="text" name="kode_barang" class="form-control" value="<?= $row['kode_barang']; ?>">
                                                                     </div>
-                                                                    <div class="form-group"><label>Nama Barang</label><input type="text" name="nama_barang" class="form-control" value="<?= $row['nama_barang']; ?>" required></div>
+                                                                    <div class="form-group"><label>Nama Barang <span class="text-danger">*</span></label><input type="text" name="nama_barang" class="form-control" value="<?= $row['nama_barang']; ?>" required></div>
                                                                     <div class="form-group"><label>Merek</label><input type="text" name="merek_barang" class="form-control" value="<?= $row['merek_barang']; ?>"></div>
                                                                     <div class="row">
                                                                         <div class="col-md-6">
-                                                                            <div class="form-group"><label>Jumlah</label><input type="number" name="jumlah" class="form-control" value="<?= $row['jumlah']; ?>" required></div>
+                                                                            <div class="form-group"><label>Jumlah <span class="text-danger">*</span></label><input type="number" name="jumlah" class="form-control" value="<?= $row['jumlah']; ?>" required></div>
                                                                         </div>
                                                                         <div class="col-md-6">
-                                                                            <div class="form-group"><label>Satuan</label><input type="text" name="satuan" class="form-control" value="<?= $row['satuan']; ?>" required></div>
+                                                                            <div class="form-group"><label>Satuan <span class="text-danger">*</span></label><input type="text" name="satuan" class="form-control" value="<?= $row['satuan']; ?>" required></div>
                                                                         </div>
                                                                     </div>
                                                                     <div class="form-group"><label>Keterangan / Lokasi</label><textarea name="keterangan" class="form-control"><?= $row['keterangan']; ?></textarea></div>
@@ -179,10 +179,10 @@
                         <h5 class="modal-title">Tambah Aset Baru</h5>
                         <button class="close text-white" data-dismiss="modal">&times;</button>
                     </div>
-                    <form method="POST" enctype="multipart/form-data" action="<?= BASE_URL ?>tambah_data_barang_tg">
+                    <form method="POST" enctype="multipart/form-data" action="<?= BASE_URL ?>tambah_data_aset_bmn">
                         <div class="modal-body">
                             <div class="form-group">
-                                <label>Penanggung Jawab (NIP)</label>
+                                <label>Penanggung Jawab (NIP) <span class="text-danger">*</span></label>
                                 <select name="nip" id="selectNipTambah" class="form-control" style="width:100%" required>
                                     <option value="">-- Pilih Pegawai --</option>
                                     <?php foreach ($list_pegawai as $pgw): ?>
@@ -193,11 +193,11 @@
                                 </select>
                             </div>
                             <div class="form-group"><label>Kode Barang (Opsional)</label><input type="text" name="kode_barang" class="form-control" placeholder="Contoh: INV-LAP-01"></div>
-                            <div class="form-group"><label>Nama Barang</label><input type="text" name="nama_barang" class="form-control" required placeholder="Contoh: Laptop"></div>
+                            <div class="form-group"><label>Nama Barang <span class="text-danger">*</span></label><input type="text" name="nama_barang" class="form-control" required placeholder="Contoh: Laptop"></div>
                             <div class="form-group"><label>Merek</label><input type="text" name="merek_barang" class="form-control" placeholder="Contoh: Asus / Lenovo"></div>
                             <div class="row">
                                 <div class="col-md-6">
-                                    <div class="form-group"><label>Jumlah</label><input type="number" name="jumlah" class="form-control" required></div>
+                                    <div class="form-group"><label>Jumlah <span class="text-danger">*</span></label><input type="number" name="jumlah" class="form-control" required></div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group"><label>Satuan</label>

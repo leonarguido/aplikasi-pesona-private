@@ -4,7 +4,7 @@ require 'config/koneksi.php';
 
 // 1. Cek Login
 if (!isset($_SESSION['user_id'])) {
-    header("Location: https://pesona.bpmpbali.id/routes/web.php?page=login");
+    header("Location: /aplikasi-pesona-private/routes/web.php?page=login");
     exit;
 }
 
@@ -33,13 +33,13 @@ $id_user = $_SESSION['user_id'];
                 <?php require 'views/layout/topbar.php'; ?>
 
                 <div class="container-fluid mt-4">
-                    <?php if ($role == 'admin' || $role == 'super_admin'): ?>
+                    <?php if ($role == 'admin' || $role == 'super admin'): ?>
 
                         <?php
                         // --- LOGIKA HITUNG DATA GUDANG (HANYA DIJALANKAN JIKA ADMIN) ---
 
                         // 1. Total Jenis Barang
-                        $q_barang = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM tb_barang_bergerak");
+                        $q_barang = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM tb_barang_habis_pakai");
                         $total_barang = mysqli_fetch_assoc($q_barang)['total'];
 
                         // 2. Permintaan Menunggu (Global)
@@ -53,7 +53,7 @@ $id_user = $_SESSION['user_id'];
 
                         // 4. Stok Menipis
                         $ambang_batas = 10;
-                        $q_menipis = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM tb_barang_bergerak WHERE stok <= '$ambang_batas'");
+                        $q_menipis = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM tb_barang_habis_pakai WHERE stok <= '$ambang_batas'");
                         $total_menipis = mysqli_fetch_assoc($q_menipis)['total'];
                         ?>
 
@@ -137,7 +137,7 @@ $id_user = $_SESSION['user_id'];
                                                 </thead>
                                                 <tbody>
                                                     <?php
-                                                    $q_low = mysqli_query($koneksi, "SELECT * FROM tb_barang_bergerak WHERE is_deleted=0 AND stok <= '$ambang_batas' ORDER BY stok ASC LIMIT 5");
+                                                    $q_low = mysqli_query($koneksi, "SELECT * FROM tb_barang_habis_pakai WHERE is_deleted=0 AND stok <= '$ambang_batas' ORDER BY stok ASC LIMIT 5");
                                                     if (mysqli_num_rows($q_low) > 0):
                                                         while ($low = mysqli_fetch_assoc($q_low)):
                                                     ?>
@@ -220,21 +220,21 @@ $id_user = $_SESSION['user_id'];
                         // --- LOGIKA HITUNG DATA GUDANG (HANYA DIJALANKAN JIKA PIMPINAN) ---
 
                         // 1. Total Jenis Barang
-                        $q_barang = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM tb_barang_bergerak");
+                        $q_barang = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM tb_barang_habis_pakai");
                         $total_barang = mysqli_fetch_assoc($q_barang)['total'];
 
                         // 2. Stok Aman
                         $ambang_batas = 10;
-                        $q_aman = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM tb_barang_bergerak WHERE stok > '$ambang_batas'");
+                        $q_aman = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM tb_barang_habis_pakai WHERE stok > '$ambang_batas'");
                         $total_aman = mysqli_fetch_assoc($q_aman)['total'];
 
                         // 3. Stok Menipis
                         $ambang_batas = 10;
-                        $q_menipis = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM tb_barang_bergerak WHERE stok <= '$ambang_batas'");
+                        $q_menipis = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM tb_barang_habis_pakai WHERE stok <= '$ambang_batas'");
                         $total_menipis = mysqli_fetch_assoc($q_menipis)['total'];
 
                         // 4. Stok Habis
-                        $q_habis = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM tb_barang_bergerak WHERE stok = 0");
+                        $q_habis = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM tb_barang_habis_pakai WHERE stok = 0");
                         $total_habis = mysqli_fetch_assoc($q_habis)['total'];
 
                         // 1. Total Transaksi Berhasil (Seluruh Bulan)
@@ -415,7 +415,7 @@ $id_user = $_SESSION['user_id'];
                                                 </thead>
                                                 <tbody>
                                                     <?php
-                                                    $q_low = mysqli_query($koneksi, "SELECT * FROM tb_barang_bergerak WHERE is_deleted=0 AND stok <= '$ambang_batas' ORDER BY stok ASC LIMIT 5");
+                                                    $q_low = mysqli_query($koneksi, "SELECT * FROM tb_barang_habis_pakai WHERE is_deleted=0 AND stok <= '$ambang_batas' ORDER BY stok ASC LIMIT 5");
                                                     if (mysqli_num_rows($q_low) > 0):
                                                         while ($low = mysqli_fetch_assoc($q_low)):
                                                     ?>

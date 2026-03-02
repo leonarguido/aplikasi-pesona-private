@@ -62,7 +62,7 @@
                                                         <?php
                                                         $q_d = mysqli_query($koneksi, "SELECT d.jumlah, d.satuan, b.nama_barang, b.stok, b.merek_barang
                                                                    FROM tb_detail_permintaan d 
-                                                                   JOIN tb_barang_bergerak b ON d.barang_id = b.id 
+                                                                   JOIN tb_barang_habis_pakai b ON d.barang_id = b.id 
                                                                    WHERE d.permintaan_id = '$id_req'");
                                                         while ($d = mysqli_fetch_assoc($q_d)) {
                                                             $status_stok = ($d['stok'] >= $d['jumlah'])
@@ -128,7 +128,7 @@
                                                     <?php
                                                     $q_modal = mysqli_query($koneksi, "SELECT d.id AS id_detail, d.jumlah, d.satuan, b.nama_barang, b.stok, b.merek_barang
                                                                    FROM tb_detail_permintaan d 
-                                                                   JOIN tb_barang_bergerak b ON d.barang_id = b.id 
+                                                                   JOIN tb_barang_habis_pakai b ON d.barang_id = b.id 
                                                                    WHERE d.permintaan_id = '$id_req'");
                                                     while ($dm = mysqli_fetch_assoc($q_modal)):
                                                     ?>

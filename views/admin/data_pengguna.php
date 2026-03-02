@@ -62,7 +62,7 @@
                                                     <?php endif; ?>
                                                 </td>
                                                 <td class="text-center">
-                                                    <?php if (!empty($row['paraf'])):?>
+                                                    <?php if (!empty($row['paraf'])): ?>
                                                         <img src="<?= ASSETS_URL ?>img/ttd/<?= $row['paraf']; ?>" alt="TTD" style="height: 40px;">
                                                     <?php else: ?>
                                                         <span class="text-muted"><small>Belum ada</small></span>
@@ -72,7 +72,7 @@
                                                     <button class="btn btn-warning btn-sm btn-circle" data-toggle="modal" data-target="#modalEdit<?= $row['id']; ?>" title="Edit">
                                                         <i class="fas fa-edit"></i>
                                                     </button>
-                                                    <a href="<?= BASE_URL ?>hapus_data_pengguna&hapus=<?= $row['id']; ?>" class="btn btn-danger btn-sm btn-circle" onclick="return confirm('Hapus User <?= $row['nama']; ?>?')" title="Hapus">
+                                                    <a href="<?= BASE_URL ?>hapus_data_pengguna&hapus=<?= $row['id']; ?>" class="btn btn-danger btn-sm btn-circle" onclick="confirmHapus(event, this.href)">
                                                         <i class="fas fa-trash"></i>
                                                     </a>
                                                 </td>
@@ -89,15 +89,15 @@
                                                             <div class="modal-body">
                                                                 <input type="hidden" name="id_user" value="<?= $row['id']; ?>">
                                                                 <div class="form-group">
-                                                                    <label>Nama Lengkap</label>
+                                                                    <label>Nama Lengkap <span class="text-danger">*</span></label>
                                                                     <input type="text" name="nama" class="form-control" value="<?= $row['nama']; ?>" required>
                                                                 </div>
                                                                 <div class="form-group">
-                                                                    <label>NIP (Opsional)</label>
-                                                                    <input type="text" name="nip" class="form-control" value="<?= $row['nip']; ?>">
+                                                                    <label>NIP <span class="text-danger">*</span></label>
+                                                                    <input type="text" name="nip" class="form-control" value="<?= $row['nip']; ?>" required minlength="18" pattern="^\d{18}$" title="NIP harus terdiri dari 18 digit angka">
                                                                 </div>
                                                                 <div class="form-group">
-                                                                    <label>Username</label>
+                                                                    <label>Username <span class="text-danger">*</span></label>
                                                                     <input type="text" name="username" class="form-control" value="<?= $row['username']; ?>" required>
                                                                 </div>
                                                                 <div class="form-group">
@@ -105,7 +105,7 @@
                                                                     <input type="password" name="password" class="form-control" placeholder="***">
                                                                 </div>
                                                                 <div class="form-group">
-                                                                    <label>Role / Jabatan</label>
+                                                                    <label>Role / Jabatan <span class="text-danger">*</span></label>
                                                                     <select name="role" class="form-control" required>
                                                                         <option value="staff" <?= $row['role'] == 'user' ? 'selected' : ''; ?>>User / Staff</option>
 
@@ -146,23 +146,23 @@
                             <form method="POST" enctype="multipart/form-data" action="<?= BASE_URL ?>tambah_data_pengguna">
                                 <div class="modal-body">
                                     <div class="form-group">
-                                        <label>Nama Lengkap</label>
+                                        <label>Nama Lengkap <span class="text-danger">*</span></label>
                                         <input type="text" name="nama" class="form-control" required>
                                     </div>
                                     <div class="form-group">
-                                        <label>NIP (Opsional)</label>
-                                        <input type="text" name="nip" class="form-control">
+                                        <label>NIP <span class="text-danger">*</span></label>
+                                        <input type="text" name="nip" class="form-control" required minlength="18" pattern="^\d{18}$" title="NIP harus terdiri dari 18 digit angka">
                                     </div>
                                     <div class="form-group">
-                                        <label>Username</label>
+                                        <label>Username <span class="text-danger">*</span></label>
                                         <input type="text" name="username" class="form-control" required>
                                     </div>
                                     <div class="form-group">
-                                        <label>Password</label>
+                                        <label>Password <span class="text-danger">*</span></label>
                                         <input type="password" name="password" class="form-control" required>
                                     </div>
                                     <div class="form-group">
-                                        <label>Role / Jabatan</label>
+                                        <label>Role / Jabatan<span class="text-danger">*</span></label>
                                         <select name="role" class="form-control" required>
                                             <option value="staff">User / Staff</option>
 
@@ -196,26 +196,44 @@
 
     <script>
         $(document).ready(function() {
-        if (!$.fn.DataTable.isDataTable('#dataTable')) {
-            $('#dataTable').DataTable({
-                "language": {
-                    "search": "Cari Pengguna:",
-                    "lengthMenu": "Tampilkan _MENU_ antrian",
-                    "zeroRecords": "Tidak ada pengguna yang cocok",
-                    "info": "Menampilkan _PAGE_ dari _PAGES_",
-                    "infoEmpty": "Tidak ada data",
-                    "infoFiltered": "(difilter dari _MAX_ total data)",
-                    "paginate": {
-                        "first": "Awal",
-                        "last": "Akhir",
-                        "next": "Lanjut",
-                        "previous": "Kembali"
+            if (!$.fn.DataTable.isDataTable('#dataTable')) {
+                $('#dataTable').DataTable({
+                    "language": {
+                        "search": "Cari Pengguna:",
+                        "lengthMenu": "Tampilkan _MENU_ antrian",
+                        "zeroRecords": "Tidak ada pengguna yang cocok",
+                        "info": "Menampilkan _PAGE_ dari _PAGES_",
+                        "infoEmpty": "Tidak ada data",
+                        "infoFiltered": "(difilter dari _MAX_ total data)",
+                        "paginate": {
+                            "first": "Awal",
+                            "last": "Akhir",
+                            "next": "Lanjut",
+                            "previous": "Kembali"
+                        }
                     }
+                });
+            }
+        });
+
+        function confirmHapus(event, url) {
+            event.preventDefault();
+
+            Swal.fire({
+                title: 'Yakin?',
+                text: 'Data pengguna akan dihapus!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Ya, hapus!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = url;
                 }
             });
         }
-    });
-         
     </script>
 </body>
 

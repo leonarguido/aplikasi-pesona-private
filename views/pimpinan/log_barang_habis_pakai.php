@@ -99,7 +99,7 @@
         function load_log($bulan_angka, $tahun_angka) {
             // console.log("Loading LOG BARANG untuk bulan: " + $bulan_angka + ", tahun: " + $tahun_angka);
             $.ajax({
-                url: '<?= BASE_URL ?>ajax_load_log_barang_bergerak',
+                url: '<?= BASE_URL ?>ajax_load_log_barang_habis_pakai',
                 type: 'POST',
                 data: {
                     bulan_angka_post: $bulan_angka,

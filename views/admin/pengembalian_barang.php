@@ -124,11 +124,11 @@
                                                                 <p>Barang: <b><?= $row['nama_barang']; ?></b><br>Peminjam: <b><?= $row['nama_peminjam']; ?></b></p>
                                                                 <hr>
                                                                 <div class="form-group">
-                                                                    <label>Tanggal Dikembalikan</label>
+                                                                    <label>Tanggal Dikembalikan <span class="text-danger">*</span></label>
                                                                     <input type="date" name="tgl_dikembalikan" class="form-control" value="<?= date('Y-m-d'); ?>" required>
                                                                 </div>
                                                                 <div class="form-group">
-                                                                    <label>Kondisi Barang Saat Dikembalikan</label>
+                                                                    <label>Kondisi Barang Saat Dikembalikan <span class="text-danger">*</span></label>
                                                                     <select name="kondisi_kembali" class="form-control" required>
                                                                         <option value="">-- Pilih Kondisi --</option>
                                                                         <option value="Baik dan Lengkap">Baik dan Lengkap</option>
@@ -162,12 +162,12 @@
                                                                 </div>
 
                                                                 <div class="form-group">
-                                                                    <label>Upload BA Pengembalian (PDF)</label>
+                                                                    <label>Upload BA Pengembalian (PDF) <span class="text-danger">*</span></label>
                                                                     <input type="file" name="file_ba_kembali" class="form-control-file" accept=".pdf" required>
                                                                 </div>
 
                                                                 <div class="form-group">
-                                                                    <label>Foto Bukti Pengembalian (JPG/PNG)</label>
+                                                                    <label>Foto Bukti Pengembalian (JPG/PNG) <span class="text-danger">*</span></label>
                                                                     <input type="file" name="foto_bukti_kembali" class="form-control-file" accept="image/*" required>
                                                                     <small class="text-muted">Foto barang saat dikembalikan sebagai bukti kondisi fisik.</small>
                                                                 </div>

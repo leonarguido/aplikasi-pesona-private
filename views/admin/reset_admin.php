@@ -11,7 +11,7 @@ $hapus = mysqli_query($koneksi, "DELETE FROM users WHERE username = '$username'"
 
 // 2. Buat user BARU
 $query = "INSERT INTO users (username, password, full_name, role) 
-          VALUES ('$username', '$password_hash', 'Super Administrator', 'super_admin')";
+          VALUES ('$username', '$password_hash', 'Super Administrator', 'super admin')";
 
 if(mysqli_query($koneksi, $query)){
     echo "<h1>SUKSES!</h1>";

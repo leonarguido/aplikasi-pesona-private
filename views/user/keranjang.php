@@ -48,7 +48,7 @@
                                                             <td><?= $item['jumlah']; ?></td>
                                                             <td><?= $item['satuan']; ?></td>
                                                             <td>
-                                                                <a href="<?= BASE_URL ?>hapus_keranjang_item&hapus=<?= $key; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Hapus item ini?')">
+                                                                <a href="<?= BASE_URL ?>hapus_keranjang_item&hapus=<?= $key; ?>" class="btn btn-danger btn-sm" onclick="confirmHapus(event, this.href)">
                                                                     <i class="fas fa-trash"></i>
                                                                 </a>
                                                             </td>
@@ -71,7 +71,7 @@
                                 <div class="card-body">
                                     <form method="POST" action="<?= BASE_URL ?>checkout_keranjang">
                                         <div class="form-group">
-                                            <label class="font-weight-bold small text-uppercase">Keperluan / Alasan</label>
+                                            <label class="font-weight-bold small text-uppercase">Keperluan / Alasan <span class="text-danger">*</span></label>
                                             <textarea name="keperluan" class="form-control" rows="4" placeholder="Contoh: Kebutuhan ATK Bulanan Divisi IT..." required></textarea>
                                             <small class="text-muted">Keperluan ini berlaku untuk semua barang di keranjang.</small>
                                         </div>
@@ -99,26 +99,45 @@
 
     <script>
         $(document).ready(function() {
-        if (!$.fn.DataTable.isDataTable('#dataTable')) {
-            $('#dataTable').DataTable({
-                "language": {
-                    "search": "Cari Barang:",
-                    "lengthMenu": "Tampilkan _MENU_ antrian",
-                    "zeroRecords": "Tidak ada barang yang cocok",
-                    "info": "Menampilkan _PAGE_ dari _PAGES_",
-                    "infoEmpty": "Tidak ada data",
-                    "infoFiltered": "(difilter dari _MAX_ total data)",
-                    "paginate": {
-                        "first": "Awal",
-                        "last": "Akhir",
-                        "next": "Lanjut",
-                        "previous": "Kembali"
+            if (!$.fn.DataTable.isDataTable('#dataTable')) {
+                $('#dataTable').DataTable({
+                    "language": {
+                        "search": "Cari Barang:",
+                        "lengthMenu": "Tampilkan _MENU_ antrian",
+                        "zeroRecords": "Tidak ada barang yang cocok",
+                        "info": "Menampilkan _PAGE_ dari _PAGES_",
+                        "infoEmpty": "Tidak ada data",
+                        "infoFiltered": "(difilter dari _MAX_ total data)",
+                        "paginate": {
+                            "first": "Awal",
+                            "last": "Akhir",
+                            "next": "Lanjut",
+                            "previous": "Kembali"
+                        }
                     }
+                });
+            }
+
+        });
+
+        function confirmHapus(event, url) {
+            event.preventDefault();
+
+            Swal.fire({
+                title: 'Yakin?',
+                text: 'Barang akan dihapus!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Ya, hapus!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = url;
                 }
             });
         }
-    });
-         
     </script>
 </body>
 

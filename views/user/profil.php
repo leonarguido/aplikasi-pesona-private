@@ -73,16 +73,16 @@
                                     <form method="POST" action="<?= BASE_URL ?>ganti_password">
                                         <div class="modal-body">
                                             <div class="form-group">
-                                                <label>Password Lama</label>
+                                                <label>Password Lama <span class="text-danger">*</span></label>
                                                 <input type="password" name="password_lama" class="form-control" required>
                                             </div>
                                             <div class="form-group">
-                                                <label>Password Baru</label>
+                                                <label>Password Baru <span class="text-danger">*</span></label>
                                                 <input type="password" id="password_baru" name="password_baru" class="form-control" required minlength="6">
                                                 <small id="password_error" class="text-danger"></small>
                                             </div>
                                             <div class="form-group">
-                                                <label>Konfirmasi Password Baru</label>
+                                                <label>Konfirmasi Password Baru <span class="text-danger">*</span></label>
                                                 <input type="password" id="konfirmasi_password_baru" name="konfirmasi_password_baru" class="form-control" required>
                                                 <small id="konfirmasi_error" class="text-danger"></small>
                                             </div>
@@ -116,7 +116,7 @@
 
                                         <form method="POST" action="<?= BASE_URL ?>upload_paraf" enctype="multipart/form-data">
                                             <div class="form-group text-left">
-                                                <label class="font-weight-bold">Upload File Tanda Tangan (Paraf)</label>
+                                                <label class="font-weight-bold">Upload File Tanda Tangan (Paraf) <span class="text-danger">*</span></label>
                                                 <input type="file" id="paraf_file" name="paraf" accept="image/*" class="form-control-file" required>
                                                 <small class="text-muted">Format: JPG/PNG, Transparan lebih baik.</small>
                                                 <small id="paraf_null" class="text-danger"></small>

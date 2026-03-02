@@ -45,7 +45,7 @@
                                         <tbody>
                                             <?php
                                             $no = 1;
-                                            $query = "SELECT * FROM tb_barang_bergerak WHERE is_deleted=0 ORDER BY nama_barang ASC";
+                                            $query = "SELECT * FROM tb_barang_habis_pakai WHERE is_deleted=0 ORDER BY nama_barang ASC";
                                             $result = mysqli_query($koneksi, $query);
 
                                             while ($row = mysqli_fetch_assoc($result)):
@@ -84,7 +84,7 @@
                                                                         <input type="text" class="form-control" value="<?= $row['nama_barang']; ?>" readonly>
                                                                     </div>
                                                                     <div class="form-group">
-                                                                        <label>Jumlah (Max: <?= $row['stok']; ?>)</label>
+                                                                        <label>Jumlah (Max: <?= $row['stok']; ?>) <span class="text-danger">*</span></label>
                                                                         <input type="number" name="jumlah" class="form-control" min="1" max="<?= $row['stok']; ?>" required>
                                                                     </div>
 

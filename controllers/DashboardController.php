@@ -4,6 +4,6 @@ class DashboardController
 {
     public function index()
     {
-        header('Location: https://pesona.bpmpbali.id/');
+        header('Location: /aplikasi-pesona-private/');
     }
 }

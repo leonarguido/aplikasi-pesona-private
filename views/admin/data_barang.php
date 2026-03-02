@@ -48,7 +48,7 @@
                                     <tbody>
                                         <?php
                                         $no = 1;
-                                        $query = "SELECT * FROM tb_barang_bergerak WHERE is_deleted=0 ORDER BY nama_barang ASC";
+                                        $query = "SELECT * FROM tb_barang_habis_pakai WHERE is_deleted=0 ORDER BY nama_barang ASC";
                                         $data = mysqli_query($koneksi, $query);
 
                                         while ($row = mysqli_fetch_assoc($data)):
@@ -100,7 +100,7 @@
                                                                             <input type="number" class="form-control" value="<?= $row['stok']; ?>" readonly>
                                                                         </div>
                                                                         <div class="col">
-                                                                            <label>Tambah Stok</label>
+                                                                            <label>Tambah Stok <span class="text-danger">*</span></label>
                                                                             <input type="number" name="stok" min="1" class="form-control" required>
                                                                         </div>
                                                                         <!-- <div class="col" id="tambahStokDiv">
@@ -114,7 +114,7 @@
                                                                     </div>
                                                                 </div>
                                                                 <div class="form-group">
-                                                                    <label>Keterangan</label>
+                                                                    <label>Keterangan <span class="text-danger">*</span></label>
                                                                     <textarea name="keterangan" class="form-control" required></textarea>
                                                                 </div>
                                                             </div>
@@ -138,15 +138,15 @@
                                                             <div class="modal-body">
                                                                 <input type="hidden" name="id" value="<?= $row['id']; ?>">
                                                                 <div class="form-group">
-                                                                    <label>Nama Barang</label>
+                                                                    <label>Nama Barang <span class="text-danger">*</span></label>
                                                                     <input type="text" name="nama_barang" class="form-control" value="<?= $row['nama_barang']; ?>" required>
                                                                 </div>
                                                                 <div class="form-group">
-                                                                    <label>Merek Barang</label>
+                                                                    <label>Merek Barang <span class="text-danger">*</span></label>
                                                                     <input type="text" name="merek_barang" class="form-control" value="<?= $row['merek_barang']; ?>" required>
                                                                 </div>
                                                                 <div class="form-group">
-                                                                    <label>Satuan</label>
+                                                                    <label>Satuan <span class="text-danger">*</span></label>
                                                                     <select name="satuan" class="form-control">
                                                                         <option value="Unit" <?= ($row['satuan'] == 'Unit') ? 'selected' : ''; ?>>Unit</option>
                                                                         <option value="Pcs" <?= ($row['satuan'] == 'Pcs') ? 'selected' : ''; ?>>Pcs</option>
@@ -204,7 +204,7 @@
                         </div>
 
                         <div class="form-group">
-                            <label>Pilih File CSV</label>
+                            <label>Pilih File CSV <span class="text-danger">*</span></label>
                             <input type="file" name="file_excel" class="form-control-file" required accept=".csv">
                         </div>
                     </div>
@@ -227,19 +227,19 @@
                 <form method="POST" action="<?= BASE_URL ?>tambah_data_barang">
                     <div class="modal-body">
                         <div class="form-group">
-                            <label>Kode Barang (Unik)</label>
+                            <label>Kode Barang (Unik) <span class="text-danger">*</span></label>
                             <input type="text" name="kode_barang" class="form-control" placeholder="Cth: KTS-001" required>
                         </div>
                         <div class="form-group">
-                            <label>Nama Barang</label>
+                            <label>Nama Barang <span class="text-danger">*</span></label>
                             <input type="text" name="nama_barang" class="form-control" required>
                         </div>
                         <div class="form-group">
-                            <label>Merek Barang</label>
+                            <label>Merek Barang <span class="text-danger">*</span></label>
                             <input type="text" name="merek_barang" class="form-control" placeholder="Cth: Bola Dunia, Snowman, Sidu, Toshiba, dll" required>
                         </div>
                         <div class="form-group">
-                            <label>Satuan</label>
+                            <label>Satuan <span class="text-danger">*</span></label>
                             <select name="satuan" class="form-control">
                                 <option value="Pcs">Pcs</option>
                                 <option value="Unit">Unit</option>
@@ -249,7 +249,7 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>Stok Awal</label>
+                            <label>Stok Awal <span class="text-danger">*</span></label>
                             <input type="number" name="stok" class="form-control" required>
                         </div>
                         <div class="form-group">

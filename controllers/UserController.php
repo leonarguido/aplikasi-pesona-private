@@ -2,7 +2,7 @@
 
 class UserController
 {
-    protected $base_url = 'https://pesona.bpmpbali.id/routes/web.php/?page=';
+    protected $base_url = '/aplikasi-pesona-private/routes/web.php/?page=';
 
     // MASUK HALAMAN DAFTAR BARANG
     public function daftar_barang_page()
@@ -198,7 +198,7 @@ class UserController
         }
 
         $list_barang = [];
-        $q_b = mysqli_query($koneksi, "SELECT * FROM tb_barang_bergerak WHERE stok > 0 ORDER BY nama_barang ASC");
+        $q_b = mysqli_query($koneksi, "SELECT * FROM tb_barang_habis_pakai WHERE stok > 0 ORDER BY nama_barang ASC");
         while ($b = mysqli_fetch_assoc($q_b)) {
             $list_barang[] = $b;
         }
@@ -275,7 +275,7 @@ class UserController
 
                     if (!empty($id_brg) && $jml > 0) {
                         // 1. Ambil info satuan barang
-                        $q_info = mysqli_query($koneksi, "SELECT satuan FROM tb_barang_bergerak WHERE id='$id_brg'");
+                        $q_info = mysqli_query($koneksi, "SELECT satuan FROM tb_barang_habis_pakai WHERE id='$id_brg'");
                         $d_info = mysqli_fetch_assoc($q_info);
                         $satuan = $d_info['satuan'];
 
