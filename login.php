@@ -2,7 +2,7 @@
 session_start();
 require 'config/koneksi.php';
 
-// Jika sudah login, lempar ke index
+// Jika sudah login (punya session utama), lempar ke index
 if (isset($_SESSION['user_id'])) {
     header("Location: index.php");
     exit;
@@ -22,28 +22,40 @@ if (isset($_POST['login'])) {
         // VERIFIKASI PASSWORD
         if (password_verify($password, $data['password'])) {
             
-            // SET SESSION
-            $_SESSION['user_id']   = $data['id'];
-            $_SESSION['username']  = $data['username'];
-            $_SESSION['full_name'] = $data['nama']; 
-            
-            // MAPPING ROLE
             $role_db = $data['role'];
-            if ($role_db == 'super admin') {
-                $_SESSION['role'] = 'super_admin';
-            } elseif ($role_db == 'admin gudang') {
-                $_SESSION['role'] = 'admin';
-            } elseif ($role_db == 'staff') {
-                $_SESSION['role'] = 'user'; 
-            } else {
-                $_SESSION['role'] = $role_db;
-            }
 
-            // Login Sukses
-            header("Location: index.php");
-            exit;
+            // JIKA ROLE ADALAH STAF (USER BIASA) -> Langsung Set Session Utama & Masuk
+            if ($role_db == 'staff') {
+                $_SESSION['user_id']   = $data['id'];
+                $_SESSION['username']  = $data['username'];
+                $_SESSION['full_name'] = $data['nama']; 
+                $_SESSION['role']      = 'user'; 
+                
+                header("Location: index.php");
+                exit;
+            } 
+            // JIKA ROLE ADALAH ADMIN/PIMPINAN/SUPERADMIN -> Tahan di Session Sementara
+            else {
+                $_SESSION['temp_user_id']   = $data['id'];
+                $_SESSION['temp_username']  = $data['username'];
+                $_SESSION['temp_full_name'] = $data['nama'];
+                
+                // MAPPING ROLE ASLI
+                if ($role_db == 'super admin') {
+                    $_SESSION['temp_role'] = 'super_admin';
+                } elseif ($role_db == 'admin gudang') {
+                    $_SESSION['temp_role'] = 'admin';
+                } else {
+                    $_SESSION['temp_role'] = $role_db; // Untuk pimpinan
+                }
+
+                // Lempar ke halaman pilih role
+                header("Location: pilih_role.php");
+                exit;
+            }
         }
     }
+    // Jika username salah atau password tidak terverifikasi
     $error = true;
 }
 ?>
@@ -60,51 +72,40 @@ if (isset($_POST['login'])) {
     <link href="assets/css/sb-admin-2.min.css" rel="stylesheet">
 
     <style>
-        /* Membuat body memenuhi layar dan konten di tengah */
         body {
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            background-color: #4e73df; /* Warna Primary SB Admin */
+            background-color: #4e73df;
             background-image: linear-gradient(180deg, #4e73df 10%, #224abe 100%);
             background-size: cover;
         }
-
-        /* Styling Kartu Login */
         .card-login {
             width: 100%;
-            max-width: 450px; /* Lebar maksimal agar tidak terlalu lebar di layar besar */
-            border-radius: 15px; /* Sudut membulat modern */
+            max-width: 450px;
+            border-radius: 15px;
             border: none;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2); /* Bayangan halus */
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
         }
-
-        /* Styling Input Form */
         .form-control {
             height: 50px;
-            border-radius: 10px; /* Sedikit membulat, bukan pill */
+            border-radius: 10px;
             padding: 10px 20px;
             font-size: 1rem;
         }
-
-        /* Styling Input Group untuk Password */
         .input-group-text {
             border-radius: 0 10px 10px 0;
             background-color: white;
             border-left: none;
         }
-        
         #passwordInput {
             border-radius: 10px 0 0 10px;
             border-right: none;
         }
-
         #passwordInput:focus + .input-group-append .input-group-text {
-            border-color: #bac8f3; /* Warna border saat fokus */
+            border-color: #bac8f3;
         }
-
-        /* Styling Tombol */
         .btn-login {
             height: 50px;
             border-radius: 10px;
@@ -114,12 +115,10 @@ if (isset($_POST['login'])) {
             border: none;
             transition: 0.3s;
         }
-        
         .btn-login:hover {
             background-color: #2e59d9;
-            transform: translateY(-2px); /* Efek naik sedikit saat hover */
+            transform: translateY(-2px);
         }
-
         .login-title {
             color: #444;
             font-weight: 300;

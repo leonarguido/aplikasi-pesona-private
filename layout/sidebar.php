@@ -78,8 +78,7 @@
 
 
         <?php 
-        if($_SESSION['role'] == 'user' || $_SESSION['role'] == 'staff' || $_SESSION['role'] == 'super_admin' || $_SESSION['role'] == 'super admin'): 
-        ?>
+        if($_SESSION['role'] == 'user' || $_SESSION['role'] == 'staff'): ?>
         
         <div class="sidebar-heading">Barang BMN</div>
 
@@ -136,6 +135,21 @@
         </li>
         <?php endif; ?>
 
+
+        <?php if (isset($_SESSION['role_asli']) && $_SESSION['role'] != $_SESSION['role_asli']): ?>
+            <hr class="sidebar-divider d-none d-md-block">
+
+            <div class="sidebar-heading text-warning">
+                Mode Menyamar
+            </div>
+
+            <li class="nav-item">
+                <a class="nav-link text-warning font-weight-bold" href="kembali_role.php">
+                    <i class="fas fa-fw fa-exchange-alt text-warning"></i>
+                    <span>Kembali ke <?= ucfirst($_SESSION['role_asli']); ?></span>
+                </a>
+            </li>
+        <?php endif; ?>
         <hr class="sidebar-divider d-none d-md-block">
 
         <div class="text-center d-none d-md-inline">
