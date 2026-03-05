@@ -26,6 +26,12 @@
                     <span>Kelola Pengguna</span></a>
             </li>
 
+            <li class="nav-item">
+                <a class="nav-link" href="<?= BASE_URL ?>data_jabatan">
+                    <i class="fab fa-fw fa-black-tie"></i>
+                    <span>Kelola Jabatan</span></a>
+            </li>
+
             <hr class="sidebar-divider">
 
             <div class="sidebar-heading">Aset BMN</div>

@@ -5,8 +5,8 @@
     <meta charset="UTF-8">
     <title>Laporan Stock Opname</title>
     <?php
-    define('BASE_URL', 'https://pesona.bpmpbali.id/routes/web.php/?page=');
-    define('ASSETS_URL', 'https://pesona.bpmpbali.id/assets/');
+    define('BASE_URL', '/aplikasi-pesona-private/routes/web.php/?page=');
+    define('ASSETS_URL', '/aplikasi-pesona-private/assets/');
     ?>
     <style>
         body {
@@ -265,7 +265,7 @@
                     </tr>
                     <tr>
                         <td width="160px"><strong>JABATAN</strong></td>
-                        <td>: <strong><?= $data_pegawai['role']; ?></strong></td>
+                        <td>: <strong><?= $data_pegawai['nama_jabatan']; ?></strong></td>
                     </tr>
                 </table>
             </div>
@@ -291,7 +291,7 @@
                             $q_detail = mysqli_query($koneksi, "
                             SELECT d.jumlah, d.satuan, b.nama_barang, b.merek_barang
                             FROM tb_detail_permintaan d
-                            JOIN tb_habis_pakai b ON d.barang_id = b.id
+                            JOIN tb_barang_habis_pakai b ON d.barang_id = b.id
                             WHERE d.permintaan_id = '$id_req'
                         ");
 

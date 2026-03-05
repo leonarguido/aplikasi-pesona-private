@@ -4,7 +4,7 @@ require 'config/koneksi.php';
 
 // 1. Cek Login
 if (!isset($_SESSION['user_id'])) {
-    header("Location: https://pesona.bpmpbali.id/routes/web.php?page=login");
+    header("Location: /aplikasi-pesona-private/routes/web.php?page=login");
     exit;
 }
 

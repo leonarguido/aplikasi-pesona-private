@@ -5,8 +5,8 @@
     <meta charset="UTF-8">
     <title>BA Pengembalian - <?= $data['nama_barang']; ?></title>
     <?php
-    define('BASE_URL', 'https://pesona.bpmpbali.id/routes/web.php/?page=');
-    define('ASSETS_URL', 'https://pesona.bpmpbali.id/assets/');
+    define('BASE_URL', '/aplikasi-pesona-private/routes/web.php/?page=');
+    define('ASSETS_URL', '/aplikasi-pesona-private/assets/');
     ?>
     <style>
         /* CSS LAYAR UTAMA */
@@ -293,7 +293,7 @@
                 <tr>
                     <td></td>
                     <td>Jabatan</td>
-                    <td>: ................................................................</td>
+                    <td>: <?= $data['jabatan_admin']; ?> </td>
                 </tr>
                 <tr>
                     <td></td>
@@ -315,7 +315,7 @@
                 <tr>
                     <td></td>
                     <td>Jabatan</td>
-                    <td>: ................................................................</td>
+                    <td>: <?= $data['jabatan_user']; ?> </td>
                 </tr>
                 <tr>
                     <td></td>
@@ -370,7 +370,7 @@
             Kasubbag Umum BPMP Prov Bali,<br>
             <div class="ttd-space">
                 <!-- <img src="<?= ASSETS_URL ?>img/ttd/<?= $data['paraf_user']; ?>" class="img-ttd"> -->
-                 <div class="ttd-space"></div>
+                <div class="ttd-space"></div>
                 <b><?= $nama_kasubbag; ?></b><br>
                 NIP. <?= $nip_kasubbag; ?>
             </div>

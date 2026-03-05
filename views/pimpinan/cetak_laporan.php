@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Laporan Transaksi <?= $tgl_mulai; ?> sd <?= $tgl_selesai; ?></title>
-    <?php define('BASE_URL', 'https://pesona.bpmpbali.id/routes/web.php/?page='); ?>
+    <?php define('BASE_URL', '/aplikasi-pesona-private/routes/web.php/?page='); ?>
     <style>
         /* CSS untuk Tampilan Cetak */
         body {

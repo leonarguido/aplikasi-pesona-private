@@ -135,6 +135,19 @@ if (isset($_GET['page'])) {
         case 'hapus_data_pengguna':
             $admin->hapus_data_pengguna();
             break;
+            
+        case 'data_jabatan':
+            $admin->data_jabatan_page();
+            break;
+        case 'tambah_data_jabatan':
+            $admin->tambah_data_jabatan();
+            break;
+        case 'edit_data_jabatan':
+            $admin->edit_data_jabatan();
+            break;
+        case 'hapus_data_jabatan':
+            $admin->hapus_data_jabatan();
+            break;
 
         // ==========================================
         // RUTE USER CONTROLLER

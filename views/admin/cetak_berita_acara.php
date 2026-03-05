@@ -5,8 +5,8 @@
     <meta charset="UTF-8">
     <title>Berita Acara - <?= $data['nama_barang']; ?></title>
     <?php
-    define('BASE_URL', 'https://pesona.bpmpbali.id/routes/web.php/?page=');
-    define('ASSETS_URL', 'https://pesona.bpmpbali.id/assets/');
+    define('BASE_URL', '/aplikasi-pesona-private/routes/web.php/?page=');
+    define('ASSETS_URL', '/aplikasi-pesona-private/assets/');
     ?>
     <style>
         /* CSS UTAMA */
@@ -288,7 +288,7 @@
                 <tr>
                     <td></td>
                     <td>Jabatan</td>
-                    <td>: ................................................................</td>
+                    <td>: <?= $data['jabatan_admin']; ?> </td>
                 </tr>
                 <tr>
                     <td></td>
@@ -310,7 +310,7 @@
                 <tr>
                     <td></td>
                     <td>Jabatan</td>
-                    <td>: ................................................................</td>
+                    <td>: <?= $data['jabatan_user']; ?> </td>
                 </tr>
                 <tr>
                     <td></td>

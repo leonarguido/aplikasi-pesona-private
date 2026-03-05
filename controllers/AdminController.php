@@ -2,7 +2,7 @@
 
 class AdminController
 {
-    protected $base_url = 'https://pesona.bpmpbali.id/routes/web.php/?page=';
+    protected $base_url = '/aplikasi-pesona-private/routes/web.php/?page=';
     protected $assets_path = __DIR__ . '/../assets/img/'; // direktori penyimpanan file paraf
 
     // MASUK HALAMAN DATA BARANG
@@ -830,12 +830,13 @@ class AdminController
         // 1. AMBIL DATA PEMINJAMAN
         // ============================================
         $query = "SELECT p.*, 
-          u_admin.nama AS nama_admin, u_admin.nip AS nip_admin,
-          u_user.nama AS nama_user, u_user.nip AS nip_user,
-          u_user.paraf AS paraf_user
+          u_admin.nama AS nama_admin, u_admin.nip AS nip_admin, j_admin.nama_jabatan as jabatan_admin,
+          u_user.nama AS nama_user, u_user.nip AS nip_user, j_user.nama_jabatan as jabatan_user, u_user.paraf AS paraf_user
           FROM tb_peminjaman p
           LEFT JOIN tb_user u_admin ON p.admin_id = u_admin.id
           LEFT JOIN tb_user u_user ON p.user_id = u_user.id
+          JOIN tb_jabatan j_admin ON j_admin.id = u_admin.jabatan_id
+          JOIN tb_jabatan j_user ON j_user.id = u_user.jabatan_id
           WHERE p.id = '$id_pinjam'";
 
         $result = mysqli_query($koneksi, $query);
@@ -990,12 +991,13 @@ class AdminController
         // 1. AMBIL DATA PEMINJAMAN
         // ============================================
         $query = "SELECT p.*, 
-          u_admin.nama AS nama_admin, u_admin.nip AS nip_admin,
-          u_user.nama AS nama_user, u_user.nip AS nip_user,
-          u_user.paraf AS paraf_user
+          u_admin.nama AS nama_admin, u_admin.nip AS nip_admin, j_admin.nama_jabatan as jabatan_admin,
+          u_user.nama AS nama_user, u_user.nip AS nip_user, j_user.nama_jabatan as jabatan_user, u_user.paraf AS paraf_user
           FROM tb_peminjaman p
           LEFT JOIN tb_user u_admin ON p.admin_id = u_admin.id
           LEFT JOIN tb_user u_user ON p.user_id = u_user.id
+          JOIN tb_jabatan j_admin ON j_admin.id = u_admin.jabatan_id
+          JOIN tb_jabatan j_user ON j_user.id = u_user.jabatan_id
           WHERE p.id = '$id_pinjam'";
 
         $result = mysqli_query($koneksi, $query);
@@ -1123,6 +1125,13 @@ class AdminController
             exit;
         }
 
+        // AMBIL DATA JABATAN (UNTUK DROPDOWN)
+        $list_jabatan = [];
+        $q_jbtn = mysqli_query($koneksi, "SELECT * FROM tb_jabatan ORDER BY nama_jabatan ASC");
+        while ($p = mysqli_fetch_assoc($q_jbtn)) {
+            $list_jabatan[] = $p;
+        }
+
         require_once '../views/admin/data_pengguna.php';
     }
 
@@ -1137,7 +1146,8 @@ class AdminController
             $nip      = mysqli_real_escape_string($koneksi, $_POST['nip']);
             $username = mysqli_real_escape_string($koneksi, $_POST['username']);
             $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-            $role     = $_POST['role']; // Ambil value dari select option
+            $role     = $_POST['role'];
+            $jabatan  = $_POST['jabatan'];
 
             // Cek apakah username sudah ada
             $q_user = mysqli_query($koneksi, "SELECT * FROM tb_user");
@@ -1148,6 +1158,7 @@ class AdminController
                     break;
                 }
             }
+
             if ($username_exists) {
                 $_SESSION['alert'] = [
                     'icon' => 'error',
@@ -1202,15 +1213,15 @@ class AdminController
                 move_uploaded_file($_FILES['paraf']['tmp_name'], $this->assets_path . 'ttd/' . $paraf_name);
             }
 
-            $q = "INSERT INTO tb_user (nama, nip, username, password, role, paraf) 
-          VALUES ('$nama', '$nip', '$username', '$password', '$role', '$paraf_name')";
+            $q = "INSERT INTO tb_user (nama, nip, username, password, role, jabatan_id, paraf) 
+          VALUES ('$nama', '$nip', '$username', '$password', '$role', '$jabatan', '$paraf_name')";
 
             if (mysqli_query($koneksi, $q)) {
                 // echo "<script>alert('User Berhasil Ditambahkan!'); window.location='" . $this->base_url . "data_pengguna';</script>";
                 $_SESSION['alert'] = [
                     'icon' => 'success',
                     'title' => 'Berhasil!',
-                    'text' => 'User Berhasil Ditambahkan!',
+                    'text' => 'User berhasil ditambahkan!',
                 ];
                 header("Location: " . $this->base_url . "data_pengguna");
                 exit;
@@ -1241,6 +1252,7 @@ class AdminController
             $nip      = mysqli_real_escape_string($koneksi, $_POST['nip']);
             $username = mysqli_real_escape_string($koneksi, $_POST['username']);
             $role     = $_POST['role'];
+            $jabatan  = $_POST['jabatan'];
 
             // Password Logic
             if (!empty($_POST['password'])) {
@@ -1261,7 +1273,7 @@ class AdminController
             }
 
             $q = "UPDATE tb_user SET 
-          nama='$nama', nip='$nip', username='$username', role='$role' $q_pass $q_ttd
+          nama='$nama', nip='$nip', username='$username', role='$role', jabatan_id='$jabatan' $q_pass $q_ttd
           WHERE id='$id'";
 
             if (mysqli_query($koneksi, $q)) {
@@ -1338,6 +1350,145 @@ class AdminController
                     'text' => 'Gagal hapus!',
                 ];
                 header("Location: " . $this->base_url . "data_pengguna");
+                exit;
+            }
+        }
+    }
+
+    // MASUK KE HALAMAN JABATAN
+    public function data_jabatan_page()
+    {
+        require __DIR__ . '/../config/koneksi.php';
+        session_start();
+
+        // 1. Cek Login & Akses
+        if (!isset($_SESSION['user_id'])) {
+            header("Location: login.php");
+            exit;
+        }
+
+        // Hanya Super Admin yang boleh akses halaman ini
+        if ($_SESSION['role'] != 'super admin') {
+            $_SESSION['alert'] = [
+                'icon' => 'error',
+                'title' => 'Gagal!',
+                'text' => 'Akses Ditolak!',
+            ];
+            header("Location: " . $this->base_url);
+            exit;
+        }
+
+        require_once '../views/admin/data_jabatan.php';
+    }
+
+    // A. PROSES TAMBAH JABATAN
+    public function tambah_data_jabatan()
+    {
+        require __DIR__ . '/../config/koneksi.php';
+        session_start();
+
+        if (isset($_POST['tambah_jabatan'])) {
+            $jabatan     = mysqli_real_escape_string($koneksi, $_POST['jabatan']);
+
+            // Cek apakah jabatan sudah ada
+            $q_jabatan = mysqli_query($koneksi, "SELECT * FROM tb_jabatan");
+            $jabatan_exists = false;
+            while ($j = mysqli_fetch_assoc($q_jabatan)) {
+                if ($j['nama_jabatan'] == $jabatan) {
+                    $jabatan_exists = true;
+                    break;
+                }
+            }
+
+            if ($jabatan_exists) {
+                $_SESSION['alert'] = [
+                    'icon' => 'error',
+                    'title' => 'Gagal!',
+                    'text' => 'Jabatan sudah ada!',
+                ];
+                header("Location: " . $this->base_url . "data_jabatan");
+                exit;
+            }
+
+            $q = "INSERT INTO tb_jabatan (nama_jabatan) VALUES ('$jabatan')";
+
+            if (mysqli_query($koneksi, $q)) {
+                $_SESSION['alert'] = [
+                    'icon' => 'success',
+                    'title' => 'Berhasil!',
+                    'text' => 'Jabatan berhasil ditambahkan!',
+                ];
+                header("Location: " . $this->base_url . "data_jabatan");
+                exit;
+            } else {
+                $_SESSION['alert'] = [
+                    'icon' => 'error',
+                    'title' => 'Gagal!',
+                    'text' => 'Gagal menambah jabatan: ' . mysqli_error($koneksi),
+                ];
+                header("Location: " . $this->base_url . "data_jabatan");
+                exit;
+            }
+        }
+    }
+
+    // B. PROSES EDIT JABATAN
+    public function edit_data_jabatan()
+    {
+        require __DIR__ . '/../config/koneksi.php';
+        session_start();
+
+        if (isset($_POST['edit_jabatan'])) {
+            $id         = $_POST['id_jabatan'];
+            $jabatan    = $_POST['jabatan'];
+
+            $q = "UPDATE tb_jabatan SET nama_jabatan='$jabatan' WHERE id='$id'";
+
+            if (mysqli_query($koneksi, $q)) {
+                $_SESSION['alert'] = [
+                    'icon' => 'success',
+                    'title' => 'Berhasil!',
+                    'text' => 'Data Jabatan berhasil diupdate!',
+                ];
+                header("Location: " . $this->base_url . "data_jabatan");
+                exit;
+            } else {
+                $_SESSION['alert'] = [
+                    'icon' => 'error',
+                    'title' => 'Gagal!',
+                    'text' => 'Gagal update jabatan: ' . mysqli_error($koneksi),
+                ];
+                header("Location: " . $this->base_url . "data_jabatan");
+                exit;
+            }
+        }
+    }
+
+    // C. PROSES HAPUS JABATAN
+    public function hapus_data_jabatan()
+    {
+        require __DIR__ . '/../config/koneksi.php';
+        session_start();
+
+        if (isset($_GET['hapus'])) {
+
+            $id = $_GET['hapus'];
+            $q = "DELETE FROM tb_jabatan WHERE id='$id'";
+            if (mysqli_query($koneksi, $q)) {
+                $_SESSION['alert'] = [
+                    'icon' => 'success',
+                    'title' => 'Berhasil!',
+                    'text' => 'Jabatan berhasil dihapus!',
+                ];
+                header("Location: " . $this->base_url . "data_jabatan");
+                exit;
+            } else {
+                $_SESSION['alert'] = [
+                    'icon' => 'error',
+                    'title' => 'Gagal!',
+                    'text' => 'Gagal menghapus jabatan: ' . mysqli_error($koneksi),
+                ];
+                header("Location: " . $this->base_url . "data_jabatan");
                 exit;
             }
         }

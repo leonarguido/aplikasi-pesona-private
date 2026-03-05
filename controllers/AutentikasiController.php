@@ -2,6 +2,9 @@
 
 class AutentikasiController
 {
+    protected $base_url = '/aplikasi-pesona-private/routes/web.php/?page=';
+    protected $assets_path = __DIR__ . '/../assets/img/'; // direktori penyimpanan file paraf
+
     public function login()
     {
         require_once __DIR__ . '/../views/autentikasi/login.php';
@@ -34,7 +37,6 @@ class AutentikasiController
 
                     // MAPPING ROLE (Database Mentor -> Sistem Kita)
                     $role_db = $data['role'];
-
                     if ($role_db == 'super admin') {
                         $_SESSION['role'] = 'super admin';
                     } elseif ($role_db == 'admin gudang') {
@@ -46,7 +48,7 @@ class AutentikasiController
                     }
 
                     // Redirect ke dashboard
-                    header('Location: https://pesona.bpmpbali.id/');
+                    header('Location: /aplikasi-pesona-private/');
                     exit;
                 }
             } else {

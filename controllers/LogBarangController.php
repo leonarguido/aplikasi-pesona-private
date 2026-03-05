@@ -2,7 +2,7 @@
 
 class LogBarangController
 {
-    protected $base_url = 'https://pesona.bpmpbali.id/routes/web.php/?page=';
+    protected $base_url = '/aplikasi-pesona-private/routes/web.php/?page=';
 
     public function log_barang_habis_pakai()
     {

@@ -2,7 +2,7 @@
 
 class PimpinanController
 {
-    protected $base_url = 'https://pesona.bpmpbali.id/routes/web.php/?page=';
+    protected $base_url = '/aplikasi-pesona-private/routes/web.php/?page=';
 
     public function laporan_page()
     {
@@ -359,10 +359,12 @@ class PimpinanController
                         SELECT 
                             p.*, 
                             u.nama AS nama_pemohon, 
-                            a.nama AS nama_admin
+                            a.nama AS nama_admin,
+                            j.nama_jabatan
                         FROM tb_permintaan p
                         JOIN tb_user u ON p.user_id = u.id
-                        LEFT JOIN tb_user a ON p.admin_id = a.id
+                        JOIN tb_user a ON p.admin_id = a.id
+                        JOIN tb_jabatan j ON j.id = u.jabatan_id
                         WHERE 
                             p.status = 'disetujui'
                             AND p.tanggal_disetujui IS NOT NULL
@@ -381,7 +383,15 @@ class PimpinanController
                     exit;
                 }
 
-                $data_pegawai = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT id, nip, nama, role FROM tb_user WHERE id = '$pegawai'"));
+                $data_pegawai = mysqli_fetch_assoc(mysqli_query($koneksi, 
+                        "SELECT 
+                            u.nama,
+                            u.nip,
+                            j.nama_jabatan 
+                        FROM tb_user u 
+                        JOIN tb_jabatan j ON j.id = u.jabatan_id 
+                        WHERE u.id = '$pegawai'"
+                    ));
 
                 // BERDASARKAN TANGGAL
             } elseif ($kategori == 'tanggal') {

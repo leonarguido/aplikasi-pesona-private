@@ -4,6 +4,21 @@
 <head>
     <?php require __DIR__ . '/../layout/header.php'; ?>
     <?php $judul_halaman = "Data Pengguna"; ?>
+
+    <style>
+        .select2-container .select2-selection--single {
+            height: 38px !important;
+            border: 1px solid #d1d3e2;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            line-height: 38px !important;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 38px !important;
+        }
+    </style>
 </head>
 
 <body id="page-top">
@@ -38,6 +53,7 @@
                                                 <th>NIP</th>
                                                 <th>Username</th>
                                                 <th>Role</th>
+                                                <th>Jabatan</th>
                                                 <th class="text-center">Tanda Tangan</th>
                                                 <th class="text-center">Aksi</th>
                                             </tr>
@@ -45,7 +61,13 @@
                                         <tbody>
                                             <?php
                                             $no = 1;
-                                            $query = mysqli_query($koneksi, "SELECT * FROM tb_user ORDER BY role ASC, nama ASC");
+                                            $query = mysqli_query(
+                                                $koneksi,
+                                                "SELECT u.*, j.jabatan 
+                                                    FROM tb_user u
+                                                    LEFT JOIN tb_jabatan j ON u.jabatan_id = j.id
+                                                    ORDER BY u.role ASC, u.nama ASC"
+                                            );
                                             while ($row = mysqli_fetch_assoc($query)):
                                             ?>
                                                 <tr>
@@ -64,6 +86,7 @@
                                                             <span class="badge badge-success">User / Staff</span>
                                                         <?php endif; ?>
                                                     </td>
+                                                    <td><?= $row['jabatan']; ?></td>
                                                     <td class="text-center">
                                                         <?php if (!empty($row['paraf'])): ?>
                                                             <img src="<?= ASSETS_URL ?>img/ttd/<?= $row['paraf']; ?>" alt="TTD" style="height: 40px;">
@@ -108,7 +131,7 @@
                                                                         <input type="password" name="password" class="form-control" placeholder="***">
                                                                     </div>
                                                                     <div class="form-group">
-                                                                        <label>Role / Jabatan <span class="text-danger">*</span></label>
+                                                                        <label>Role <span class="text-danger">*</span></label>
                                                                         <select name="role" class="form-control" required>
                                                                             <option value="staff" <?= $row['role'] == 'user' ? 'selected' : ''; ?>>User / Staff</option>
 
@@ -116,6 +139,17 @@
 
                                                                             <option value="pimpinan" <?= ($row['role'] == 'pimpinan' || $row['role'] == 'Pimpinan') ? 'selected' : ''; ?>>Pimpinan</option>
                                                                             <option value="super admin" <?= ($row['role'] == 'super_admin' || $row['role'] == 'super admin') ? 'selected' : ''; ?>>Super Admin</option>
+                                                                        </select>
+                                                                    </div>
+                                                                    <div class="form-group">
+                                                                        <label>Jabatan <span class="text-danger">*</span></label>
+                                                                        <select name="jabatan" id="selectEditJabatan" class="form-control select2-edit" style="width:100%" required>
+                                                                            <option value="">-- Pilih Jabatan --</option>
+                                                                            <?php foreach ($list_jabatan as $jbtn): ?>
+                                                                                <option value="<?= $jbtn['id']; ?>" <?= ($jbtn['id'] == $row['jabatan_id']) ? 'selected' : ''; ?>>
+                                                                                    <?= $jbtn['jabatan']; ?>
+                                                                                </option>
+                                                                            <?php endforeach; ?>
                                                                         </select>
                                                                     </div>
                                                                     <div class="form-group">
@@ -165,7 +199,7 @@
                                             <input type="password" name="password" class="form-control" required>
                                         </div>
                                         <div class="form-group">
-                                            <label>Role / Jabatan<span class="text-danger">*</span></label>
+                                            <label>Role<span class="text-danger">*</span></label>
                                             <select name="role" class="form-control" required>
                                                 <option value="staff">User / Staff</option>
 
@@ -175,8 +209,17 @@
                                                 <option value="super admin">Super Admin</option>
                                             </select>
                                         </div>
-
-                                        <hr>
+                                        <div class="form-group">
+                                            <label>Jabatan <span class="text-danger">*</span></label>
+                                            <select name="jabatan" id="selectTambahJabatan" class="form-control select2-tambah" style="width:100%" required>
+                                                <option value="">-- Pilih Jabatan --</option>
+                                                <?php foreach ($list_jabatan as $jbtn): ?>
+                                                    <option value="<?= $jbtn['id']; ?>">
+                                                        <?= $jbtn['jabatan']; ?>
+                                                    </option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
                                         <div class="form-group">
                                             <label class="font-weight-bold">Upload File Tanda Tangan (Paraf)</label>
                                             <input type="file" name="paraf" accept="image/*" class="form-control-file">
@@ -193,7 +236,7 @@
                     </div>
                 </div>
 
-            <?php require __DIR__ . '/../layout/footer.php'; ?>
+                <?php require __DIR__ . '/../layout/footer.php'; ?>
             </div>
         </div>
     </div>
@@ -218,6 +261,23 @@
                     }
                 });
             }
+
+        });
+
+        $('.modal').on('shown.bs.modal', function() {
+            $(this).find('.select2-tambah').select2({
+                dropdownParent: $(this),
+                placeholder: "Pilih Jabatan...",
+                allowClear: true
+            });
+        });
+
+        $('.modal').on('shown.bs.modal', function() {
+            $(this).find('.select2-edit').select2({
+                dropdownParent: $(this),
+                placeholder: "Pilih Jabatan...",
+                allowClear: true
+            });
         });
 
         function confirmHapus(event, url) {
