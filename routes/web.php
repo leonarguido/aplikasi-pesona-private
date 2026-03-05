@@ -31,6 +31,15 @@ if (isset($_GET['page'])) {
         case 'autentikasi':
             $autentikasi->autentikasi();
             break;
+        case 'role':
+            $autentikasi->role_page();
+            break;
+        case 'pilih_role':
+            $autentikasi->pilih_role();
+            break;
+        case'kembali_role':
+            $autentikasi->kembali_role();
+            break;
         case 'logout':
             $autentikasi->logout();
             break;

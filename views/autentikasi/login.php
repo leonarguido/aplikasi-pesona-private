@@ -2,9 +2,7 @@
 <html lang="en">
 
 <head>
-    <?php
-    require __DIR__ . '/../layout/header.php';
-    ?>
+    <?php require __DIR__ . '/../layout/header.php'; ?>
 </head>
 
 <body>
@@ -14,7 +12,7 @@
                 <div class="content-wrapper align-items-center auth px-0">
                     <div class="row w-100 mx-0" style="background-image: url('<?= ASSETS_URL ?>img/bpmp/kantor_bpmp_bali_3.jpeg'); background-size: cover; background-repeat: no-repeat;">
                         <div class="col-lg-8 mx-auto">
-                            <div class="auth-form-light py-5 px-4 px-sm-5" style="height: 100vh; opacity: 0.95;">
+                            <div class="auth-form-light py-5 px-4 px-sm-5 d-flex flex-row align-items-center justify-content-between" style="height: 100vh; opacity: 0.95;">
 
                                 <div class="container">
                                     <div class="card o-hidden border-0 shadow-lg my-5">
