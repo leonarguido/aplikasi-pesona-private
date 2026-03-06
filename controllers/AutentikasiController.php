@@ -49,9 +49,11 @@ class AutentikasiController
 
                         // MAPPING ROLE ASLI
                         if ($role_db == 'super admin') {
-                            $_SESSION['temp_role'] = 'super_admin';
-                        } elseif ($role_db == 'admin gudang') {
-                            $_SESSION['temp_role'] = 'admin';
+                            $_SESSION['temp_role'] = 'super admin';
+                        } elseif ($role_db == 'admin bmn') {
+                            $_SESSION['temp_role'] = 'admin bmn';
+                        } elseif ($role_db == 'admin bhp') {
+                            $_SESSION['temp_role'] = 'admin bhp';
                         } else {
                             $_SESSION['temp_role'] = $role_db; // Untuk pimpinan
                         }
@@ -64,6 +66,7 @@ class AutentikasiController
             }
             // Jika username salah atau password tidak terverifikasi
             $error = true;
+            require_once __DIR__ . '/../views/autentikasi/login.php';
         }
     }
 
@@ -72,7 +75,16 @@ class AutentikasiController
         require __DIR__ . '/../config/koneksi.php';
         session_start();
 
-        // Jika tidak ada session temp (langsung akses url), kembalikan ke login
+        // 1. CEK JIKA SUDAH PUNYA SESI UTAMA (Efek tombol Back)
+        if (isset($_SESSION['user_id'])) {
+            // Jika dia sudah login penuh dan menekan back ke halaman ini,
+            // dia harus logout dulu atau gunakan tombol "Kembali ke Akun Asli" di sidebar.
+            // Kita lempar kembali ke dashboard yang sedang aktif.
+            header("Location: index.php");
+            exit;
+        }
+
+        // 2. CEK JIKA TIDAK ADA SESI SEMENTARA
         if (!isset($_SESSION['temp_user_id'])) {
             header("Location: index.php");
             exit;
@@ -81,15 +93,16 @@ class AutentikasiController
         // FORMAT NAMA ROLE ASLI UNTUK DITAMPILKAN
         $role_asli = $_SESSION['temp_role'];
         $nama_role_tampil = "";
-        if ($role_asli == 'admin') {
-            $nama_role_tampil = "Admin Gudang";
+        if ($role_asli == 'admin bmn') {
+            $nama_role_tampil = "Admin BMN";
+        } elseif ($role_asli == 'admin bhp') {
+            $nama_role_tampil = "Admin BHP";
         } elseif ($role_asli == 'pimpinan') {
             $nama_role_tampil = "Pimpinan";
-        } elseif ($role_asli == 'super_admin' || $role_asli == 'super admin') {
+        } elseif ($role_asli == 'super admin') {
             $nama_role_tampil = "Super Admin";
         }
 
-        // Lempar ke halaman pilih role
         require_once __DIR__ . '/../views/autentikasi/role_page.php';
     }
 
@@ -102,11 +115,11 @@ class AutentikasiController
         if (isset($_POST['role_pilihan'])) {
             $role_pilihan = $_POST['role_pilihan'];
 
-            // Set Session Utama yang sebenarnya (Perbaikan menyesuaikan login.php Anda)
+            // Set Session Utama yang sebenarnya
             $_SESSION['user_id']   = $_SESSION['temp_user_id'];
             $_SESSION['username']  = $_SESSION['temp_username'];
             $_SESSION['full_name'] = $_SESSION['temp_full_name'];
-            $_SESSION['role_asli'] = $_SESSION['temp_role']; // Simpan role asli untuk tombol "Kembali"
+            $_SESSION['role_asli'] = $_SESSION['temp_role'];
 
             if ($role_pilihan == 'staf') {
                 $_SESSION['role'] = 'user'; // Menyamar jadi staf
@@ -114,19 +127,13 @@ class AutentikasiController
                 $_SESSION['role'] = $_SESSION['temp_role']; // Masuk dengan role asli
             }
 
-            // Hapus session temporary agar bersih
-            unset($_SESSION['temp_user_id']);
-            unset($_SESSION['temp_username']);
-            unset($_SESSION['temp_full_name']);
-            unset($_SESSION['temp_role']);
-
-            // Lanjut ke halaman utama
-            header("Location: index.php");
+            // Gunakan teknik pengalihan (PRG pattern) untuk mencegah form resubmission
+            header("Location: index.php", true, 303);
             exit;
         }
     }
 
-    public function kembali_role()
+    public function kembali_role_asli()
     {
         session_start();
 
@@ -135,7 +142,24 @@ class AutentikasiController
             $_SESSION['role'] = $_SESSION['role_asli'];
         }
 
-        // Langsung lemparkan kembali ke dashboard utama
+        header("Location: index.php");
+        exit;
+    }
+
+    public function kembali_role_staff()
+    {
+        session_start();
+
+        // Pastikan yang mengakses ini adalah user yang sudah login dan BUKAN staf
+        if (isset($_SESSION['role']) && $_SESSION['role'] != 'user' && $_SESSION['role'] != 'staff') {
+
+            // 1. Simpan role sakti (asli) saat ini ke memori 'role_asli'
+            $_SESSION['role_asli'] = $_SESSION['role'];
+
+            // 2. Ubah role utama menjadi staf (user)
+            $_SESSION['role'] = 'user';
+        }
+
         header("Location: index.php");
         exit;
     }

@@ -298,7 +298,7 @@ class AdminController
         session_start();
 
         // Cek Login & Role
-        if (!isset($_SESSION['user_id']) || ($_SESSION['role'] != 'admin' && $_SESSION['role'] != 'admin gudang' && $_SESSION['role'] != 'super admin' && $_SESSION['role'] != 'pimpinan')) {
+        if (!isset($_SESSION['user_id']) || ($_SESSION['role'] != 'admin bmn' && $_SESSION['role'] != 'super admin' && $_SESSION['role'] != 'pimpinan')) {
             header("Location: login.php");
             exit;
         }
@@ -662,7 +662,7 @@ class AdminController
         require __DIR__ . '/../config/koneksi.php';
         session_start();
 
-        if (!isset($_SESSION['user_id']) || ($_SESSION['role'] != 'admin' && $_SESSION['role'] != 'admin gudang' && $_SESSION['role'] != 'super admin')) {
+        if (!isset($_SESSION['user_id']) || ($_SESSION['role'] != 'admin bmn' && $_SESSION['role'] != 'super admin')) {
             header("Location: index.php");
             exit;
         }
@@ -670,7 +670,7 @@ class AdminController
         // 1. AMBIL DATA STAF (Untuk Dropdown Peminjam)
         $list_pegawai = [];
         // Ambil user yang role-nya BUKAN admin
-        $q_pgw = mysqli_query($koneksi, "SELECT id, nip, nama FROM tb_user WHERE role != 'admin' AND role != 'super admin' ORDER BY nama ASC");
+        $q_pgw = mysqli_query($koneksi, "SELECT id, nip, nama FROM tb_user ORDER BY nama ASC");
         while ($p = mysqli_fetch_assoc($q_pgw)) {
             $list_pegawai[] = $p;
         }
@@ -932,7 +932,7 @@ class AdminController
         session_start();
 
         // CEK AKSES: HANYA ADMIN
-        if (!isset($_SESSION['user_id']) || ($_SESSION['role'] != 'admin' && $_SESSION['role'] != 'admin gudang' && $_SESSION['role'] != 'super admin')) {
+        if (!isset($_SESSION['user_id']) || ($_SESSION['role'] != 'admin bmn' && $_SESSION['role'] != 'super admin')) {
             header("Location: index.php");
             exit;
         }
@@ -1124,6 +1124,7 @@ class AdminController
             header("Location: " . $this->base_url);
             exit;
         }
+     
 
         // AMBIL DATA JABATAN (UNTUK DROPDOWN)
         $list_jabatan = [];

@@ -4,7 +4,7 @@ class PimpinanController
 {
     protected $base_url = '/aplikasi-pesona-private/routes/web.php/?page=';
 
-    public function laporan_page()
+    public function laporan_transaksi_page()
     {
         require __DIR__ . '/../config/koneksi.php';
         session_start();
@@ -29,7 +29,7 @@ class PimpinanController
         $bulan_angka = date('m');
         $tahun_angka = date('Y');
 
-        require_once '../views/pimpinan/laporan.php';
+        require_once '../views/pimpinan/laporan_transaksi.php';
     }
 
     public function ajax_load_stok_barang()
@@ -189,7 +189,7 @@ class PimpinanController
 
         // AMBIL DATA PEGAWAI (UNTUK DROPDOWN)
         $list_pegawai = [];
-        $q_pgw = mysqli_query($koneksi, "SELECT id, nip, nama FROM tb_user WHERE role = 'staff' OR role = 'pimpinan' AND nip IS NOT NULL AND nip != '' ORDER BY nama ASC");
+        $q_pgw = mysqli_query($koneksi, "SELECT id, nip, nama FROM tb_user WHERE nip IS NOT NULL AND nip != '' ORDER BY nama ASC");
         while ($p = mysqli_fetch_assoc($q_pgw)) {
             $list_pegawai[] = $p;
         }
@@ -197,12 +197,12 @@ class PimpinanController
         require_once '../views/pimpinan/laporan_stock_opname.php';
     }
 
-    public function proses_stock_opname()
+    public function cetak_laporan_stock_opname()
     {
         require __DIR__ . '/../config/koneksi.php';
         session_start();
 
-        if (isset($_POST['proses_stock_opname'])) {
+        if (isset($_POST['cetak_laporan_stock_opname'])) {
             $kategori    = $_POST['kategori'];
             $item       = $_POST['item'];
             $pegawai    = $_POST['pegawai'];
@@ -383,15 +383,16 @@ class PimpinanController
                     exit;
                 }
 
-                $data_pegawai = mysqli_fetch_assoc(mysqli_query($koneksi, 
-                        "SELECT 
+                $data_pegawai = mysqli_fetch_assoc(mysqli_query(
+                    $koneksi,
+                    "SELECT 
                             u.nama,
                             u.nip,
                             j.nama_jabatan 
                         FROM tb_user u 
                         JOIN tb_jabatan j ON j.id = u.jabatan_id 
                         WHERE u.id = '$pegawai'"
-                    ));
+                ));
 
                 // BERDASARKAN TANGGAL
             } elseif ($kategori == 'tanggal') {
@@ -511,6 +512,14 @@ class PimpinanController
         }
     }
 
+    public function cetak_referensi_barang()
+    {
+        require __DIR__ . '/../config/koneksi.php';
+        $data = mysqli_query($koneksi, "SELECT * FROM tb_barang_habis_pakai WHERE is_deleted = 0 ORDER BY nama_barang ASC");
+
+        require_once '../views/pimpinan/cetak_referensi_barang.php';
+    }
+
     public function laporan_permintaan_page()
     {
         require __DIR__ . '/../config/koneksi.php';
@@ -617,7 +626,7 @@ class PimpinanController
         }
     }
 
-    public function cetak_laporan()
+    public function cetak_laporan_transaksi()
     {
         require __DIR__ . '/../config/koneksi.php';
         session_start();
@@ -637,6 +646,6 @@ class PimpinanController
             exit;
         }
 
-        require_once '../views/pimpinan/cetak_laporan.php';
+        require_once '../views/pimpinan/cetak_laporan_transaksi.php';
     }
 }

@@ -373,7 +373,26 @@
 
     <script>
         $(document).ready(function() {
-            $('#dataTable').DataTable();
+            $(document).ready(function() {
+                if (!$.fn.DataTable.isDataTable('#dataTable')) {
+                    $('#dataTable').DataTable({
+                        "language": {
+                            "search": "Cari Permintaan:",
+                            "lengthMenu": "Tampilkan _MENU_ antrian",
+                            "zeroRecords": "Tidak ada permintaan yang cocok",
+                            "info": "Menampilkan _PAGE_ dari _PAGES_",
+                            "infoEmpty": "Tidak ada data",
+                            "infoFiltered": "(difilter dari _MAX_ total data)",
+                            "paginate": {
+                                "first": "Awal",
+                                "last": "Akhir",
+                                "next": "Lanjut",
+                                "previous": "Kembali"
+                            }
+                        }
+                    });
+                }
+            });
 
             // Aktifkan Select2 di Modal Baru
             $('.select2-modal').select2({

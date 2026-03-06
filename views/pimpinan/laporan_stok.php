@@ -46,9 +46,9 @@
                         <div class="card shadow mb-4" id="printableArea">
                             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                                 <h6 class="m-0 font-weight-bold text-primary">Data Stok per Tanggal: <?= date('d F Y'); ?></h6>
-                                <!-- <button onclick="window.print()" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
-                                <i class="fas fa-print fa-sm text-white-50"></i> Cetak / Simpan PDF
-                            </button> -->
+                                <a href="<?= BASE_URL ?>cetak_referensi_barang" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+                                    <i class="fas fa-print fa-sm text-white-50"></i> Cetak / Simpan PDF
+                                </a>
                             </div>
                             <div class="card-body">
                                 <div class="table-responsive">
@@ -73,7 +73,7 @@
                         </div>
                     </div>
                 </div>
-            <?php require __DIR__ . '/../layout/footer.php'; ?>
+                <?php require __DIR__ . '/../layout/footer.php'; ?>
             </div>
         </div>
     </div>

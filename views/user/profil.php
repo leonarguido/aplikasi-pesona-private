@@ -54,6 +54,10 @@
                                             <input type="text" class="form-control" value="<?= ucfirst($data['role']); ?>" readonly>
                                         </div>
                                         <div class="form-group">
+                                            <label>Jabatan</label>
+                                            <input type="text" class="form-control" value="<?= ucfirst($data['nama_jabatan']); ?>" readonly>
+                                        </div>
+                                        <div class="form-group">
                                             <label>Password Anda</label>
                                             <input type="password" class="form-control" value="rahasia" readonly>
                                             <small class="form-text text-muted">Password tidak akan ditampilkan untuk keamanan.</small>

@@ -25,7 +25,7 @@
                                     <h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-filter"></i> Filter Laporan Transaksi per Tanggal</h6>
                                 </div>
                                 <div class="card-body">
-                                    <form action="<?= BASE_URL ?>cetak_laporan" method="POST" target="_blank">
+                                    <form action="<?= BASE_URL ?>cetak_laporan_transaksi" method="POST" target="_blank">
 
                                         <div class="row">
                                             <div class="col">

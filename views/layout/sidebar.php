@@ -35,7 +35,7 @@
             <hr class="sidebar-divider">
         <?php endif; ?>
 
-        <?php if($_SESSION['role'] == 'admin gudang' || $_SESSION['role'] == 'admin' || $_SESSION['role'] == 'super_admin' || $_SESSION['role'] == 'super admin'): ?>
+        <?php if ($_SESSION['role'] == 'admin bmn' || $_SESSION['role'] == 'super_admin' || $_SESSION['role'] == 'super admin'): ?>
 
             <div class="sidebar-heading">Aset BMN</div>
 
@@ -51,6 +51,10 @@
             </li>
 
             <hr class="sidebar-divider">
+
+        <?php endif; ?>
+
+        <?php if ($_SESSION['role'] == 'admin bhp' || $_SESSION['role'] == 'super_admin' || $_SESSION['role'] == 'super admin'): ?>
 
             <div class="sidebar-heading">Barang Habis Pakai</div>
 
@@ -72,6 +76,10 @@
             </li>
 
             <hr class="sidebar-divider">
+
+        <?php endif; ?>
+
+        <?php if ($_SESSION['role'] == 'admin bmn' || $_SESSION['role'] == 'admin bhp' || $_SESSION['role'] == 'super_admin' || $_SESSION['role'] == 'super admin'): ?>
 
             <div class="sidebar-heading">Laporan</div>
 
@@ -158,23 +166,42 @@
             </li>
         <?php endif; ?>
 
-        <?php if (isset($_SESSION['role_asli']) && $_SESSION['role'] != $_SESSION['role_asli']): ?>
+        <?php
+        $role_sekarang = strtolower($_SESSION['role']);
+        if (in_array($role_sekarang, ['admin', 'admin gudang', 'super_admin', 'super admin', 'pimpinan'])):
+        ?>
             <hr class="sidebar-divider d-none d-md-block">
 
-            <div class="sidebar-heading text-warning">
-                Mode Menyamar
+            <div class="sidebar-heading">
+                Hak Akses
             </div>
 
             <li class="nav-item">
-                <a class="nav-link text-warning font-weight-bold" href="<?= BASE_URL ?>kembali_role">
-                    <i class="fas fa-fw fa-exchange-alt text-warning"></i>
+                <a class="nav-link font-weight-bold" href="<?= BASE_URL ?>kembali_role_staff">
+                    <!-- <i class="fas fa-fw fa-user-secret"></i> -->
+                     <i class="fas fa-fw fa-exchange-alt"></i>
+                    <span>Kembali ke Staf</span>
+                </a>
+            </li>
+        <?php endif; ?>
+
+        <?php if (isset($_SESSION['role_asli']) && $_SESSION['role'] != $_SESSION['role_asli']): ?>
+            <hr class="sidebar-divider d-none d-md-block">
+
+            <div class="sidebar-heading">
+                Hak Akses
+            </div>
+
+            <li class="nav-item">
+                <a class="nav-link font-weight-bold" href="<?= BASE_URL ?>kembali_role_asli">
+                    <i class="fas fa-fw fa-exchange-alt"></i>
                     <span>Kembali ke <?= ucfirst($_SESSION['role_asli']); ?></span>
                 </a>
             </li>
         <?php endif; ?>
 
         <hr class="sidebar-divider d-none d-md-block">
-        
+
         <div class="text-center d-none d-md-inline">
             <button class="rounded-circle border-0" id="sidebarToggle"></button>
         </div>

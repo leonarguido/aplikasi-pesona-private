@@ -63,7 +63,7 @@
                                             $no = 1;
                                             $query = mysqli_query(
                                                 $koneksi,
-                                                "SELECT u.*, j.jabatan 
+                                                "SELECT u.*, j.nama_jabatan 
                                                     FROM tb_user u
                                                     LEFT JOIN tb_jabatan j ON u.jabatan_id = j.id
                                                     ORDER BY u.role ASC, u.nama ASC"
@@ -78,15 +78,17 @@
                                                     <td>
                                                         <?php if ($row['role'] == 'super_admin' || $row['role'] == 'super admin'): ?>
                                                             <span class="badge badge-danger">Super Admin</span>
-                                                        <?php elseif ($row['role'] == 'admin gudang' || $row['role'] == 'admin'): ?>
-                                                            <span class="badge badge-primary">Admin Gudang</span>
+                                                        <?php elseif ($row['role'] == 'admin bmn') : ?>
+                                                            <span class="badge badge-primary">Admin Aset BMN</span>
+                                                        <?php elseif ($row['role'] == 'admin bhp') : ?>
+                                                            <span class="badge badge-primary">Admin Barang Habis Pakai</span>
                                                         <?php elseif ($row['role'] == 'pimpinan' || $row['role'] == 'Pimpinan'): ?>
                                                             <span class="badge badge-warning">Pimpinan</span>
                                                         <?php else: ?>
                                                             <span class="badge badge-success">User / Staff</span>
                                                         <?php endif; ?>
                                                     </td>
-                                                    <td><?= $row['jabatan']; ?></td>
+                                                    <td><?= $row['nama_jabatan']; ?></td>
                                                     <td class="text-center">
                                                         <?php if (!empty($row['paraf'])): ?>
                                                             <img src="<?= ASSETS_URL ?>img/ttd/<?= $row['paraf']; ?>" alt="TTD" style="height: 40px;">
@@ -134,9 +136,8 @@
                                                                         <label>Role <span class="text-danger">*</span></label>
                                                                         <select name="role" class="form-control" required>
                                                                             <option value="staff" <?= $row['role'] == 'user' ? 'selected' : ''; ?>>User / Staff</option>
-
-                                                                            <option value="admin gudang" <?= ($row['role'] == 'admin' || $row['role'] == 'admin gudang') ? 'selected' : ''; ?>>Admin Gudang</option>
-
+                                                                            <option value="admin bmn" <?= ($row['role'] == 'admin bmn') ? 'selected' : ''; ?>>Admin Aset BMN</option>
+                                                                            <option value="admin bhp" <?= ($row['role'] == 'admin bhp') ? 'selected' : ''; ?>>Admin Barang Habis Pakai</option>
                                                                             <option value="pimpinan" <?= ($row['role'] == 'pimpinan' || $row['role'] == 'Pimpinan') ? 'selected' : ''; ?>>Pimpinan</option>
                                                                             <option value="super admin" <?= ($row['role'] == 'super_admin' || $row['role'] == 'super admin') ? 'selected' : ''; ?>>Super Admin</option>
                                                                         </select>
@@ -147,7 +148,7 @@
                                                                             <option value="">-- Pilih Jabatan --</option>
                                                                             <?php foreach ($list_jabatan as $jbtn): ?>
                                                                                 <option value="<?= $jbtn['id']; ?>" <?= ($jbtn['id'] == $row['jabatan_id']) ? 'selected' : ''; ?>>
-                                                                                    <?= $jbtn['jabatan']; ?>
+                                                                                    <?= $jbtn['nama_jabatan']; ?>
                                                                                 </option>
                                                                             <?php endforeach; ?>
                                                                         </select>
@@ -202,9 +203,8 @@
                                             <label>Role<span class="text-danger">*</span></label>
                                             <select name="role" class="form-control" required>
                                                 <option value="staff">User / Staff</option>
-
-                                                <option value="admin gudang">Admin Gudang</option>
-
+                                                <option value="admin bmn">Admin Aset BMN</option>
+                                                <option value="admin bhp">Admin Barang Habis Pakai</option>
                                                 <option value="pimpinan">Pimpinan</option>
                                                 <option value="super admin">Super Admin</option>
                                             </select>
@@ -215,7 +215,7 @@
                                                 <option value="">-- Pilih Jabatan --</option>
                                                 <?php foreach ($list_jabatan as $jbtn): ?>
                                                     <option value="<?= $jbtn['id']; ?>">
-                                                        <?= $jbtn['jabatan']; ?>
+                                                        <?= $jbtn['nama_jabatan']; ?>
                                                     </option>
                                                 <?php endforeach; ?>
                                             </select>

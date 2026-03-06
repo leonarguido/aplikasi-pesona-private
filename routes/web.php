@@ -37,8 +37,11 @@ if (isset($_GET['page'])) {
         case 'pilih_role':
             $autentikasi->pilih_role();
             break;
-        case'kembali_role':
-            $autentikasi->kembali_role();
+        case 'kembali_role_asli':
+            $autentikasi->kembali_role_asli();
+            break;
+        case 'kembali_role_staff':
+            $autentikasi->kembali_role_staff();
             break;
         case 'logout':
             $autentikasi->logout();
@@ -144,7 +147,7 @@ if (isset($_GET['page'])) {
         case 'hapus_data_pengguna':
             $admin->hapus_data_pengguna();
             break;
-            
+
         case 'data_jabatan':
             $admin->data_jabatan_page();
             break;
@@ -225,14 +228,8 @@ if (isset($_GET['page'])) {
         // ==========================================
 
         // LAPORAN
-        case 'laporan':
-            $pimpinan->laporan_page();
-            break;
-        case 'laporan_stok':
-            $pimpinan->laporan_stok_page();
-            break;
-        case 'ajax_load_stok_barang':
-            $pimpinan->ajax_load_stok_barang();
+        case 'laporan_transaksi':
+            $pimpinan->laporan_transaksi_page();
             break;
         case 'ajax_load_riwayat_persetujuan':
             $pimpinan->ajax_load_riwayat_persetujuan();
@@ -243,17 +240,26 @@ if (isset($_GET['page'])) {
         case 'ajax_load_laporan_permintaan':
             $pimpinan->ajax_load_laporan_permintaan();
             break;
+        case 'laporan_stok':
+            $pimpinan->laporan_stok_page();
+            break;
+        case 'ajax_load_stok_barang':
+            $pimpinan->ajax_load_stok_barang();
+            break;
+        case 'cetak_referensi_barang':
+            $pimpinan->cetak_referensi_barang();
+            break;
         case 'laporan_permintaan':
             $pimpinan->laporan_permintaan_page();
             break;
-        case 'cetak_laporan':
-            $pimpinan->cetak_laporan();
+        case 'cetak_laporan_transaksi':
+            $pimpinan->cetak_laporan_transaksi();
             break;
         case 'laporan_stock_opname':
             $pimpinan->laporan_stock_opname_page();
             break;
-        case 'proses_stock_opname':
-            $pimpinan->proses_stock_opname();
+        case 'cetak_laporan_stock_opname':
+            $pimpinan->cetak_laporan_stock_opname();
             break;
 
 

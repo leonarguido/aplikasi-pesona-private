@@ -402,7 +402,11 @@ class UserController
         // Ambil Role & ID User
         $role    = $_SESSION['role'];
         $id_user = $_SESSION['user_id'];
-        $data = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT * FROM tb_user WHERE id = '$id_user'"));
+        $data = mysqli_fetch_assoc(mysqli_query($koneksi, 
+            "SELECT u.*, j.nama_jabatan
+            FROM tb_user u
+            JOIN tb_jabatan j ON j.id = u.jabatan_id
+            WHERE u.id = '$id_user'"));
 
         require_once '../views/user/profil.php';
     }

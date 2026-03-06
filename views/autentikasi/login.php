@@ -24,8 +24,11 @@
                                                 </div>
 
                                                 <?php if (isset($error)) : ?>
-                                                    <div class="alert alert-danger text-center" role="alert">
-                                                        Username atau Password salah!
+                                                    <div class="alert alert-danger border-left-danger alert-dismissible fade show" role="alert">
+                                                        <strong>Gagal!</strong> Username atau Password salah!
+                                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                        </button>
                                                     </div>
                                                 <?php endif; ?>
 

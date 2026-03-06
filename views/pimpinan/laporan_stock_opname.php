@@ -41,7 +41,7 @@
                                         <h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-filter"></i> Filter Laporan Stock Opname Berdasarkan:</h6>
                                     </div>
                                     <div class="card-body">
-                                        <form action="<?= BASE_URL ?>proses_stock_opname" method="POST">
+                                        <form action="<?= BASE_URL ?>cetak_laporan_stock_opname" method="POST">
 
                                             <div class="row">
                                                 <div class="col">
@@ -115,7 +115,7 @@
                                                 </div>
                                             </div>
                                             <hr>
-                                            <button type="submit" name="proses_stock_opname" class="btn btn-primary btn-block shadow-sm">
+                                            <button type="submit" name="cetak_laporan_stock_opname" class="btn btn-primary btn-block shadow-sm">
                                                 <i class="fas fa-print fa-sm text-white-50"></i> Cetak Laporan
                                             </button>
                                     </div>

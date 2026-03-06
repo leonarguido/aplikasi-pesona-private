@@ -42,12 +42,12 @@
                                             <?php
                                             $no = 1;
                                             $query = mysqli_query($koneksi, 
-                                                    "SELECT * FROM tb_jabatan ORDER BY jabatan ASC");
+                                                    "SELECT * FROM tb_jabatan ORDER BY nama_jabatan ASC");
                                             while ($row = mysqli_fetch_assoc($query)):
                                             ?>
                                                 <tr>
                                                     <td><?= $no++; ?></td>
-                                                    <td><?= $row['jabatan']; ?></td>
+                                                    <td><?= $row['nama_jabatan']; ?></td>
                                                     <td class="text-center">
                                                         <button class="btn btn-warning btn-sm btn-circle" data-toggle="modal" data-target="#modalEdit<?= $row['id']; ?>" title="Edit">
                                                             <i class="fas fa-edit"></i>
@@ -70,7 +70,7 @@
                                                                     <input type="hidden" name="id_jabatan" value="<?= $row['id']; ?>">
                                                                     <div class="form-group">
                                                                         <label>Nama Jabatan <span class="text-danger">*</span></label>
-                                                                        <input type="text" name="jabatan" class="form-control" value="<?= $row['jabatan']; ?>" required>
+                                                                        <input type="text" name="jabatan" class="form-control" value="<?= $row['nama_jabatan']; ?>" required>
                                                                     </div>
                                                                 </div>
                                                                 <div class="modal-footer">
