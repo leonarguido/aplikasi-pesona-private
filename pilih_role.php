@@ -1,7 +1,16 @@
 <?php
 session_start();
 
-// Jika tidak ada session temp (langsung akses url), kembalikan ke login
+// 1. CEK JIKA SUDAH PUNYA SESI UTAMA (Efek tombol Back)
+if (isset($_SESSION['user_id'])) {
+    // Jika dia sudah login penuh dan menekan back ke halaman ini,
+    // dia harus logout dulu atau gunakan tombol "Kembali ke Akun Asli" di sidebar.
+    // Kita lempar kembali ke dashboard yang sedang aktif.
+    header("Location: index.php");
+    exit;
+}
+
+// 2. CEK JIKA TIDAK ADA SESI SEMENTARA
 if (!isset($_SESSION['temp_user_id'])) {
     header("Location: index.php");
     exit;
@@ -22,26 +31,21 @@ if ($role_asli == 'admin') {
 if (isset($_POST['role_pilihan'])) {
     $role_pilihan = $_POST['role_pilihan'];
     
-    // Set Session Utama yang sebenarnya (Perbaikan menyesuaikan login.php Anda)
+    // Set Session Utama yang sebenarnya
     $_SESSION['user_id']   = $_SESSION['temp_user_id'];
     $_SESSION['username']  = $_SESSION['temp_username'];
     $_SESSION['full_name'] = $_SESSION['temp_full_name'];
-    $_SESSION['role_asli'] = $_SESSION['temp_role']; // Simpan role asli untuk tombol "Kembali"
+    $_SESSION['role_asli'] = $_SESSION['temp_role']; 
     
     if ($role_pilihan == 'staf') {
         $_SESSION['role'] = 'user'; // Menyamar jadi staf
     } else {
         $_SESSION['role'] = $_SESSION['temp_role']; // Masuk dengan role asli
     }
+
     
-    // Hapus session temporary agar bersih
-    unset($_SESSION['temp_user_id']);
-    unset($_SESSION['temp_username']);
-    unset($_SESSION['temp_full_name']);
-    unset($_SESSION['temp_role']);
-    
-    // Lanjut ke halaman utama
-    header("Location: index.php");
+    // Gunakan teknik pengalihan (PRG pattern) untuk mencegah form resubmission
+    header("Location: index.php", true, 303);
     exit;
 }
 ?>

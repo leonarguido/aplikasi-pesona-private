@@ -136,6 +136,23 @@
         <?php endif; ?>
 
 
+        <?php 
+        $role_sekarang = strtolower($_SESSION['role']);
+        if(in_array($role_sekarang, ['admin', 'admin gudang', 'super_admin', 'super admin', 'pimpinan'])): 
+        ?>
+            <hr class="sidebar-divider d-none d-md-block">
+
+            <div class="sidebar-heading text-info">
+                Mode Menyamar
+            </div>
+
+            <li class="nav-item">
+                <a class="nav-link text-info font-weight-bold" href="menyamar_staf.php">
+                    <i class="fas fa-fw fa-user-secret text-info"></i>
+                    <span>Menyamar jadi Staf</span>
+                </a>
+            </li>
+        <?php endif; ?>
         <?php if (isset($_SESSION['role_asli']) && $_SESSION['role'] != $_SESSION['role_asli']): ?>
             <hr class="sidebar-divider d-none d-md-block">
 
