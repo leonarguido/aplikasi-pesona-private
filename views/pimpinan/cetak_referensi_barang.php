@@ -184,7 +184,7 @@
                     <thead>
                         <tr>
                             <td width="110px">KODE UAKPB</td>
-                            <td width="300px">: </td>
+                            <td width="300px">: <?= $kode ?></td>
                             <td width="110px">Tanggal</td>
                             <td>: <?= date('d-m-Y'); ?></td>
                         </tr>
@@ -217,7 +217,7 @@
                         <td style="text-align: center;"><?= $no ?></td>
                         <td style="text-align: center;"><?= $row['kode_barang'] ?></td>
                         <td style="text-align: center;"><?= $row['satuan'] ?></td>
-                        <td><?= $row['nama_barang'] ?></td>
+                        <td><?= $row['nama_barang'] ?> <?php if ($row['merek_barang']): ?> (<?= $row['merek_barang'] ?>) <?php else: ?> (Tidak ada merek) <?php endif ?></td>
                     </tr>
                     <?php if ($no % 35 == 0): ?>
                         </tbody>

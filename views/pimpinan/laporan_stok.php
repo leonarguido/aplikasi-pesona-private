@@ -45,10 +45,13 @@
 
                         <div class="card shadow mb-4" id="printableArea">
                             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                                <h6 class="m-0 font-weight-bold text-primary">Data Stok per Tanggal: <?= date('d F Y'); ?></h6>
-                                <a href="<?= BASE_URL ?>cetak_referensi_barang" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
-                                    <i class="fas fa-print fa-sm text-white-50"></i> Cetak / Simpan PDF
-                                </a>
+                                <h6 class="m-0 font-weight-bold text-primary">Data Stok</h6>
+                                <form action="<?= BASE_URL ?>cetak_referensi_barang" target="_blank" method="post" class="d-flex flex-row align-items-center justify-content-between">
+                                    <input type="text" name="kode" id="kode" class="form-control form-control-sm mr-2" placeholder="Kode UAKPB.." required>
+                                    <button type="submit" class="btn btn-sm btn-primary form-control">
+                                        <i class="fas fa-print fa-sm text-white-50"></i> Cetak / Simpan PDF
+                                    </button>
+                                </form>
                             </div>
                             <div class="card-body">
                                 <div class="table-responsive">
@@ -130,6 +133,10 @@
             $status_stok = this.value;
             load_laporan_stok_barang($status_stok);
         });
+
+        // $(document).on('click', '.btn-kode', function() {
+        //     $('#kode').show();
+        // });
     </script>
 </body>
 

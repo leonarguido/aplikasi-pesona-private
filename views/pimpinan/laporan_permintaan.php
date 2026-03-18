@@ -45,10 +45,10 @@
 
                         <div class="card shadow mb-4" id="printableArea">
                             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                                <h6 class="m-0 font-weight-bold text-primary">Total Permintaan per Tanggal: <?= date('d F Y'); ?></h6>
+                                <h6 class="m-0 font-weight-bold text-primary">Daftar Permintaan</h6>
                                 <!-- <button onclick="window.print()" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
-                                <i class="fas fa-print fa-sm text-white-50"></i> Cetak / Simpan PDF
-                            </button> -->
+                                    <i class="fas fa-print fa-sm text-white-50"></i> Cetak / Simpan PDF
+                                </button> -->
                             </div>
                             <div class="card-body">
                                 <div class="table-responsive">
@@ -73,7 +73,7 @@
 
                     </div>
                 </div>
-            <?php require __DIR__ . '/../layout/footer.php'; ?>
+                <?php require __DIR__ . '/../layout/footer.php'; ?>
             </div>
         </div>
     </div>
@@ -112,9 +112,8 @@
                         Filter:
                             <label>
                                 <select name="status_permintaan" class="form-control form-control-sm">
-                                    <option value="" ${$status_permintaan === '' ? 'selected' : ''}>Semua Status</option>
+                                    <option value="" ${$status_permintaan === '' ? 'selected' : ''}>Disetujui</option>
                                     <option value="menunggu" ${$status_permintaan === 'menunggu' ? 'selected' : ''}>Menunggu</option>
-                                    <option value="disetujui" ${$status_permintaan === 'disetujui' ? 'selected' : ''}>Disetujui</option>
                                     <option value="ditolak" ${$status_permintaan === 'ditolak' ? 'selected' : ''}>Ditolak</option>
                                 </select>
                             </label>

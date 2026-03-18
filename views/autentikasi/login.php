@@ -11,16 +11,17 @@
             <div class="page-body-wrapper full-page-wrapper">
                 <div class="content-wrapper align-items-center auth px-0">
                     <div class="row w-100 mx-0" style="background-image: url('<?= ASSETS_URL ?>img/bpmp/kantor_bpmp_bali_3.jpeg'); background-size: cover; background-repeat: no-repeat;">
-                        <div class="col-lg-8 mx-auto">
+                        <div class="col-lg-6 mx-auto">
                             <div class="auth-form-light py-5 px-4 px-sm-5 d-flex flex-row align-items-center justify-content-between" style="height: 100vh; opacity: 0.95;">
 
                                 <div class="container">
-                                    <div class="card o-hidden border-0 shadow-lg my-5">
+                                    <div class="card o-hidden border-0 shadow-lg my-5" style="border-radius: 10%; opacity: 0.93;">
                                         <div class="card-body p-0">
                                             <div class="p-5">
                                                 <div class="text-center">
-                                                    <h1 class="text-gray-900">PESONA</h1>
-                                                    <H5 class="text-gray-900 mb-4">Penata Usahaan Stok Opname</H5>
+                                                    <h1 class="text-gray-900 mb-2">PESONA BALI</h1>
+                                                    <h5 class="text-gray-900 m-0">Penata Usahaan Stok Opname</h5>
+                                                    <h5 class="text-gray-900 m-0 pb-3">BPMP Provinsi Bali</h5>
                                                 </div>
 
                                                 <?php if (isset($error)) : ?>

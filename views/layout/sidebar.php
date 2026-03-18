@@ -35,7 +35,7 @@
             <hr class="sidebar-divider">
         <?php endif; ?>
 
-        <?php if ($_SESSION['role'] == 'admin bmn' || $_SESSION['role'] == 'super_admin' || $_SESSION['role'] == 'super admin'): ?>
+        <?php if ($_SESSION['role'] == 'admin bmn'): ?>
 
             <div class="sidebar-heading">Aset BMN</div>
 
@@ -52,9 +52,25 @@
 
             <hr class="sidebar-divider">
 
+            <div class="sidebar-heading">Laporan</div>
+
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseDataLaporan"
+                    aria-expanded="true" aria-controls="collapseDataLaporan">
+                    <i class="fas fa-fw fa-file-pdf"></i>
+                    <span>Laporan</span>
+                </a>
+                <div id="collapseDataLaporan" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <h6 class="collapse-header">Pilih Kategori:</h6>
+                        <a class="collapse-item" href="<?= BASE_URL ?>laporan_aset">Laporan Aset</a>
+                    </div>
+                </div>
+            </li>
+
         <?php endif; ?>
 
-        <?php if ($_SESSION['role'] == 'admin bhp' || $_SESSION['role'] == 'super_admin' || $_SESSION['role'] == 'super admin'): ?>
+        <?php if ($_SESSION['role'] == 'admin bhp'): ?>
 
             <div class="sidebar-heading">Barang Habis Pakai</div>
 
@@ -77,9 +93,27 @@
 
             <hr class="sidebar-divider">
 
+            <div class="sidebar-heading">Laporan</div>
+
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseDataLaporan"
+                    aria-expanded="true" aria-controls="collapseDataLaporan">
+                    <i class="fas fa-fw fa-file-pdf"></i>
+                    <span>Laporan</span>
+                </a>
+                <div id="collapseDataLaporan" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <h6 class="collapse-header">Pilih Kategori:</h6>
+                        <a class="collapse-item" href="<?= BASE_URL ?>laporan_persediaan">Laporan Persediaan</a>
+                        <a class="collapse-item" href="<?= BASE_URL ?>laporan_permintaan">Laporan Permintaan</a>
+                        <a class="collapse-item" href="<?= BASE_URL ?>laporan_stok">Laporan Stok Barang</a>
+                    </div>
+                </div>
+            </li>
+
         <?php endif; ?>
 
-        <?php if ($_SESSION['role'] == 'admin bmn' || $_SESSION['role'] == 'admin bhp' || $_SESSION['role'] == 'super_admin' || $_SESSION['role'] == 'super admin'): ?>
+        <?php if ($_SESSION['role'] == 'super_admin' || $_SESSION['role'] == 'super admin'): ?>
 
             <div class="sidebar-heading">Laporan</div>
 
@@ -92,8 +126,7 @@
                 <div id="collapseDataLaporan" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">Pilih Kategori:</h6>
-                        <a class="collapse-item" href="<?= BASE_URL ?>laporan_stock_opname">Laporan Stock Opname</a>
-                        <a class="collapse-item" href="<?= BASE_URL ?>laporan">Laporan Transaksi Berhasil</a>
+                        <a class="collapse-item" href="<?= BASE_URL ?>laporan_persediaan">Laporan Persediaan</a>
                         <a class="collapse-item" href="<?= BASE_URL ?>laporan_stok">Laporan Stok Barang</a>
                         <a class="collapse-item" href="<?= BASE_URL ?>laporan_permintaan">Laporan Permintaan</a>
                     </div>
@@ -151,9 +184,8 @@
                 <div id="collapseDataLaporan" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">Pilih Kategori:</h6>
-                        <a class="collapse-item" href="<?= BASE_URL ?>laporan_stock_opname">Laporan Stock Opname</a>
-                        <a class="collapse-item" href="<?= BASE_URL ?>laporan">Laporan Transaksi Berhasil</a>
-                        <a class="collapse-item" href="<?= BASE_URL ?>laporan_stok">Laporan Stok Barang</a>
+                        <a class="collapse-item" href="<?= BASE_URL ?>laporan_aset">Laporan Aset</a>
+                        <a class="collapse-item" href="<?= BASE_URL ?>laporan_persediaan">Laporan Persediaan</a>
                         <a class="collapse-item" href="<?= BASE_URL ?>laporan_permintaan">Laporan Permintaan</a>
                     </div>
                 </div>
@@ -168,7 +200,7 @@
 
         <?php
         $role_sekarang = strtolower($_SESSION['role']);
-        if (in_array($role_sekarang, ['admin', 'admin gudang', 'super_admin', 'super admin', 'pimpinan'])):
+        if (in_array($role_sekarang, ['admin', 'admin bhp', 'admin bmn', 'super_admin', 'super admin', 'pimpinan'])):
         ?>
             <hr class="sidebar-divider d-none d-md-block">
 

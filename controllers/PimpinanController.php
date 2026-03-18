@@ -14,8 +14,7 @@ class PimpinanController
             header("Location: login.php");
             exit;
         }
-        if ($_SESSION['role'] == 'user') {
-            // echo "<script>alert('Akses Ditolak!'); window.location='index.php';</script>";
+        if ($_SESSION['role'] == 'user' || $_SESSION['role'] == 'staff') {
             $_SESSION['alert'] = [
                 'icon' => 'error',
                 'title' => 'Gagal!',
@@ -155,7 +154,7 @@ class PimpinanController
         }
     }
 
-    public function laporan_stock_opname_page()
+    public function laporan_persediaan_page()
     {
         require __DIR__ . '/../config/koneksi.php';
         session_start();
@@ -165,7 +164,7 @@ class PimpinanController
             header("Location: login.php");
             exit;
         }
-        if ($_SESSION['role'] == 'user') {
+        if ($_SESSION['role'] == 'user' || $_SESSION['role'] == 'staff') {
             // echo "<script>alert('Akses Ditolak!'); window.location='index.php';</script>";
             $_SESSION['alert'] = [
                 'icon' => 'error',
@@ -194,20 +193,21 @@ class PimpinanController
             $list_pegawai[] = $p;
         }
 
-        require_once '../views/pimpinan/laporan_stock_opname.php';
+        require_once '../views/pimpinan/laporan_persediaan.php';
     }
 
-    public function cetak_laporan_stock_opname()
+    public function cetak_laporan_persediaan()
     {
         require __DIR__ . '/../config/koneksi.php';
         session_start();
 
-        if (isset($_POST['cetak_laporan_stock_opname'])) {
+        if (isset($_POST['cetak_laporan_persediaan'])) {
             $kategori    = $_POST['kategori'];
             $item       = $_POST['item'];
             $pegawai    = $_POST['pegawai'];
             $tgl_mulai  = $_POST['tgl_mulai'];
             $tgl_selesai = $_POST['tgl_selesai'];
+            $kode       = $_POST['kode'];
 
             if (!$kategori) {
                 $_SESSION['alert'] = [
@@ -215,7 +215,7 @@ class PimpinanController
                     'title' => 'Gagal!',
                     'text' => 'Kategori filter harus dipilih.'
                 ];
-                header("Location: " . $this->base_url . "laporan_stock_opname");
+                header("Location: " . $this->base_url . "laporan_persediaan");
                 exit;
             } elseif ($kategori == 'item' && !$item) {
                 $_SESSION['alert'] = [
@@ -223,7 +223,7 @@ class PimpinanController
                     'title' => 'Gagal!',
                     'text' => 'Pilih item terlebih dahulu!'
                 ];
-                header("Location: " . $this->base_url . "laporan_stock_opname");
+                header("Location: " . $this->base_url . "laporan_persediaan");
                 exit;
             } elseif ($kategori == 'pegawai' && !$pegawai) {
                 $_SESSION['alert'] = [
@@ -231,7 +231,7 @@ class PimpinanController
                     'title' => 'Gagal!',
                     'text' => 'Pilih pegawai terlebih dahulu!'
                 ];
-                header("Location: " . $this->base_url . "laporan_stock_opname");
+                header("Location: " . $this->base_url . "laporan_persediaan");
                 exit;
             } elseif (!$tgl_mulai || !$tgl_selesai) {
                 $_SESSION['alert'] = [
@@ -239,7 +239,7 @@ class PimpinanController
                     'title' => 'Gagal!',
                     'text' => 'Tanggal mulai dan tanggal selesai harus diisi.'
                 ];
-                header("Location: " . $this->base_url . "laporan_stock_opname");
+                header("Location: " . $this->base_url . "laporan_persediaan");
                 exit;
             }
 
@@ -284,7 +284,7 @@ class PimpinanController
                         'title' => 'Gagal!',
                         'text' => 'Tidak ada data transaksi untuk barang ini pada periode terpilih.'
                     ];
-                    header("Location: " . $this->base_url . "laporan_stock_opname");
+                    header("Location: " . $this->base_url . "laporan_persediaan");
                     exit;
                 }
 
@@ -379,7 +379,7 @@ class PimpinanController
                         'title' => 'Gagal!',
                         'text' => 'Tidak ada data transaksi untuk pegawai ini pada periode terpilih.'
                     ];
-                    header("Location: " . $this->base_url . "laporan_stock_opname");
+                    header("Location: " . $this->base_url . "laporan_persediaan");
                     exit;
                 }
 
@@ -418,13 +418,38 @@ class PimpinanController
                         'title' => 'Gagal!',
                         'text' => 'Tidak ada data transaksi pada periode terpilih.'
                     ];
-                    header("Location: " . $this->base_url . "laporan_stock_opname");
+                    header("Location: " . $this->base_url . "laporan_persediaan");
                     exit;
                 }
             }
 
-            require_once '../views/pimpinan/cetak_laporan_stock_opname.php';
+            require_once '../views/pimpinan/cetak_laporan_persediaan.php';
         }
+    }
+
+    public function laporan_aset_page()
+    {
+        require __DIR__ . '/../config/koneksi.php';
+        session_start();
+
+        if ($_SESSION['role'] == 'user' || $_SESSION['role'] == 'staff' || $_SESSION['role'] == 'admin bhp') {
+            $_SESSION['alert'] = [
+                'icon' => 'error',
+                'title' => 'Gagal!',
+                'text' => 'Akses Ditolak!',
+            ];
+            header("Location: index.php");
+            exit;
+        }
+
+        require_once '../views/pimpinan/laporan_aset.php';
+    }
+
+    public function cetak_laporan_aset()
+    {
+        require __DIR__ . '/../config/koneksi.php';
+
+        require_once '../views/pimpinan/cetak_laporan_aset.php';
     }
 
     public function laporan_stok_page()
@@ -516,6 +541,7 @@ class PimpinanController
     {
         require __DIR__ . '/../config/koneksi.php';
         $data = mysqli_query($koneksi, "SELECT * FROM tb_barang_habis_pakai WHERE is_deleted = 0 ORDER BY nama_barang ASC");
+        $kode = $_POST['kode'];
 
         require_once '../views/pimpinan/cetak_referensi_barang.php';
     }
@@ -569,6 +595,8 @@ class PimpinanController
 
             if ($status_permintaan != "") {
                 $sql .= " WHERE p.status = '$status_permintaan'";
+                } else {
+                $sql .= " WHERE p.status = 'disetujui'";
             }
 
             $sql .= " ORDER BY p.id DESC";

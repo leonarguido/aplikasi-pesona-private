@@ -15,6 +15,16 @@ class UserController
             exit;
         }
 
+        if ($_SESSION['role'] != 'user') {
+            $_SESSION['alert'] = [
+                'icon' => 'error',
+                'title' => 'Gagal!',
+                'text' => 'Akses Ditolak!',
+            ];
+            header("Location: index.php");
+            exit;
+        }
+
         // Inisialisasi Keranjang jika belum ada
         if (!isset($_SESSION['keranjang'])) {
             $_SESSION['keranjang'] = [];
@@ -82,6 +92,16 @@ class UserController
 
         if (!isset($_SESSION['user_id'])) {
             header("Location: login.php");
+            exit;
+        }
+
+        if ($_SESSION['role'] != 'user') {
+            $_SESSION['alert'] = [
+                'icon' => 'error',
+                'title' => 'Gagal!',
+                'text' => 'Akses Ditolak!',
+            ];
+            header("Location: index.php");
             exit;
         }
 
@@ -194,6 +214,16 @@ class UserController
         // 1. Cek Login (Hanya User/Staff)
         if (!isset($_SESSION['user_id'])) {
             header("Location: login.php");
+            exit;
+        }
+
+        if ($_SESSION['role'] != 'user') {
+            $_SESSION['alert'] = [
+                'icon' => 'error',
+                'title' => 'Gagal!',
+                'text' => 'Akses Ditolak!',
+            ];
+            header("Location: index.php");
             exit;
         }
 
@@ -383,6 +413,16 @@ class UserController
             exit;
         }
 
+        if ($_SESSION['role'] != 'user') {
+            $_SESSION['alert'] = [
+                'icon' => 'error',
+                'title' => 'Gagal!',
+                'text' => 'Akses Ditolak!',
+            ];
+            header("Location: index.php");
+            exit;
+        }
+
         $id_user = $_SESSION['user_id'];
 
         // 2. Ambil Info User (Terutama NIP)
@@ -543,7 +583,17 @@ class UserController
         require __DIR__ . '/../config/koneksi.php';
         session_start();
 
-        if (!isset($_SESSION['user_id']) || ($_SESSION['role'] != 'user' && $_SESSION['role'] != 'staff')) {
+        if (!isset($_SESSION['user_id'])) {
+            header("Location: login.php");
+            exit;
+        }
+
+        if ($_SESSION['role'] != 'user') {
+            $_SESSION['alert'] = [
+                'icon' => 'error',
+                'title' => 'Gagal!',
+                'text' => 'Akses Ditolak!',
+            ];
             header("Location: index.php");
             exit;
         }

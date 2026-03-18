@@ -228,18 +228,13 @@ if (isset($_GET['page'])) {
         // ==========================================
 
         // LAPORAN
-        case 'laporan_transaksi':
-            $pimpinan->laporan_transaksi_page();
+        case 'laporan_aset':
+            $pimpinan->laporan_aset_page();
             break;
-        case 'ajax_load_riwayat_persetujuan':
-            $pimpinan->ajax_load_riwayat_persetujuan();
+        case 'cetak_laporan_aset':
+            $pimpinan->cetak_laporan_aset();
             break;
-        case 'ajax_load_laporan_stok_barang':
-            $pimpinan->ajax_load_laporan_stok_barang();
-            break;
-        case 'ajax_load_laporan_permintaan':
-            $pimpinan->ajax_load_laporan_permintaan();
-            break;
+
         case 'laporan_stok':
             $pimpinan->laporan_stok_page();
             break;
@@ -249,17 +244,33 @@ if (isset($_GET['page'])) {
         case 'cetak_referensi_barang':
             $pimpinan->cetak_referensi_barang();
             break;
+
         case 'laporan_permintaan':
             $pimpinan->laporan_permintaan_page();
             break;
+        case 'ajax_load_laporan_permintaan':
+            $pimpinan->ajax_load_laporan_permintaan();
+            break;
+
+        case 'laporan_persediaan':
+            $pimpinan->laporan_persediaan_page();
+            break;
+        case 'cetak_laporan_persediaan':
+            $pimpinan->cetak_laporan_persediaan();
+            break;
+
+        // LAPORAN [CADANGAN]
+        case 'laporan_transaksi':
+            $pimpinan->laporan_transaksi_page();
+            break;
+        case 'ajax_load_riwayat_persetujuan':
+            $pimpinan->ajax_load_riwayat_persetujuan();
+            break;
+        case 'ajax_load_laporan_stok_barang':
+            $pimpinan->ajax_load_laporan_stok_barang();
+            break;
         case 'cetak_laporan_transaksi':
             $pimpinan->cetak_laporan_transaksi();
-            break;
-        case 'laporan_stock_opname':
-            $pimpinan->laporan_stock_opname_page();
-            break;
-        case 'cetak_laporan_stock_opname':
-            $pimpinan->cetak_laporan_stock_opname();
             break;
 
 

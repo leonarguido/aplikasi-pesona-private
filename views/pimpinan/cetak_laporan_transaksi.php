@@ -93,7 +93,7 @@
 
     <div class="container">
         <div class="no-print" style="margin-bottom: 20px;">
-            <a href="<?= BASE_URL ?>laporan" class="btn-back">⬅ Kembali</a>
+            <a href="<?= BASE_URL ?>laporan_transaksi" class="btn-back">⬅ Kembali</a>
             <button onclick="window.print()" class="btn-print">🖨️ Cetak / Simpan PDF</button>
         </div>
 

@@ -16,7 +16,7 @@ class AdminController
             header("Location: login.php");
             exit;
         }
-        if ($_SESSION['role'] == 'user' || $_SESSION['role'] == 'pimpinan') {
+        if ($_SESSION['role'] == 'user' || $_SESSION['role'] == 'staff' || $_SESSION['role'] == 'pimpinan') {
             $_SESSION['alert'] = [
                 'icon' => 'error',
                 'title' => 'Gagal!',
@@ -298,11 +298,11 @@ class AdminController
         session_start();
 
         // Cek Login & Role
-        if (!isset($_SESSION['user_id']) || ($_SESSION['role'] != 'admin bmn' && $_SESSION['role'] != 'super admin' && $_SESSION['role'] != 'pimpinan')) {
+        if (!isset($_SESSION['user_id']) || ($_SESSION['role'] != 'admin bmn' && $_SESSION['role'] != 'super admin')) {
             header("Location: login.php");
             exit;
         }
-        if ($_SESSION['role'] == 'user' || $_SESSION['role'] == 'pimpinan') {
+        if ($_SESSION['role'] == 'user' || $_SESSION['role'] == 'staff' || $_SESSION['role'] == 'pimpinan') {
             $_SESSION['alert'] = [
                 'icon' => 'error',
                 'title' => 'Gagal!',
@@ -489,7 +489,6 @@ class AdminController
             exit;
         }
         if ($_SESSION['role'] == 'staff' || $_SESSION['role'] == 'user') {
-            // echo "<script>alert('Akses Ditolak!'); window.location='index.php';</script>";
             $_SESSION['alert'] = [
                 'icon' => 'error',
                 'title' => 'Gagal!',
@@ -512,7 +511,6 @@ class AdminController
             exit;
         }
         if ($_SESSION['role'] == 'staff' || $_SESSION['role'] == 'user') {
-            // echo "<script>alert('Akses Ditolak!'); window.location='index.php';</script>";
             $_SESSION['alert'] = [
                 'icon' => 'error',
                 'title' => 'Gagal!',
@@ -663,6 +661,11 @@ class AdminController
         session_start();
 
         if (!isset($_SESSION['user_id']) || ($_SESSION['role'] != 'admin bmn' && $_SESSION['role'] != 'super admin')) {
+            $_SESSION['alert'] = [
+                'icon' => 'error',
+                'title' => 'Gagal!',
+                'text' => 'Akses Ditolak!',
+            ];
             header("Location: index.php");
             exit;
         }
@@ -933,6 +936,11 @@ class AdminController
 
         // CEK AKSES: HANYA ADMIN
         if (!isset($_SESSION['user_id']) || ($_SESSION['role'] != 'admin bmn' && $_SESSION['role'] != 'super admin')) {
+            $_SESSION['alert'] = [
+                'icon' => 'error',
+                'title' => 'Gagal!',
+                'text' => 'Akses Ditolak!',
+            ];
             header("Location: index.php");
             exit;
         }
@@ -1115,7 +1123,6 @@ class AdminController
 
         // Hanya Super Admin yang boleh akses halaman ini
         if ($_SESSION['role'] != 'super admin') {
-            // echo "<script>alert('Akses Ditolak!'); window.location='index.php';</script>";
             $_SESSION['alert'] = [
                 'icon' => 'error',
                 'title' => 'Gagal!',
@@ -1124,7 +1131,6 @@ class AdminController
             header("Location: " . $this->base_url);
             exit;
         }
-     
 
         // AMBIL DATA JABATAN (UNTUK DROPDOWN)
         $list_jabatan = [];
