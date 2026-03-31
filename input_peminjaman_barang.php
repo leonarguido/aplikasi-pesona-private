@@ -59,7 +59,7 @@ if (isset($_POST['ajukan_pinjam'])) {
     }
 }
 
-// B. EDIT PENGAJUAN (UPDATE DATA) - BARU DITAMBAHKAN
+// B. EDIT PENGAJUAN (UPDATE DATA)
 if (isset($_POST['update_pinjam'])) {
     $id_edit        = $_POST['id_edit'];
     $nama_barang    = mysqli_real_escape_string($koneksi, $_POST['nama_barang']);
@@ -71,7 +71,7 @@ if (isset($_POST['update_pinjam'])) {
     $id_penerima    = $_POST['id_penerima']; 
     $tgl_serah      = $_POST['tgl_serah_terima'];
     
-    // LOGIKA TANGGAL KEMBALI (SAMA SEPERTI INPUT)
+    // LOGIKA TANGGAL KEMBALI 
     if (isset($_POST['jangka_panjang'])) {
         $tgl_kembali_sql = "NULL"; 
     } else {
@@ -100,36 +100,59 @@ if (isset($_POST['update_pinjam'])) {
 // C. HAPUS DATA
 if (isset($_GET['hapus'])) {
     $id = $_GET['hapus'];
+    
+    // Hapus juga file fisik arsip sebelum menghapus row data
+    $q_del = mysqli_query($koneksi, "SELECT file_ba_signed, foto_bukti FROM tb_peminjaman WHERE id='$id'");
+    $d_del = mysqli_fetch_assoc($q_del);
+    if($d_del['file_ba_signed'] && file_exists("assets/arsip/" . $d_del['file_ba_signed'])) {
+        unlink("assets/arsip/" . $d_del['file_ba_signed']);
+    }
+    if($d_del['foto_bukti'] && file_exists("assets/arsip/" . $d_del['foto_bukti'])) {
+        unlink("assets/arsip/" . $d_del['foto_bukti']);
+    }
+
     mysqli_query($koneksi, "DELETE FROM tb_peminjaman WHERE id='$id'");
-    echo "<script>alert('Data Peminjaman Dihapus!'); window.location='input_peminjaman_barang.php';</script>";
+    echo "<script>alert('Data Peminjaman beserta Arsip Dihapus!'); window.location='input_peminjaman_barang.php';</script>";
 }
 
-// D. UPLOAD ARSIP (FINALISASI)
+// D. UPLOAD / EDIT ARSIP (FINALISASI) - DIPERBARUI
 if (isset($_POST['upload_arsip'])) {
     $id_pinjam = $_POST['id'];
     
-    // Upload Berita Acara (PDF)
-    $ba_name = null;
+    // Ambil data file lama untuk dihapus jika di-replace
+    $q_old = mysqli_query($koneksi, "SELECT file_ba_signed, foto_bukti, status FROM tb_peminjaman WHERE id='$id_pinjam'");
+    $d_old = mysqli_fetch_assoc($q_old);
+    
+    $ba_name = $d_old['file_ba_signed'];
+    $foto_name = $d_old['foto_bukti'];
+    $current_status = $d_old['status'];
+
+    // Upload Berita Acara (PDF) jika ada file baru
     if (!empty($_FILES['file_ba']['name'])) {
+        // Hapus file lama
+        if ($ba_name && file_exists("assets/arsip/" . $ba_name)) { unlink("assets/arsip/" . $ba_name); }
         $ba_tmp = $_FILES['file_ba']['tmp_name'];
         $ba_name = time() . "_BA_" . $_FILES['file_ba']['name'];
         if (!is_dir("assets/arsip/")) { mkdir("assets/arsip/", 0777, true); }
         move_uploaded_file($ba_tmp, "assets/arsip/" . $ba_name);
     }
     
-    // Upload Foto Bukti (JPG)
-    $foto_name = null;
+    // Upload Foto Bukti (JPG/PNG) jika ada file baru
     if (!empty($_FILES['foto_bukti']['name'])) {
+        // Hapus file lama
+        if ($foto_name && file_exists("assets/arsip/" . $foto_name)) { unlink("assets/arsip/" . $foto_name); }
         $foto_tmp = $_FILES['foto_bukti']['tmp_name'];
         $foto_name = time() . "_FOTO_" . $_FILES['foto_bukti']['name'];
         move_uploaded_file($foto_tmp, "assets/arsip/" . $foto_name);
     }
     
-    // Update DB -> Status Selesai
-    $q_update = "UPDATE tb_peminjaman SET file_ba_signed='$ba_name', foto_bukti='$foto_name', status='selesai' WHERE id='$id_pinjam'";
+    // Ubah status ke selesai HANYA jika status sebelumnya adalah 'disetujui' (pertama kali upload finalisasi)
+    $new_status = ($current_status == 'disetujui') ? 'selesai' : $current_status;
+
+    $q_update = "UPDATE tb_peminjaman SET file_ba_signed='$ba_name', foto_bukti='$foto_name', status='$new_status' WHERE id='$id_pinjam'";
     
     if (mysqli_query($koneksi, $q_update)) {
-        echo "<script>alert('Arsip Berhasil Diupload! Transaksi Selesai.'); window.location='input_peminjaman_barang.php';</script>";
+        echo "<script>alert('Arsip Berhasil Disimpan/Diupdate!'); window.location='input_peminjaman_barang.php';</script>";
     }
 }
 ?>
@@ -215,15 +238,15 @@ require 'layout/topbar.php';
                                     <span class="badge badge-danger">Ditolak Staf</span>
                                 <?php endif; ?>
                             </td>
-                            <td class="text-center">
-                                <?php if($row['status'] == 'selesai' || $row['status'] == 'dikembalikan'): ?>
-                                    <?php if($row['file_ba_signed']): ?>
-                                        <a href="assets/arsip/<?= $row['file_ba_signed']; ?>" target="_blank" class="btn btn-xs btn-primary" title="Lihat Berita Acara"><i class="fas fa-file-pdf"></i></a>
-                                    <?php endif; ?>
-                                    <?php if($row['foto_bukti']): ?>
-                                        <a href="assets/arsip/<?= $row['foto_bukti']; ?>" target="_blank" class="btn btn-xs btn-success" title="Lihat Foto"><i class="fas fa-image"></i></a>
-                                    <?php endif; ?>
-                                <?php else: ?>
+                            
+                            <td class="text-center nowrap">
+                                <?php if($row['file_ba_signed']): ?>
+                                    <a href="assets/arsip/<?= $row['file_ba_signed']; ?>" target="_blank" class="btn btn-xs btn-primary" title="Lihat Berita Acara"><i class="fas fa-file-pdf"></i></a>
+                                <?php endif; ?>
+                                <?php if($row['foto_bukti']): ?>
+                                    <a href="assets/arsip/<?= $row['foto_bukti']; ?>" target="_blank" class="btn btn-xs btn-success" title="Lihat Foto"><i class="fas fa-image"></i></a>
+                                <?php endif; ?>
+                                <?php if(!$row['file_ba_signed'] && !$row['foto_bukti']): ?>
                                     -
                                 <?php endif; ?>
                             </td>
@@ -233,18 +256,20 @@ require 'layout/topbar.php';
                                 <button class="btn btn-warning btn-sm shadow-sm" data-toggle="modal" data-target="#modalEdit<?= $row['id']; ?>" title="Edit Pengajuan">
                                     <i class="fas fa-pencil-alt"></i>
                                 </button>
-                                <a href="input_peminjaman_barang.php?hapus=<?= $row['id']; ?>" class="btn btn-danger btn-sm shadow-sm" onclick="return confirm('Apakah Anda yakin ingin menghapus data ini?')" title="Hapus Data">
-                                    <i class="fas fa-trash"></i>
-                                </a>
+                                
+                                <button class="btn btn-success btn-sm shadow-sm" data-toggle="modal" data-target="#modalUpload<?= $row['id']; ?>" title="Upload / Edit Arsip">
+                                    <i class="fas fa-upload"></i>
+                                </button>
                                 
                                 <?php if($row['status'] == 'disetujui'): ?>
                                     <a href="cetak_berita_acara.php?id=<?= $row['id']; ?>" target="_blank" class="btn btn-info btn-sm shadow-sm" title="Cetak Berita Acara">
                                         <i class="fas fa-print"></i>
                                     </a>
-                                    <button class="btn btn-success btn-sm shadow-sm" data-toggle="modal" data-target="#modalUpload<?= $row['id']; ?>" title="Upload Arsip">
-                                        <i class="fas fa-upload"></i>
-                                    </button>
                                 <?php endif; ?>
+
+                                <a href="input_peminjaman_barang.php?hapus=<?= $row['id']; ?>" class="btn btn-danger btn-sm shadow-sm" onclick="return confirm('Apakah Anda yakin ingin menghapus data ini beserta file arsipnya?')" title="Hapus Data">
+                                    <i class="fas fa-trash"></i>
+                                </a>
 
                             </td>
                         </tr>
@@ -356,26 +381,34 @@ require 'layout/topbar.php';
                             <div class="modal-dialog">
                                 <div class="modal-content">
                                     <div class="modal-header bg-success text-white">
-                                        <h5 class="modal-title">Finalisasi Peminjaman</h5>
+                                        <h5 class="modal-title">Upload / Edit Arsip</h5>
                                         <button class="close" data-dismiss="modal">&times;</button>
                                     </div>
                                     <form method="POST" enctype="multipart/form-data">
                                         <div class="modal-body">
                                             <input type="hidden" name="id" value="<?= $row['id']; ?>">
                                             <div class="alert alert-info small">
-                                                Pastikan Berita Acara sudah ditandatangani basah dan distempel sebelum diupload.
+                                                Pastikan Berita Acara sudah ditandatangani basah dan distempel sebelum diupload.<br>
+                                                <b>Catatan:</b> Kosongkan form input file di bawah ini jika tidak ingin mengubah file yang sudah ada sebelumnya.
                                             </div>
                                             <div class="form-group">
-                                                <label>Scan Berita Acara (PDF)</label>
-                                                <input type="file" name="file_ba" class="form-control-file" accept=".pdf" required>
+                                                <label>
+                                                    Scan Berita Acara (PDF) 
+                                                    <?= $row['file_ba_signed'] ? '<span class="text-success small font-weight-bold"><i class="fas fa-check-circle"></i> Sudah diupload</span>' : ''; ?>
+                                                </label>
+                                                <input type="file" name="file_ba" class="form-control-file" accept=".pdf">
                                             </div>
                                             <div class="form-group">
-                                                <label>Foto Bukti Penyerahan (JPG/PNG)</label>
-                                                <input type="file" name="foto_bukti" class="form-control-file" accept="image/*" required>
+                                                <label>
+                                                    Foto Bukti Penyerahan (JPG/PNG) 
+                                                    <?= $row['foto_bukti'] ? '<span class="text-success small font-weight-bold"><i class="fas fa-check-circle"></i> Sudah diupload</span>' : ''; ?>
+                                                </label>
+                                                <input type="file" name="foto_bukti" class="form-control-file" accept="image/*">
                                             </div>
                                         </div>
                                         <div class="modal-footer">
-                                            <button type="submit" name="upload_arsip" class="btn btn-success">Simpan & Selesai</button>
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                                            <button type="submit" name="upload_arsip" class="btn btn-success">Simpan Arsip</button>
                                         </div>
                                     </form>
                                 </div>
