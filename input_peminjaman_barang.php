@@ -227,26 +227,25 @@ require 'layout/topbar.php';
                                     -
                                 <?php endif; ?>
                             </td>
+                            
                             <td class="text-center nowrap">
-                                <?php if($row['status'] == 'menunggu_persetujuan'): ?>
-                                    <button class="btn btn-warning btn-sm" data-toggle="modal" data-target="#modalEdit<?= $row['id']; ?>" title="Edit Pengajuan">
-                                        <i class="fas fa-pencil-alt"></i>
-                                    </button>
-                                    <a href="input_peminjaman_barang.php?hapus=<?= $row['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Batalkan pengajuan ini?')" title="Batalkan">
-                                        <i class="fas fa-trash"></i>
-                                    </a>
                                 
-                                <?php elseif($row['status'] == 'disetujui'): ?>
-                                    
-                                    <a href="cetak_berita_acara.php?id=<?= $row['id']; ?>" target="_blank" class="btn btn-warning btn-sm shadow-sm" title="Cetak Berita Acara">
+                                <button class="btn btn-warning btn-sm shadow-sm" data-toggle="modal" data-target="#modalEdit<?= $row['id']; ?>" title="Edit Pengajuan">
+                                    <i class="fas fa-pencil-alt"></i>
+                                </button>
+                                <a href="input_peminjaman_barang.php?hapus=<?= $row['id']; ?>" class="btn btn-danger btn-sm shadow-sm" onclick="return confirm('Apakah Anda yakin ingin menghapus data ini?')" title="Hapus Data">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                                
+                                <?php if($row['status'] == 'disetujui'): ?>
+                                    <a href="cetak_berita_acara.php?id=<?= $row['id']; ?>" target="_blank" class="btn btn-info btn-sm shadow-sm" title="Cetak Berita Acara">
                                         <i class="fas fa-print"></i>
                                     </a>
-
                                     <button class="btn btn-success btn-sm shadow-sm" data-toggle="modal" data-target="#modalUpload<?= $row['id']; ?>" title="Upload Arsip">
                                         <i class="fas fa-upload"></i>
                                     </button>
-
                                 <?php endif; ?>
+
                             </td>
                         </tr>
 
