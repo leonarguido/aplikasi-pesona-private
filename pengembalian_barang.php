@@ -28,13 +28,22 @@ if (isset($_POST['simpan_kondisi'])) {
     }
 }
 
-// B. UPLOAD ARSIP PENGEMBALIAN & FOTO BUKTI (Tahap 2 - FINALISASI)
+// B. UPLOAD / EDIT ARSIP PENGEMBALIAN & FOTO BUKTI (Tahap 2 - FINALISASI) - DIPERBARUI
 if (isset($_POST['upload_arsip_kembali'])) {
     $id_pinjam = $_POST['id'];
     
+    // Ambil data file lama untuk dihapus jika di-replace
+    $q_old = mysqli_query($koneksi, "SELECT file_ba_kembali, foto_bukti_kembali FROM tb_peminjaman WHERE id='$id_pinjam'");
+    $d_old = mysqli_fetch_assoc($q_old);
+    
+    $ba_name = $d_old['file_ba_kembali'];
+    $foto_name = $d_old['foto_bukti_kembali'];
+
     // 1. Upload Berita Acara (PDF)
-    $ba_name = null;
     if (!empty($_FILES['file_ba_kembali']['name'])) {
+        // Hapus file lama jika ada
+        if ($ba_name && file_exists("assets/arsip/" . $ba_name)) { unlink("assets/arsip/" . $ba_name); }
+        
         $ba_tmp = $_FILES['file_ba_kembali']['tmp_name'];
         $ba_name = time() . "_BA_KEMBALI_" . $_FILES['file_ba_kembali']['name'];
         
@@ -42,9 +51,11 @@ if (isset($_POST['upload_arsip_kembali'])) {
         move_uploaded_file($ba_tmp, "assets/arsip/" . $ba_name);
     }
 
-    // 2. Upload Foto Bukti Pengembalian (JPG/PNG) - BARU DITAMBAHKAN
-    $foto_name = null;
+    // 2. Upload Foto Bukti Pengembalian (JPG/PNG)
     if (!empty($_FILES['foto_bukti_kembali']['name'])) {
+        // Hapus file lama jika ada
+        if ($foto_name && file_exists("assets/arsip/" . $foto_name)) { unlink("assets/arsip/" . $foto_name); }
+        
         $foto_tmp = $_FILES['foto_bukti_kembali']['tmp_name'];
         $foto_name = time() . "_FOTO_KEMBALI_" . $_FILES['foto_bukti_kembali']['name'];
         
@@ -52,15 +63,36 @@ if (isset($_POST['upload_arsip_kembali'])) {
         move_uploaded_file($foto_tmp, "assets/arsip/" . $foto_name);
     }
     
-    // Update DB: Simpan kedua file dan ubah status jadi 'dikembalikan'
+    // Update DB: Simpan file (baik baru maupun lama yang tidak diubah) dan pastikan status jadi 'dikembalikan'
     $q_update = "UPDATE tb_peminjaman SET file_ba_kembali='$ba_name', foto_bukti_kembali='$foto_name', status='dikembalikan' WHERE id='$id_pinjam'";
     
     if (mysqli_query($koneksi, $q_update)) {
-        echo "<script>alert('Pengembalian Selesai! Arsip dan Foto Bukti berhasil disimpan.'); window.location='pengembalian_barang.php';</script>";
+        echo "<script>alert('Arsip Pengembalian Berhasil Disimpan/Diperbarui!'); window.location='pengembalian_barang.php';</script>";
     } else {
         echo "<script>alert('Gagal: " . mysqli_error($koneksi) . "');</script>";
     }
 }
+
+// C. HAPUS DATA (BARU DITAMBAHKAN)
+if (isset($_GET['hapus'])) {
+    $id = $_GET['hapus'];
+    
+    // Hapus juga file fisik arsip (peminjaman & pengembalian) sebelum menghapus row data
+    $q_del = mysqli_query($koneksi, "SELECT file_ba_signed, foto_bukti, file_ba_kembali, foto_bukti_kembali FROM tb_peminjaman WHERE id='$id'");
+    $d_del = mysqli_fetch_assoc($q_del);
+    
+    // Hapus arsip peminjaman
+    if($d_del['file_ba_signed'] && file_exists("assets/arsip/" . $d_del['file_ba_signed'])) { unlink("assets/arsip/" . $d_del['file_ba_signed']); }
+    if($d_del['foto_bukti'] && file_exists("assets/arsip/" . $d_del['foto_bukti'])) { unlink("assets/arsip/" . $d_del['foto_bukti']); }
+    
+    // Hapus arsip pengembalian
+    if($d_del['file_ba_kembali'] && file_exists("assets/arsip/" . $d_del['file_ba_kembali'])) { unlink("assets/arsip/" . $d_del['file_ba_kembali']); }
+    if($d_del['foto_bukti_kembali'] && file_exists("assets/arsip/" . $d_del['foto_bukti_kembali'])) { unlink("assets/arsip/" . $d_del['foto_bukti_kembali']); }
+
+    mysqli_query($koneksi, "DELETE FROM tb_peminjaman WHERE id='$id'");
+    echo "<script>alert('Data Transaksi beserta seluruh arsip berhasil dihapus secara permanen!'); window.location='pengembalian_barang.php';</script>";
+}
+
 ?>
 
 <?php 
@@ -86,7 +118,7 @@ require 'layout/topbar.php';
                             <th>Peminjam</th>
                             <th>Target Kembali</th>
                             <th>Status Pengembalian</th>
-                            <th>Aksi</th>
+                            <th>Arsip</th> <th>Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -130,6 +162,31 @@ require 'layout/topbar.php';
                                     <small>Kondisi: <?= $row['kondisi_kembali']; ?></small>
                                 <?php endif; ?>
                             </td>
+
+                            <td class="text-center" style="white-space: nowrap;">
+                                <?php if($row['status'] == 'dikembalikan'): ?>
+                                    
+                                    <?php if($row['file_ba_kembali']): ?>
+                                        <a href="assets/arsip/<?= $row['file_ba_kembali']; ?>" target="_blank" class="btn btn-outline-success btn-sm" title="Lihat PDF Pengembalian">
+                                            <i class="fas fa-file-pdf"></i> BA
+                                        </a>
+                                    <?php endif; ?>
+
+                                    <?php if(!empty($row['foto_bukti_kembali'])): ?>
+                                        <a href="assets/arsip/<?= $row['foto_bukti_kembali']; ?>" target="_blank" class="btn btn-outline-primary btn-sm" title="Lihat Foto Bukti">
+                                            <i class="fas fa-image"></i> Foto
+                                        </a>
+                                    <?php endif; ?>
+
+                                    <?php if(!$row['file_ba_kembali'] && empty($row['foto_bukti_kembali'])): ?>
+                                        -
+                                    <?php endif; ?>
+
+                                <?php else: ?>
+                                    -
+                                <?php endif; ?>
+                            </td>
+                            
                             <td class="text-center" style="white-space: nowrap;">
                                 
                                 <?php if($row['status'] == 'selesai' && empty($row['kondisi_kembali'])): ?>
@@ -147,19 +204,19 @@ require 'layout/topbar.php';
                                 
                                 <?php elseif($row['status'] == 'dikembalikan'): ?>
                                     
-                                    <?php if($row['file_ba_kembali']): ?>
-                                        <a href="assets/arsip/<?= $row['file_ba_kembali']; ?>" target="_blank" class="btn btn-outline-success btn-sm" title="Lihat BA Pengembalian">
-                                            <i class="fas fa-file-pdf"></i> BA
-                                        </a>
-                                    <?php endif; ?>
+                                    <button class="btn btn-warning btn-sm shadow-sm" data-toggle="modal" data-target="#modalUploadKembali<?= $row['id']; ?>" title="Edit / Upload Ulang Arsip">
+                                        <i class="fas fa-pencil-alt"></i> Edit Arsip
+                                    </button>
 
-                                    <?php if(!empty($row['foto_bukti_kembali'])): ?>
-                                        <a href="assets/arsip/<?= $row['foto_bukti_kembali']; ?>" target="_blank" class="btn btn-outline-info btn-sm" title="Lihat Foto Bukti">
-                                            <i class="fas fa-image"></i> Foto
-                                        </a>
-                                    <?php endif; ?>
+                                    <a href="cetak_ba_kembali.php?id=<?= $row['id']; ?>" target="_blank" class="btn btn-info btn-sm shadow-sm" title="Cetak BA Pengembalian">
+                                        <i class="fas fa-print"></i> BA
+                                    </a>
 
                                 <?php endif; ?>
+                                
+                                <a href="pengembalian_barang.php?hapus=<?= $row['id']; ?>" class="btn btn-danger btn-sm shadow-sm" onclick="return confirm('Apakah Anda yakin ingin menghapus data ini secara permanen? Seluruh arsip juga akan terhapus.')" title="Hapus Data">
+                                    <i class="fas fa-trash"></i>
+                                </a>
 
                             </td>
                         </tr>
@@ -203,31 +260,41 @@ require 'layout/topbar.php';
                         <div class="modal fade" id="modalUploadKembali<?= $row['id']; ?>">
                             <div class="modal-dialog">
                                 <div class="modal-content">
-                                    <div class="modal-header bg-success text-white">
-                                        <h5 class="modal-title">Finalisasi Pengembalian</h5>
+                                    <div class="modal-header <?= ($row['status'] == 'dikembalikan') ? 'bg-warning' : 'bg-success'; ?> text-white">
+                                        <h5 class="modal-title"><?= ($row['status'] == 'dikembalikan') ? 'Edit Arsip Pengembalian' : 'Finalisasi Pengembalian'; ?></h5>
                                         <button class="close text-white" data-dismiss="modal">&times;</button>
                                     </div>
                                     <form method="POST" enctype="multipart/form-data">
                                         <div class="modal-body">
                                             <input type="hidden" name="id" value="<?= $row['id']; ?>">
+                                            
                                             <div class="alert alert-info small">
-                                                Pastikan Berita Acara Pengembalian sudah dicetak dan ditandatangani oleh Admin Gudang dan Staf.
+                                                Pastikan Berita Acara Pengembalian sudah dicetak dan ditandatangani oleh Admin Gudang dan Staf. <br>
+                                                <b>Catatan:</b> Kosongkan form input file di bawah ini jika tidak ingin mengubah file yang sudah ada sebelumnya.
                                             </div>
                                             
                                             <div class="form-group">
-                                                <label>Upload BA Pengembalian (PDF)</label>
-                                                <input type="file" name="file_ba_kembali" class="form-control-file" accept=".pdf" required>
+                                                <label>
+                                                    Upload BA Pengembalian (PDF)
+                                                    <?= $row['file_ba_kembali'] ? '<span class="text-success small font-weight-bold"><i class="fas fa-check-circle"></i> Sudah diupload</span>' : ''; ?>
+                                                </label>
+                                                <input type="file" name="file_ba_kembali" class="form-control-file" accept=".pdf">
                                             </div>
 
                                             <div class="form-group">
-                                                <label>Foto Bukti Pengembalian (JPG/PNG)</label>
-                                                <input type="file" name="foto_bukti_kembali" class="form-control-file" accept="image/*" required>
+                                                <label>
+                                                    Foto Bukti Pengembalian (JPG/PNG)
+                                                    <?= $row['foto_bukti_kembali'] ? '<span class="text-success small font-weight-bold"><i class="fas fa-check-circle"></i> Sudah diupload</span>' : ''; ?>
+                                                </label>
+                                                <input type="file" name="foto_bukti_kembali" class="form-control-file" accept="image/*">
                                                 <small class="text-muted">Foto barang saat dikembalikan sebagai bukti kondisi fisik.</small>
                                             </div>
                                         </div>
                                         <div class="modal-footer">
                                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                                            <button type="submit" name="upload_arsip_kembali" class="btn btn-success">Selesaikan Pengembalian</button>
+                                            <button type="submit" name="upload_arsip_kembali" class="btn <?= ($row['status'] == 'dikembalikan') ? 'btn-warning' : 'btn-success'; ?>">
+                                                <?= ($row['status'] == 'dikembalikan') ? 'Simpan Perubahan' : 'Selesaikan Pengembalian'; ?>
+                                            </button>
                                         </div>
                                     </form>
                                 </div>
