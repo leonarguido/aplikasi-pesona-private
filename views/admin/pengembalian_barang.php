@@ -34,6 +34,7 @@
                                                 <th>Peminjam</th>
                                                 <th>Target Kembali</th>
                                                 <th>Status Pengembalian</th>
+                                                <th>Arsip</th> 
                                                 <th>Aksi</th>
                                             </tr>
                                         </thead>
@@ -45,7 +46,8 @@
                             SELECT p.*, u.nama AS nama_peminjam, u.nip AS nip_peminjam
                             FROM tb_peminjaman p
                             JOIN tb_user u ON p.user_id = u.id
-                            WHERE p.status IN ('selesai', 'dikembalikan')
+                            WHERE p.status IN ('selesai', 'dikembalikan') 
+                            AND p.deleted_at IS NULL
                             ORDER BY p.id DESC
                         ");
 
@@ -83,6 +85,29 @@
                                                         <?php endif; ?>
                                                     </td>
                                                     <td class="text-center" style="white-space: nowrap;">
+                                                        <?php if ($row['status'] == 'dikembalikan'): ?>
+
+                                                            <?php if ($row['file_ba_kembali']): ?>
+                                                                <a href="<?= ASSETS_URL ?>arsip/<?= $row['file_ba_kembali']; ?>" target="_blank" class="btn btn-outline-success btn-sm" title="Lihat PDF Pengembalian">
+                                                                    <i class="fas fa-file-pdf"></i> BA
+                                                                </a>
+                                                            <?php endif; ?>
+
+                                                            <?php if (!empty($row['foto_bukti_kembali'])): ?>
+                                                                <a href="<?= ASSETS_URL ?>arsip/<?= $row['foto_bukti_kembali']; ?>" target="_blank" class="btn btn-outline-primary btn-sm" title="Lihat Foto Bukti">
+                                                                    <i class="fas fa-image"></i> Foto
+                                                                </a>
+                                                            <?php endif; ?>
+
+                                                            <?php if (!$row['file_ba_kembali'] && empty($row['foto_bukti_kembali'])): ?>
+                                                                -
+                                                            <?php endif; ?>
+
+                                                        <?php else: ?>
+                                                            -
+                                                        <?php endif; ?>
+                                                    </td>
+                                                    <td class="text-center" style="white-space: nowrap;">
 
                                                         <?php if ($row['status'] == 'selesai' && empty($row['kondisi_kembali'])): ?>
                                                             <button class="btn btn-primary btn-sm shadow-sm" data-toggle="modal" data-target="#modalKembali<?= $row['id']; ?>">
@@ -99,19 +124,19 @@
 
                                                         <?php elseif ($row['status'] == 'dikembalikan'): ?>
 
-                                                            <?php if ($row['file_ba_kembali']): ?>
-                                                                <a href="<?= ASSETS_URL ?>arsip/<?= $row['file_ba_kembali']; ?>" target="_blank" class="btn btn-outline-success btn-sm" title="Lihat BA Pengembalian">
-                                                                    <i class="fas fa-file-pdf"></i> BA
-                                                                </a>
-                                                            <?php endif; ?>
+                                                            <button class="btn btn-warning btn-sm shadow-sm" data-toggle="modal" data-target="#modalUploadKembali<?= $row['id']; ?>" title="Edit / Upload Ulang Arsip">
+                                                                <i class="fas fa-pencil-alt"></i> Edit Arsip
+                                                            </button>
 
-                                                            <?php if (!empty($row['foto_bukti_kembali'])): ?>
-                                                                <a href="<?= ASSETS_URL ?>arsip/<?= $row['foto_bukti_kembali']; ?>" target="_blank" class="btn btn-outline-info btn-sm" title="Lihat Foto Bukti">
-                                                                    <i class="fas fa-image"></i> Foto
-                                                                </a>
-                                                            <?php endif; ?>
+                                                            <a href="<?= BASE_URL ?>cetak_ba_kembali&id=<?= $row['id']; ?>" target="_blank" class="btn btn-info btn-sm shadow-sm" title="Cetak BA Pengembalian">
+                                                                <i class="fas fa-print"></i> BA
+                                                            </a>
 
                                                         <?php endif; ?>
+
+                                                        <a href="<?= BASE_URL ?>hapus_pengembalian&hapus=<?= $row['id']; ?>" class="btn btn-danger btn-sm shadow-sm" onclick="confirmHapus(event, this.href)" title="Hapus Data">
+                                                            <i class="fas fa-trash"></i>
+                                                        </a>
 
                                                     </td>
                                                 </tr>
@@ -155,31 +180,41 @@
                                                 <div class="modal fade" id="modalUploadKembali<?= $row['id']; ?>">
                                                     <div class="modal-dialog">
                                                         <div class="modal-content">
-                                                            <div class="modal-header bg-success text-white">
-                                                                <h5 class="modal-title">Finalisasi Pengembalian</h5>
+                                                            <div class="modal-header <?= ($row['status'] == 'dikembalikan') ? 'bg-warning' : 'bg-success'; ?> text-white">
+                                                                <h5 class="modal-title"><?= ($row['status'] == 'dikembalikan') ? 'Edit Arsip Pengembalian' : 'Finalisasi Pengembalian'; ?></h5>
                                                                 <button class="close text-white" data-dismiss="modal">&times;</button>
                                                             </div>
                                                             <form method="POST" action="<?= BASE_URL ?>upload_arsip_kembali" enctype="multipart/form-data">
                                                                 <div class="modal-body">
                                                                     <input type="hidden" name="id" value="<?= $row['id']; ?>">
                                                                     <div class="alert alert-info small">
-                                                                        Pastikan Berita Acara Pengembalian sudah dicetak dan ditandatangani oleh Admin Gudang dan Staf.
+                                                                        Pastikan Berita Acara Pengembalian sudah dicetak dan ditandatangani oleh Admin Gudang dan Staf. <br>
+                                                                        <b>Catatan:</b> Kosongkan form input file di bawah ini jika tidak ingin mengubah file yang sudah ada sebelumnya.
                                                                     </div>
 
                                                                     <div class="form-group">
-                                                                        <label>Upload BA Pengembalian (PDF) <span class="text-danger">*</span></label>
-                                                                        <input type="file" name="file_ba_kembali" class="form-control-file" accept=".pdf" required>
+                                                                        <label>
+                                                                            Upload BA Pengembalian (PDF)
+                                                                            <?= $row['file_ba_kembali'] ? '<span class="text-success small font-weight-bold"><i class="fas fa-check-circle"></i> Sudah diupload</span>' : ''; ?>
+                                                                        </label>
+                                                                        <input type="file" name="file_ba_kembali" class="form-control-file" accept=".pdf">
+
                                                                     </div>
 
                                                                     <div class="form-group">
-                                                                        <label>Foto Bukti Pengembalian (JPG/PNG) <span class="text-danger">*</span></label>
-                                                                        <input type="file" name="foto_bukti_kembali" class="form-control-file" accept="image/*" required>
+                                                                        <label>
+                                                                            Foto Bukti Pengembalian (JPG/PNG)
+                                                                            <?= $row['foto_bukti_kembali'] ? '<span class="text-success small font-weight-bold"><i class="fas fa-check-circle"></i> Sudah diupload</span>' : ''; ?>
+                                                                        </label>
+                                                                        <input type="file" name="foto_bukti_kembali" class="form-control-file" accept="image/*">
                                                                         <small class="text-muted">Foto barang saat dikembalikan sebagai bukti kondisi fisik.</small>
                                                                     </div>
                                                                 </div>
                                                                 <div class="modal-footer">
                                                                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                                                                    <button type="submit" name="upload_arsip_kembali" class="btn btn-success">Selesaikan Pengembalian</button>
+                                                                    <button type="submit" name="upload_arsip_kembali" class="btn <?= ($row['status'] == 'dikembalikan') ? 'btn-warning' : 'btn-success'; ?>">
+                                                                        <?= ($row['status'] == 'dikembalikan') ? 'Simpan Perubahan' : 'Selesaikan Pengembalian'; ?>
+                                                                    </button>
                                                                 </div>
                                                             </form>
                                                         </div>
@@ -221,6 +256,25 @@
                 }
             });
         });
+
+        function confirmHapus(event, url) {
+            event.preventDefault();
+
+            Swal.fire({
+                title: 'Yakin?',
+                text: 'Apakah Anda yakin ingin menghapus data ini secara permanen? Seluruh arsip juga akan terhapus',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Ya, hapus!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = url;
+                }
+            });
+        }
     </script>
 </body>
 

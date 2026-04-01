@@ -51,7 +51,7 @@
                                         <tbody>
                                             <?php
                                             $no = 1;
-                                            $query = "SELECT * FROM tb_barang_habis_pakai WHERE is_deleted=0 ORDER BY nama_barang ASC";
+                                            $query = "SELECT * FROM tb_barang_habis_pakai WHERE deleted_at is null ORDER BY nama_barang ASC";
                                             $data = mysqli_query($koneksi, $query);
 
                                             while ($row = mysqli_fetch_assoc($data)):

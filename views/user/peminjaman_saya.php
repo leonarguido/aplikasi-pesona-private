@@ -21,7 +21,7 @@
                     <div class="container-fluid mt-4">
 
                         <?php
-                        $cek_pending = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM tb_peminjaman WHERE user_id='$id_staf_login' AND status='menunggu_persetujuan'");
+                        $cek_pending = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM tb_peminjaman WHERE user_id='$id_staf_login' AND status='menunggu_persetujuan' AND deleted_at IS NULL");
                         $count = mysqli_fetch_assoc($cek_pending);
                         if ($count['total'] > 0):
                         ?>
@@ -57,7 +57,7 @@
                                             SELECT p.*, u.nama AS nama_admin, u.nip AS nip_admin
                                             FROM tb_peminjaman p
                                             LEFT JOIN tb_user u ON p.admin_id = u.id
-                                            WHERE p.user_id = '$id_staf_login'
+                                            WHERE p.user_id = '$id_staf_login' AND p.deleted_at IS NULL
                                             ORDER BY p.id DESC
                                         ");
 

@@ -181,7 +181,7 @@ class PimpinanController
 
         // AMBIL DATA BARANG (UNTUK DROPDOWN)
         $list_barang = [];
-        $q_brg = mysqli_query($koneksi, "SELECT id, kode_barang, nama_barang FROM tb_barang_habis_pakai WHERE is_deleted = 0 ORDER BY nama_barang ASC");
+        $q_brg = mysqli_query($koneksi, "SELECT id, kode_barang, nama_barang FROM tb_barang_habis_pakai WHERE deleted_at is null ORDER BY nama_barang ASC");
         while ($b = mysqli_fetch_assoc($q_brg)) {
             $list_barang[] = $b;
         }
@@ -495,13 +495,13 @@ class PimpinanController
             }
 
             if ($status_stok == "habis") {
-                $query = mysqli_query($koneksi, "SELECT * FROM tb_barang_habis_pakai WHERE is_deleted=0 AND stok=0 ORDER BY nama_barang ASC");
+                $query = mysqli_query($koneksi, "SELECT * FROM tb_barang_habis_pakai WHERE deleted_at is null AND stok=0 ORDER BY nama_barang ASC");
             } else if ($status_stok == "menipis") {
-                $query = mysqli_query($koneksi, "SELECT * FROM tb_barang_habis_pakai WHERE is_deleted=0 AND stok>0 AND stok<=10 ORDER BY nama_barang ASC");
+                $query = mysqli_query($koneksi, "SELECT * FROM tb_barang_habis_pakai WHERE deleted_at is null AND stok>0 AND stok<=10 ORDER BY nama_barang ASC");
             } else if ($status_stok == "aman") {
-                $query = mysqli_query($koneksi, "SELECT * FROM tb_barang_habis_pakai WHERE is_deleted=0 AND stok>10 ORDER BY nama_barang ASC");
+                $query = mysqli_query($koneksi, "SELECT * FROM tb_barang_habis_pakai WHERE deleted_at is null AND stok>10 ORDER BY nama_barang ASC");
             } else {
-                $query = mysqli_query($koneksi, "SELECT * FROM tb_barang_habis_pakai WHERE is_deleted=0 ORDER BY nama_barang ASC");
+                $query = mysqli_query($koneksi, "SELECT * FROM tb_barang_habis_pakai WHERE deleted_at is null ORDER BY nama_barang ASC");
             }
 
             $no = 1;
@@ -540,7 +540,7 @@ class PimpinanController
     public function cetak_referensi_barang()
     {
         require __DIR__ . '/../config/koneksi.php';
-        $data = mysqli_query($koneksi, "SELECT * FROM tb_barang_habis_pakai WHERE is_deleted = 0 ORDER BY nama_barang ASC");
+        $data = mysqli_query($koneksi, "SELECT * FROM tb_barang_habis_pakai WHERE deleted_at is null ORDER BY nama_barang ASC");
         $kode = $_POST['kode'];
 
         require_once '../views/pimpinan/cetak_referensi_barang.php';

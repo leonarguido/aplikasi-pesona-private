@@ -127,11 +127,14 @@ if (isset($_GET['page'])) {
         case 'simpan_kondisi':
             $admin->simpan_kondisi();
             break;
+        case 'cetak_ba_kembali':
+            $admin->cetak_ba_kembali();
+            break;
         case 'upload_arsip_kembali':
             $admin->upload_arsip_kembali();
             break;
-        case 'cetak_ba_kembali':
-            $admin->cetak_ba_kembali();
+        case 'hapus_pengembalian':
+            $admin->hapus_pengembalian();
             break;
 
         // USER MANAGEMENT

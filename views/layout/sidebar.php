@@ -33,6 +33,61 @@
             </li>
 
             <hr class="sidebar-divider">
+
+            <div class="sidebar-heading">Aset BMN</div>
+
+            <li class="nav-item">
+                <a class="nav-link" href="<?= BASE_URL ?>input_peminjaman_barang">
+                    <i class="fas fa-fw fa-file-alt"></i> <span>Input Peminjaman Barang</span></a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" href="<?= BASE_URL ?>pengembalian_barang">
+                    <i class="fas fa-fw fa-undo"></i>
+                    <span>Pengembalian Barang</span></a>
+            </li>
+
+            <hr class="sidebar-divider">
+
+            <div class="sidebar-heading">Barang Habis Pakai</div>
+
+            <li class="nav-item">
+                <a class="nav-link" href="<?= BASE_URL ?>data_barang">
+                    <i class="fas fa-fw fa-dolly"></i> <span>Data Barang Habis Pakai</span></a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" href="<?= BASE_URL ?>persetujuan">
+                    <i class="fas fa-fw fa-check-circle"></i>
+                    <span>Persetujuan (Pending)</span></a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" href="<?= BASE_URL ?>riwayat_persetujuan">
+                    <i class="fas fa-fw fa-history"></i>
+                    <span>Riwayat Persetujuan</span></a>
+            </li>
+
+            <hr class="sidebar-divider">
+
+            <div class="sidebar-heading">Laporan</div>
+
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseDataLaporan"
+                    aria-expanded="true" aria-controls="collapseDataLaporan">
+                    <i class="fas fa-fw fa-file-pdf"></i>
+                    <span>Laporan</span>
+                </a>
+                <div id="collapseDataLaporan" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <h6 class="collapse-header">Pilih Kategori:</h6>
+                        <a class="collapse-item" href="<?= BASE_URL ?>laporan_aset">Laporan Aset</a>
+                        <a class="collapse-item" href="<?= BASE_URL ?>laporan_persediaan">Laporan Persediaan</a>
+                        <a class="collapse-item" href="<?= BASE_URL ?>laporan_stok">Laporan Stok Barang</a>
+                        <a class="collapse-item" href="<?= BASE_URL ?>laporan_permintaan">Laporan Permintaan</a>
+                    </div>
+                </div>
+            </li>
         <?php endif; ?>
 
         <?php if ($_SESSION['role'] == 'admin bmn'): ?>
@@ -113,28 +168,6 @@
 
         <?php endif; ?>
 
-        <?php if ($_SESSION['role'] == 'super_admin' || $_SESSION['role'] == 'super admin'): ?>
-
-            <div class="sidebar-heading">Laporan</div>
-
-            <li class="nav-item">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseDataLaporan"
-                    aria-expanded="true" aria-controls="collapseDataLaporan">
-                    <i class="fas fa-fw fa-file-pdf"></i>
-                    <span>Laporan</span>
-                </a>
-                <div id="collapseDataLaporan" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded">
-                        <h6 class="collapse-header">Pilih Kategori:</h6>
-                        <a class="collapse-item" href="<?= BASE_URL ?>laporan_persediaan">Laporan Persediaan</a>
-                        <a class="collapse-item" href="<?= BASE_URL ?>laporan_stok">Laporan Stok Barang</a>
-                        <a class="collapse-item" href="<?= BASE_URL ?>laporan_permintaan">Laporan Permintaan</a>
-                    </div>
-                </div>
-            </li>
-        <?php endif; ?>
-
-
         <?php if ($_SESSION['role'] == 'user' || $_SESSION['role'] == 'staff'): ?>
             <div class="sidebar-heading">Barang BMN</div>
 
@@ -186,6 +219,7 @@
                         <h6 class="collapse-header">Pilih Kategori:</h6>
                         <a class="collapse-item" href="<?= BASE_URL ?>laporan_aset">Laporan Aset</a>
                         <a class="collapse-item" href="<?= BASE_URL ?>laporan_persediaan">Laporan Persediaan</a>
+                        <a class="collapse-item" href="<?= BASE_URL ?>laporan_stok">Laporan Stok Barang</a>
                         <a class="collapse-item" href="<?= BASE_URL ?>laporan_permintaan">Laporan Permintaan</a>
                     </div>
                 </div>

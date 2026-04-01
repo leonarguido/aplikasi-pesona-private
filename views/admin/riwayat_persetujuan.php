@@ -28,6 +28,7 @@
                                     <table class="table table-bordered table-hover" id="dataTable" width="100%" cellspacing="0">
                                         <thead class="thead-light">
                                             <tr>
+                                                <th>No</th>
                                                 <th width="15%">Tanggal</th>
                                                 <th>Pemohon</th>
                                                 <th>Rincian Barang (Final)</th>
@@ -38,12 +39,13 @@
                                         </thead>
                                         <tbody>
                                             <?php
+                                            $no = 1;
                                             // Ambil semua riwayat (Disetujui/Ditolak)
                                             $query_hist = "SELECT p.*, u.nama AS nama_pemohon, a.nama AS nama_admin
                                        FROM tb_permintaan p 
                                        JOIN tb_user u ON p.user_id = u.id 
                                        LEFT JOIN tb_user a ON p.admin_id = a.id
-                                       WHERE p.status != 'menunggu' 
+                                       WHERE p.status != 'menunggu' AND p.deleted_at IS NULL
                                        ORDER BY p.id DESC";
 
                                             $res_hist = mysqli_query($koneksi, $query_hist);
@@ -55,6 +57,7 @@
                                                 $tgl_aksi = ($hist['status'] == 'disetujui') ? $hist['tanggal_disetujui'] : $hist['tanggal_ditolak'];
                                             ?>
                                                 <tr>
+                                                    <td><?= $no++; ?></td>
                                                     <td>
                                                         <i class="far fa-calendar-alt text-gray-400"></i> <?= date('d-m-Y', strtotime($tgl_aksi)); ?>
                                                     </td>

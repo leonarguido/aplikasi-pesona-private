@@ -15,7 +15,7 @@ class UserController
             exit;
         }
 
-        if ($_SESSION['role'] != 'user') {
+        if ($_SESSION['role'] != 'user' && $_SESSION['role'] != 'staff') {
             $_SESSION['alert'] = [
                 'icon' => 'error',
                 'title' => 'Gagal!',
@@ -95,7 +95,7 @@ class UserController
             exit;
         }
 
-        if ($_SESSION['role'] != 'user') {
+        if ($_SESSION['role'] != 'user' && $_SESSION['role'] != 'staff') {
             $_SESSION['alert'] = [
                 'icon' => 'error',
                 'title' => 'Gagal!',
@@ -217,7 +217,7 @@ class UserController
             exit;
         }
 
-        if ($_SESSION['role'] != 'user') {
+        if ($_SESSION['role'] != 'user' && $_SESSION['role'] != 'staff') {
             $_SESSION['alert'] = [
                 'icon' => 'error',
                 'title' => 'Gagal!',
@@ -413,7 +413,7 @@ class UserController
             exit;
         }
 
-        if ($_SESSION['role'] != 'user') {
+        if ($_SESSION['role'] != 'user' && $_SESSION['role'] != 'staff') {
             $_SESSION['alert'] = [
                 'icon' => 'error',
                 'title' => 'Gagal!',
@@ -588,7 +588,7 @@ class UserController
             exit;
         }
 
-        if ($_SESSION['role'] != 'user') {
+        if ($_SESSION['role'] != 'user' && $_SESSION['role'] != 'staff') {
             $_SESSION['alert'] = [
                 'icon' => 'error',
                 'title' => 'Gagal!',

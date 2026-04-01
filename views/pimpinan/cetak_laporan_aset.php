@@ -246,6 +246,7 @@
                             SELECT p.*, u.nama AS nama_peminjam, u.nip AS nip_peminjam
                             FROM tb_peminjaman p
                             JOIN tb_user u ON p.user_id = u.id
+                            WHERE p.deleted_at IS NULL
                             ORDER BY p.id DESC
                         ");
 

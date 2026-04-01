@@ -64,6 +64,7 @@
                             SELECT p.*, u.nama AS nama_peminjam, u.nip AS nip_peminjam
                             FROM tb_peminjaman p
                             JOIN tb_user u ON p.user_id = u.id
+                            WHERE p.deleted_at IS NULL
                             ORDER BY p.id DESC
                         ");
 
@@ -101,38 +102,52 @@
                                                             <span class="badge badge-danger">Ditolak Staf</span>
                                                         <?php endif; ?>
                                                     </td>
-                                                    <td class="text-center">
-                                                        <?php if ($row['status'] == 'selesai' || $row['status'] == 'dikembalikan'): ?>
-                                                            <?php if ($row['file_ba_signed']): ?>
-                                                                <a href="<?= ASSETS_URL ?>arsip/<?= $row['file_ba_signed']; ?>" target="_blank" class="btn btn-xs btn-primary" title="Lihat Berita Acara"><i class="fas fa-file-pdf"></i></a>
-                                                            <?php endif; ?>
-                                                            <?php if ($row['foto_bukti']): ?>
-                                                                <a href="<?= ASSETS_URL ?>arsip/<?= $row['foto_bukti']; ?>" target="_blank" class="btn btn-xs btn-success" title="Lihat Foto"><i class="fas fa-image"></i></a>
+                                                    <td class="text-center nowrap">
+                                                        <?php if ($row['file_ba_signed']): ?>
+                                                            <a href="<?= ASSETS_URL ?>arsip/<?= $row['file_ba_signed']; ?>" target="_blank" class="btn btn-sm btn-primary" title="Lihat Berita Acara"><i class="fas fa-file-pdf"></i></a>
+                                                        <?php endif; ?>
+                                                        <?php if ($row['foto_bukti']): ?>
+                                                            <a href="<?= ASSETS_URL ?>arsip/<?= $row['foto_bukti']; ?>" target="_blank" class="btn btn-sm btn-success" title="Lihat Foto"><i class="fas fa-image"></i></a>
+                                                        <?php endif; ?>
+                                                        <?php if (!$row['file_ba_signed'] && !$row['foto_bukti']): ?>
+                                                            <?php if ($row['status'] == 'disetujui'): ?>
+                                                                <button class="btn btn-sm btn-warning" data-toggle="modal" data-target="#modalUpload<?= $row['id']; ?>" title="Upload / Edit Arsip">
+                                                                    <i class="fas fa-upload"></i>
+                                                                </button>
+                                                            <?php else: ?>
+                                                                -
                                                             <?php endif; ?>
                                                         <?php else: ?>
-                                                            -
+                                                            <button class="btn btn-sm btn-warning" data-toggle="modal" data-target="#modalUpload<?= $row['id']; ?>" title="Upload / Edit Arsip">
+                                                                <i class="fas fa-upload"></i>
+                                                            </button>
                                                         <?php endif; ?>
                                                     </td>
                                                     <td class="text-center nowrap">
-                                                        <?php if ($row['status'] == 'menunggu_persetujuan'): ?>
+
+                                                        <?php if ($_SESSION['role'] == 'super admin'): ?>
                                                             <button class="btn btn-warning btn-sm" data-toggle="modal" data-target="#modalEdit<?= $row['id']; ?>" title="Edit Pengajuan">
                                                                 <i class="fas fa-pencil-alt"></i>
                                                             </button>
-                                                            <a href="<?= BASE_URL ?>hapus_pinjaman&hapus=<?= $row['id']; ?>" class="btn btn-danger btn-sm" onclick="confirmHapus(event, this.href)">
-                                                                <i class="fas fa-trash"></i>
-                                                            </a>
 
-                                                        <?php elseif ($row['status'] == 'disetujui'): ?>
-
-                                                            <a href="<?= BASE_URL ?>cetak_berita_acara&id=<?= $row['id']; ?>" target="_blank" class="btn btn-warning btn-sm shadow-sm" title="Cetak Berita Acara">
-                                                                <i class="fas fa-print"></i>
-                                                            </a>
-
-                                                            <button class="btn btn-success btn-sm shadow-sm" data-toggle="modal" data-target="#modalUpload<?= $row['id']; ?>" title="Upload Arsip">
-                                                                <i class="fas fa-upload"></i>
-                                                            </button>
+                                                        <?php else: ?>
+                                                            <?php if ($row['status'] == 'menunggu_persetujuan' || $row['status'] == 'disetujui'): ?>
+                                                                <button class="btn btn-warning btn-sm" data-toggle="modal" data-target="#modalEdit<?= $row['id']; ?>" title="Edit Pengajuan">
+                                                                    <i class="fas fa-pencil-alt"></i>
+                                                                </button>
+                                                            <?php endif ?>
 
                                                         <?php endif; ?>
+
+                                                        <?php if ($row['status'] != 'menunggu_persetujuan' && $row['status'] != 'ditolak'): ?>
+                                                            <a href="<?= BASE_URL ?>cetak_berita_acara&id=<?= $row['id']; ?>" target="_blank" class="btn btn-primary btn-sm shadow-sm" title="Cetak Berita Acara">
+                                                                <i class="fas fa-print"></i>
+                                                            </a>
+                                                        <?php endif; ?>
+
+                                                        <a href="<?= BASE_URL ?>hapus_pinjaman&hapus=<?= $row['id']; ?>" class="btn btn-danger btn-sm" onclick="confirmHapus(event, this.href)" title="Hapus Data">
+                                                            <i class="fas fa-trash"></i>
+                                                        </a>
                                                     </td>
                                                 </tr>
 
@@ -243,26 +258,35 @@
                                                     <div class="modal-dialog">
                                                         <div class="modal-content">
                                                             <div class="modal-header bg-success text-white">
-                                                                <h5 class="modal-title">Finalisasi Peminjaman</h5>
+                                                                <h5 class="modal-title">Upload / Edit Arsip</h5>
                                                                 <button class="close" data-dismiss="modal">&times;</button>
                                                             </div>
                                                             <form method="POST" action="<?= BASE_URL ?>upload_arsip_pinjaman" enctype="multipart/form-data">
                                                                 <div class="modal-body">
                                                                     <input type="hidden" name="id" value="<?= $row['id']; ?>">
                                                                     <div class="alert alert-info small">
-                                                                        Pastikan Berita Acara sudah ditandatangani basah dan distempel sebelum diupload.
+                                                                        Pastikan Berita Acara sudah ditandatangani basah dan distempel sebelum diupload.<br>
+                                                                        <b>Catatan:</b> Kosongkan form input file di bawah ini jika tidak ingin mengubah file yang sudah ada sebelumnya.
                                                                     </div>
                                                                     <div class="form-group">
-                                                                        <label>Scan Berita Acara (PDF) <span class="text-danger">*</span></label>
-                                                                        <input type="file" name="file_ba" class="form-control-file" accept=".pdf" required>
+                                                                        <label>
+                                                                            Scan Berita Acara (PDF)
+                                                                            <?= $row['file_ba_signed'] ? '<span class="text-success small font-weight-bold"><i class="fas fa-check-circle"></i> Sudah diupload</span>' : ''; ?>
+                                                                        </label>
+                                                                        <input type="file" name="file_ba" class="form-control-file" accept=".pdf">
                                                                     </div>
                                                                     <div class="form-group">
-                                                                        <label>Foto Bukti Penyerahan (JPG/PNG) <span class="text-danger">*</span></label>
-                                                                        <input type="file" name="foto_bukti" class="form-control-file" accept="image/*" required>
+                                                                        <label>
+                                                                            Foto Bukti Penyerahan (JPG/PNG)
+                                                                            <?= $row['foto_bukti'] ? '<span class="text-success small font-weight-bold"><i class="fas fa-check-circle"></i> Sudah diupload</span>' : ''; ?>
+                                                                        </label>
+                                                                        <input type="file" name="foto_bukti" class="form-control-file" accept="image/*">
                                                                     </div>
                                                                 </div>
                                                                 <div class="modal-footer">
-                                                                    <button type="submit" name="upload_arsip" class="btn btn-success">Simpan & Selesai</button>
+                                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                                                                    <button type="submit" name="upload_arsip" class="btn btn-success">Simpan Arsip</button>
+
                                                                 </div>
                                                             </form>
                                                         </div>

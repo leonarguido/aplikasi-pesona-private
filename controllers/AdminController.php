@@ -44,7 +44,7 @@ class AdminController
             $desc   = $_POST['keterangan'];
             $stok   = $_POST['stok'];
 
-            $cek = mysqli_query($koneksi, "SELECT * FROM tb_barang_habis_pakai WHERE is_deleted=0 AND kode_barang = '$kode'");
+            $cek = mysqli_query($koneksi, "SELECT * FROM tb_barang_habis_pakai WHERE deleted_at is null AND kode_barang = '$kode'");
             if (mysqli_num_rows($cek) > 0) {
                 // echo "<script>alert('Kode Barang sudah ada!'); window.location='" . $this->base_url . "data_barang';</script>";
                 $_SESSION['alert'] = [
@@ -185,7 +185,7 @@ class AdminController
 
         if (isset($_GET['id'])) {
             $id = $_GET['id'];
-            $query = "UPDATE tb_barang_habis_pakai SET is_deleted=1 WHERE id = '$id'";
+            $query = "UPDATE tb_barang_habis_pakai SET deleted_at=NOW() WHERE id = '$id'";
             if (mysqli_query($koneksi, $query)) {
                 // LOG BARANG DILAKUKAN SETELAH EKSEKUSI
                 $id_admin = $_SESSION['user_id'];
@@ -453,7 +453,7 @@ class AdminController
                 unlink($this->assets_path . "berkas/" . $d_cek['berkas']);
             }
             // mysqli_query($koneksi, "DELETE FROM tb_aset_bmn WHERE id='$id'");
-            mysqli_query($koneksi, "UPDATE tb_aset_bmn SET is_deleted=1 WHERE id = '$id'");
+            mysqli_query($koneksi, "UPDATE tb_aset_bmn SET deleted_at=NOW() WHERE id = '$id'");
             // LOG BARANG DILAKUKAN SETELAH EKSEKUSI
             $id_admin = $_SESSION['user_id'];
             $id_barang = $id;
@@ -805,11 +805,22 @@ class AdminController
 
         if (isset($_GET['hapus'])) {
             $id = $_GET['hapus'];
-            mysqli_query($koneksi, "DELETE FROM tb_peminjaman WHERE id='$id'");
+
+            // Hapus juga file fisik arsip sebelum menghapus row data
+            $q_del = mysqli_query($koneksi, "SELECT file_ba_signed, foto_bukti FROM tb_peminjaman WHERE id='$id'");
+            $d_del = mysqli_fetch_assoc($q_del);
+            if ($d_del['file_ba_signed'] && file_exists("assets/arsip/" . $d_del['file_ba_signed'])) {
+                unlink("assets/arsip/" . $d_del['file_ba_signed']);
+            }
+            if ($d_del['foto_bukti'] && file_exists("assets/arsip/" . $d_del['foto_bukti'])) {
+                unlink("assets/arsip/" . $d_del['foto_bukti']);
+            }
+            mysqli_query($koneksi, "UPDATE tb_peminjaman SET deleted_at=NOW() WHERE id='$id'");
+
             $_SESSION['alert'] = [
                 'icon' => 'success',
                 'title' => 'Berhasil!',
-                'text' => 'Data Peminjaman Dihapus!',
+                'text' => 'Data Peminjaman beserta Arsip Dihapus!',
             ];
             header("Location: " . $this->base_url . "input_peminjaman_barang");
             exit;
@@ -883,7 +894,7 @@ class AdminController
         require_once '../views/admin/cetak_berita_acara.php';
     }
 
-    // E. UPLOAD ARSIP (FINALISASI)
+    // E. UPLOAD / EDIT ARSIP (FINALISASI) -DIPERBARUI
     public function upload_arsip_pinjaman()
     {
         require __DIR__ . '/../config/koneksi.php';
@@ -893,19 +904,40 @@ class AdminController
             $id_pinjam = $_POST['id'];
             $target_dir = __DIR__ . '/../assets/arsip/';
 
-            // Upload Berita Acara (PDF)
-            $ba_name = null;
+            // Ambil data file lama untuk dihapus jika di-replace
+            $q_old = mysqli_query($koneksi, "SELECT file_ba_signed, foto_bukti, status FROM tb_peminjaman WHERE id='$id_pinjam'");
+            $d_old = mysqli_fetch_assoc($q_old);
+
+            $ba_name = $d_old['file_ba_signed'];
+            $foto_name = $d_old['foto_bukti'];
+            $current_status = $d_old['status'];
+
+            // Upload Berita Acara (PDF) jika ada file baru
             if (!empty($_FILES['file_ba']['name'])) {
+
+                if ($ba_name && file_exists("assets/arsip/" . $ba_name)) {
+                    unlink("assets/arsip/" . $ba_name);
+                }
+
                 $ba_tmp = $_FILES['file_ba']['tmp_name'];
                 $ba_name = time() . "_BA_" . $_FILES['file_ba']['name'];
+
+                if (!is_dir("assets/arsip/")) {
+                    mkdir("assets/arsip/", 0777, true);
+                }
 
                 $target_path = $target_dir . $ba_name;
                 move_uploaded_file($ba_tmp, $target_path);
             }
 
             // Upload Foto Bukti (JPG)
-            $foto_name = null;
             if (!empty($_FILES['foto_bukti']['name'])) {
+
+                // Hapus file lama
+                if ($foto_name && file_exists("assets/arsip/" . $foto_name)) {
+                    unlink("assets/arsip/" . $foto_name);
+                }
+
                 $foto_tmp = $_FILES['foto_bukti']['tmp_name'];
                 $foto_name = time() . "_FOTO_" . $_FILES['foto_bukti']['name'];
 
@@ -913,14 +945,15 @@ class AdminController
                 move_uploaded_file($foto_tmp, $target_path);
             }
 
-            // Update DB -> Status Selesai
-            $q_update = "UPDATE tb_peminjaman SET file_ba_signed='$ba_name', foto_bukti='$foto_name', status='selesai' WHERE id='$id_pinjam'";
+            // Ubah status ke selesai HANYA jika status sebelumnya adalah 'disetujui' (pertama kali upload finalisasi)
+            $new_status = ($current_status == 'disetujui') ? 'selesai' : $current_status;
+            $q_update = "UPDATE tb_peminjaman SET file_ba_signed='$ba_name', foto_bukti='$foto_name', status='$new_status' WHERE id='$id_pinjam'";
 
             if (mysqli_query($koneksi, $q_update)) {
                 $_SESSION['alert'] = [
                     'icon' => 'success',
                     'title' => 'Berhasil!',
-                    'text' => 'Arsip Berhasil Diupload! Transaksi Selesai.',
+                    'text' => 'Arsip Berhasil Disimpan!',
                 ];
                 header("Location: " . $this->base_url . "input_peminjaman_barang");
                 exit;
@@ -1050,7 +1083,7 @@ class AdminController
         require_once '../views/admin/cetak_ba_kembali.php';
     }
 
-    // C. UPLOAD ARSIP PENGEMBALIAN & FOTO BUKTI (Tahap 2 - FINALISASI)
+    // C. UPLOAD ARSIP PENGEMBALIAN & FOTO BUKTI (Tahap 2 - FINALISASI) -DIPERBARUI
     public function upload_arsip_kembali()
     {
         require __DIR__ . '/../config/koneksi.php';
@@ -1060,9 +1093,19 @@ class AdminController
             $id_pinjam = $_POST['id'];
             $target_dir = __DIR__ . '/../assets/arsip/';
 
+            // Ambil data file lama untuk dihapus jika di-replace
+            $q_old = mysqli_query($koneksi, "SELECT file_ba_kembali, foto_bukti_kembali FROM tb_peminjaman WHERE id='$id_pinjam'");
+            $d_old = mysqli_fetch_assoc($q_old);
+
+            $ba_name = $d_old['file_ba_kembali'];
+            $foto_name = $d_old['foto_bukti_kembali'];
+
             // 1. Upload Berita Acara (PDF)
-            $ba_name = null;
             if (!empty($_FILES['file_ba_kembali']['name'])) {
+                // Hapus file lama jika ada
+                if ($ba_name && file_exists("assets/arsip/" . $ba_name)) {
+                    unlink("assets/arsip/" . $ba_name);
+                }
                 $ba_tmp = $_FILES['file_ba_kembali']['tmp_name'];
                 $ba_name = time() . "_BA_KEMBALI_" . $_FILES['file_ba_kembali']['name'];
 
@@ -1073,9 +1116,12 @@ class AdminController
                 move_uploaded_file($ba_tmp, $target_path);
             }
 
-            // 2. Upload Foto Bukti Pengembalian (JPG/PNG) - BARU DITAMBAHKAN
-            $foto_name = null;
+            // 2. Upload Foto Bukti Pengembalian (JPG/PNG)
             if (!empty($_FILES['foto_bukti_kembali']['name'])) {
+                // Hapus file lama jika ada
+                if ($foto_name && file_exists("assets/arsip/" . $foto_name)) {
+                    unlink("assets/arsip/" . $foto_name);
+                }
                 $foto_tmp = $_FILES['foto_bukti_kembali']['tmp_name'];
                 $foto_name = time() . "_FOTO_KEMBALI_" . $_FILES['foto_bukti_kembali']['name'];
 
@@ -1086,14 +1132,14 @@ class AdminController
                 move_uploaded_file($foto_tmp, $target_path);
             }
 
-            // Update DB: Simpan kedua file dan ubah status jadi 'dikembalikan'
+            // Update DB: Simpan file (baik baru maupun lama yang tidak diubah) dan pastikan status jadi 'dikembalikan'
             $q_update = "UPDATE tb_peminjaman SET file_ba_kembali='$ba_name', foto_bukti_kembali='$foto_name', status='dikembalikan' WHERE id='$id_pinjam'";
 
             if (mysqli_query($koneksi, $q_update)) {
                 $_SESSION['alert'] = [
                     'icon' => 'success',
                     'title' => 'Berhasil!',
-                    'text' => 'Pengembalian Selesai! Arsip dan Foto Bukti berhasil disimpan.',
+                    'text' => 'Arsip pengembalian berhasil disimpan!',
                 ];
                 header("Location: " . $this->base_url . "pengembalian_barang");
                 exit;
@@ -1106,6 +1152,46 @@ class AdminController
                 header("Location: " . $this->base_url . "pengembalian_barang");
                 exit;
             }
+        }
+    }
+
+    // D. HAPUS DATA (BARU DITAMBAHKAN)
+    public function hapus_pengembalian()
+    {
+        require __DIR__ . '/../config/koneksi.php';
+        session_start();
+        
+        if (isset($_GET['hapus'])) {
+            $id = $_GET['hapus'];
+
+            // Hapus juga file fisik arsip (peminjaman & pengembalian) sebelum menghapus row data
+            $q_del = mysqli_query($koneksi, "SELECT file_ba_signed, foto_bukti, file_ba_kembali, foto_bukti_kembali FROM tb_peminjaman WHERE id='$id'");
+            $d_del = mysqli_fetch_assoc($q_del);
+
+            // Hapus arsip peminjaman
+            if ($d_del['file_ba_signed'] && file_exists("assets/arsip/" . $d_del['file_ba_signed'])) {
+                unlink("assets/arsip/" . $d_del['file_ba_signed']);
+            }
+            if ($d_del['foto_bukti'] && file_exists("assets/arsip/" . $d_del['foto_bukti'])) {
+                unlink("assets/arsip/" . $d_del['foto_bukti']);
+            }
+
+            // Hapus arsip pengembalian
+            if ($d_del['file_ba_kembali'] && file_exists("assets/arsip/" . $d_del['file_ba_kembali'])) {
+                unlink("assets/arsip/" . $d_del['file_ba_kembali']);
+            }
+            if ($d_del['foto_bukti_kembali'] && file_exists("assets/arsip/" . $d_del['foto_bukti_kembali'])) {
+                unlink("assets/arsip/" . $d_del['foto_bukti_kembali']);
+            }
+
+            mysqli_query($koneksi, "UPDATE tb_peminjaman SET deleted_at=NOW() WHERE id='$id'");
+            $_SESSION['alert'] = [
+                'icon' => 'success',
+                'title' => 'Berhasil!',
+                'text' => 'Data Peminjaman beserta Arsip Dihapus!',
+            ];
+            header("Location: " . $this->base_url . "pengembalian_barang");
+            exit;
         }
     }
 

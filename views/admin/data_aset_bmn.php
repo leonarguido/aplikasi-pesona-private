@@ -73,7 +73,7 @@
                                             SELECT b.*, u.nama AS nama_pegawai 
                                             FROM tb_aset_bmn b 
                                             LEFT JOIN tb_user u ON b.nip = u.nip 
-                                            WHERE b.is_deleted=0
+                                            WHERE b.deleted_at is null
                                             ORDER BY b.nama_barang ASC
                                         ");
 

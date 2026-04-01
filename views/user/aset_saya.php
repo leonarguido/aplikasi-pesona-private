@@ -56,7 +56,7 @@
                                             if (!empty($nip_user)) {
                                                 $no = 1;
                                                 // Query mencari barang berdasarkan NIP user yang login
-                                                $query = mysqli_query($koneksi, "SELECT * FROM tb_aset_bmn WHERE nip = $nip_user AND is_deleted=0 ORDER BY nama_barang ASC");
+                                                $query = mysqli_query($koneksi, "SELECT * FROM tb_aset_bmn WHERE nip = $nip_user AND deleted_at is null ORDER BY nama_barang ASC");
 
                                                 // Cek jika data ditemukan
                                                 if (mysqli_num_rows($query) > 0) {

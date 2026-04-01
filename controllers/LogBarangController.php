@@ -52,10 +52,10 @@ class LogBarangController
 
             if ($stok_baru < $stok_lama) {
                 $selisih = $stok_lama - $stok_baru;
-                mysqli_query($koneksi, "UPDATE tb_barang_habis_pakai SET stok= stok-'$selisih' WHERE kode_barang='$kode' AND is_deleted=0");
+                mysqli_query($koneksi, "UPDATE tb_barang_habis_pakai SET stok= stok-'$selisih' WHERE kode_barang='$kode' AND deleted_at is null");
             } else {
                 $selisih = $stok_baru - $stok_lama;
-                mysqli_query($koneksi, "UPDATE tb_barang_habis_pakai SET stok= stok+'$selisih' WHERE kode_barang='$kode' AND is_deleted=0");
+                mysqli_query($koneksi, "UPDATE tb_barang_habis_pakai SET stok= stok+'$selisih' WHERE kode_barang='$kode' AND deleted_at is null");
             }
 
             $query = "UPDATE tb_log_barang_habis_pakai SET stok= '$stok_baru', keterangan='$desc' WHERE id='$id'";
@@ -88,7 +88,7 @@ class LogBarangController
                     u.nama,
                     b.kode_barang,
                     b.nama_barang,
-                    b.is_deleted,
+                    b.deleted_at,
                     l.aksi,
                     l.stok,
                     l.keterangan
@@ -129,7 +129,7 @@ class LogBarangController
                         {$aksi}
                     </td>
                 ";
-                if ($row['stok'] != null && $row['stok'] > 0 && $row['is_deleted'] == 0) {
+                if ($row['stok'] != null && $row['stok'] > 0 && $row['deleted_at'] == null) {
                     echo "
                     <td>penambahan stok sebesar {$row['stok']} dengan keterangan {$row['keterangan']}
                         <button 
@@ -145,7 +145,7 @@ class LogBarangController
                     </td>
                     </tr>
                     ";
-                } elseif ($row['stok'] != null && $row['stok'] > 0 && $row['is_deleted'] == 1) {
+                } elseif ($row['stok'] != null && $row['stok'] > 0 && $row['deleted_at'] == null) {
                     echo "<td>penambahan stok sebesar {$row['stok']} dengan keterangan {$row['keterangan']}</td>
                     </tr>";
                 } else {
