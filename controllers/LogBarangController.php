@@ -11,7 +11,7 @@ class LogBarangController
 
         // 1. Cek Akses (Hanya Pimpinan & Admin yang boleh lihat stok)
         if (!isset($_SESSION['user_id'])) {
-            header("Location: login.php");
+            header("Location: " . $this->base_url . "login");
             exit;
         }
         if ($_SESSION['role'] != 'pimpinan') {
@@ -230,7 +230,7 @@ class LogBarangController
 
         // 1. Cek Akses (Hanya Pimpinan & Admin yang boleh lihat stok)
         if (!isset($_SESSION['user_id'])) {
-            header("Location: login.php");
+            header("Location: " . $this->base_url . "login");
             exit;
         }
         if ($_SESSION['role'] != 'pimpinan') {

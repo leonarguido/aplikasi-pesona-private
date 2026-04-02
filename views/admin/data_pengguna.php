@@ -91,7 +91,7 @@
                                                     <td><?= $row['nama_jabatan']; ?></td>
                                                     <td class="text-center">
                                                         <?php if (!empty($row['paraf'])): ?>
-                                                            <img src="<?= ASSETS_URL ?>img/ttd/<?= $row['paraf']; ?>" alt="TTD" style="height: 40px;">
+                                                            <img src="<?= FILE_URL ?>file.php?type=img_ttd&file=<?= urlencode($row['paraf']); ?>" alt="TTD" style="height: 40px;">
                                                         <?php else: ?>
                                                             <span class="text-muted"><small>Belum ada</small></span>
                                                         <?php endif; ?>

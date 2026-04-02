@@ -36,7 +36,7 @@ class AutentikasiController
                         $_SESSION['user_id']   = $data['id'];
                         $_SESSION['username']  = $data['username'];
                         $_SESSION['full_name'] = $data['nama'];
-                        $_SESSION['role']      = 'staff';
+                        $_SESSION['role']      = 'user';
 
                         header("Location: index.php");
                         exit;
@@ -64,7 +64,6 @@ class AutentikasiController
                     }
                 }
             }
-            
             // Jika username salah atau password tidak terverifikasi
             $error = true;
             require_once __DIR__ . '/../views/autentikasi/login.php';
@@ -123,7 +122,7 @@ class AutentikasiController
             $_SESSION['role_asli'] = $_SESSION['temp_role'];
 
             if ($role_pilihan == 'staf') {
-                $_SESSION['role'] = 'Staff'; // Menyamar jadi staf
+                $_SESSION['role'] = 'user'; // Menyamar jadi staf
             } else {
                 $_SESSION['role'] = $_SESSION['temp_role']; // Masuk dengan role asli
             }
@@ -152,13 +151,13 @@ class AutentikasiController
         session_start();
 
         // Pastikan yang mengakses ini adalah user yang sudah login dan BUKAN staf
-        if (isset($_SESSION['role']) && $_SESSION['role'] != 'user' && $_SESSION['role'] != 'staff' && $_SESSION['role'] != 'staff') {
+        if (isset($_SESSION['role']) && $_SESSION['role'] != 'user' && $_SESSION['role'] != 'staff') {
 
             // 1. Simpan role sakti (asli) saat ini ke memori 'role_asli'
             $_SESSION['role_asli'] = $_SESSION['role'];
 
             // 2. Ubah role utama menjadi staf (user)
-            $_SESSION['role'] = 'staff';
+            $_SESSION['role'] = 'user';
         }
 
         header("Location: index.php");
@@ -171,7 +170,7 @@ class AutentikasiController
         session_unset();
         session_destroy();
 
-        header("Location: login.php");
+        header("Location: " . $this->base_url . "login");
         exit;
     }
 }

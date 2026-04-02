@@ -94,7 +94,7 @@
                                                     <td><?= $row['jumlah']; ?> <?= $row['satuan']; ?></td>
                                                     <td class="text-center">
                                                         <?php if ($row['berkas']): ?>
-                                                            <a href="<?= ASSETS_URL ?>img/berkas/<?= $row['berkas']; ?>" target="_blank" class="btn btn-sm btn-success shadow-sm" title="Lihat Berkas">
+                                                            <a href="file.php?type=img_berkas&file=<?= urlencode($row['berkas']); ?>" target="_blank" class="btn btn-sm btn-success shadow-sm" title="Lihat Berkas">
                                                                 <i class="fas fa-file-alt"></i> Lihat
                                                             </a>
                                                         <?php else: ?>

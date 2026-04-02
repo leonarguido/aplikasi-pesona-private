@@ -369,7 +369,7 @@
             Mengetahui/Menyetujui :<br>
             Kasubbag Umum BPMP Prov Bali,<br>
             <div class="ttd-space">
-                <!-- <img src="<?= ASSETS_URL ?>img/ttd/<?= $data['paraf_user']; ?>" class="img-ttd"> -->
+                <!-- <img src="<?= FILE_URL ?>file.php?type=img_ttd&file=<?= urlencode($data['paraf_user']); ?>" class="img-ttd"> -->
                 <div class="ttd-space"></div>
                 <b><?= $nama_kasubbag; ?></b><br>
                 NIP. <?= $nip_kasubbag; ?>

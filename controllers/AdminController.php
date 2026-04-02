@@ -13,7 +13,7 @@ class AdminController
 
         // Cek Login & Role
         if (!isset($_SESSION['user_id'])) {
-            header("Location: login.php");
+            header("Location: " . $this->base_url . "login");
             exit;
         }
         if ($_SESSION['role'] == 'user' || $_SESSION['role'] == 'staff' || $_SESSION['role'] == 'pimpinan') {
@@ -299,7 +299,7 @@ class AdminController
 
         // Cek Login & Role
         if (!isset($_SESSION['user_id']) || ($_SESSION['role'] != 'admin bmn' && $_SESSION['role'] != 'super admin')) {
-            header("Location: login.php");
+            header("Location: " . $this->base_url . "login");
             exit;
         }
         if ($_SESSION['role'] == 'user' || $_SESSION['role'] == 'staff' || $_SESSION['role'] == 'pimpinan') {
@@ -485,7 +485,7 @@ class AdminController
         session_start();
 
         if (!isset($_SESSION['user_id'])) {
-            header("Location: login.php");
+            header("Location: " . $this->base_url . "login");
             exit;
         }
         if ($_SESSION['role'] == 'staff' || $_SESSION['role'] == 'user') {
@@ -507,7 +507,7 @@ class AdminController
 
         // 1. Cek Akses
         if (!isset($_SESSION['user_id'])) {
-            header("Location: login.php");
+            header("Location: " . $this->base_url . "login");
             exit;
         }
         if ($_SESSION['role'] == 'staff' || $_SESSION['role'] == 'user') {
@@ -1203,7 +1203,7 @@ class AdminController
 
         // 1. Cek Login & Akses
         if (!isset($_SESSION['user_id'])) {
-            header("Location: login.php");
+            header("Location: " . $this->base_url . "login");
             exit;
         }
 
@@ -1456,7 +1456,7 @@ class AdminController
 
         // 1. Cek Login & Akses
         if (!isset($_SESSION['user_id'])) {
-            header("Location: login.php");
+            header("Location: " . $this->base_url . "login");
             exit;
         }
 

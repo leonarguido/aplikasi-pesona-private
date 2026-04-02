@@ -104,10 +104,10 @@
                                                     </td>
                                                     <td class="text-center nowrap">
                                                         <?php if ($row['file_ba_signed']): ?>
-                                                            <a href="<?= ASSETS_URL ?>arsip/<?= $row['file_ba_signed']; ?>" target="_blank" class="btn btn-sm btn-primary" title="Lihat Berita Acara"><i class="fas fa-file-pdf"></i></a>
+                                                            <a href="<?= FILE_URL ?>file.php?type=arsip&file=<?= urlencode($row['file_ba_signed']); ?>" target="_blank" class="btn btn-sm btn-primary" title="Lihat Berita Acara"><i class="fas fa-file-pdf"></i></a>
                                                         <?php endif; ?>
                                                         <?php if ($row['foto_bukti']): ?>
-                                                            <a href="<?= ASSETS_URL ?>arsip/<?= $row['foto_bukti']; ?>" target="_blank" class="btn btn-sm btn-success" title="Lihat Foto"><i class="fas fa-image"></i></a>
+                                                            <a href="<?= FILE_URL ?>file.php?type=arsip&file=<?= urlencode($row['foto_bukti']); ?>" target="_blank" class="btn btn-sm btn-success" title="Lihat Foto"><i class="fas fa-image"></i></a>
                                                         <?php endif; ?>
                                                         <?php if (!$row['file_ba_signed'] && !$row['foto_bukti']): ?>
                                                             <?php if ($row['status'] == 'disetujui'): ?>

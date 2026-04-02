@@ -1,0 +1,24 @@
+# Nonaktifkan directory listing
+Options -Indexes
+
+# Blok file (.env, .git, dll)
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>
+
+# Blok file sensitif
+<FilesMatch "\.(env|ini|log|conf|sql)$">
+    Require all denied
+</FilesMatch>
+
+# Aktifkan rewrite engine
+RewriteEngine On
+
+# Anti hotlink
+RewriteCond %{HTTP_REFERER} !^$
+RewriteCond %{HTTP_REFERER} !^http(s)?://(www\.)?yourdomain.com [NC]
+RewriteRule \.(jpg|jpeg|png|gif)$ - [F]
+
+# Blok request mencurigakan sederhana
+RewriteCond %{QUERY_STRING} (\.\./|\<|\>|%3C|%3E) [NC]
+RewriteRule .* - [F]

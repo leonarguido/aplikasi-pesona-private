@@ -71,7 +71,7 @@
                                                             <td><?= $row['keterangan']; ?></td>
                                                             <td class="text-center">
                                                                 <?php if ($row['berkas']): ?>
-                                                                    <a href="<?= ASSETS_URL ?>img/berkas/<?= $row['berkas']; ?>" target="_blank" class="btn btn-sm btn-info shadow-sm" title="Download Berita Acara">
+                                                                    <a href="<?= FILE_URL ?>file.php?type=img_berkas&file=<?= urlencode($row['berkas']); ?>" target="_blank" class="btn btn-sm btn-info shadow-sm" title="Download Berita Acara">
                                                                         <i class="fas fa-download"></i> Unduh
                                                                     </a>
                                                                 <?php else: ?>

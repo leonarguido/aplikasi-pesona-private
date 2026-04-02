@@ -11,7 +11,7 @@ class PimpinanController
 
         // Cek Akses (Hanya Admin)
         if (!isset($_SESSION['user_id'])) {
-            header("Location: login.php");
+            header("Location: " . $this->base_url . "login");
             exit;
         }
         if ($_SESSION['role'] == 'user' || $_SESSION['role'] == 'staff') {
@@ -161,7 +161,7 @@ class PimpinanController
 
         // Cek Akses (Hanya Admin)
         if (!isset($_SESSION['user_id'])) {
-            header("Location: login.php");
+            header("Location: " . $this->base_url . "login");
             exit;
         }
         if ($_SESSION['role'] == 'user' || $_SESSION['role'] == 'staff') {
@@ -459,7 +459,7 @@ class PimpinanController
 
         // 1. Cek Akses (Hanya Pimpinan & Admin yang boleh lihat stok)
         if (!isset($_SESSION['user_id'])) {
-            header("Location: login.php");
+            header("Location: " . $this->base_url . "login");
             exit;
         }
         if ($_SESSION['role'] == 'user' || $_SESSION['role'] == 'staff') {
@@ -553,7 +553,7 @@ class PimpinanController
 
         // 1. Cek Akses (Hanya Pimpinan & Admin yang boleh lihat stok)
         if (!isset($_SESSION['user_id'])) {
-            header("Location: login.php");
+            header("Location: " . $this->base_url . "login");
             exit;
         }
         if ($_SESSION['role'] == 'user' || $_SESSION['role'] == 'staff') {
@@ -661,7 +661,7 @@ class PimpinanController
 
         // Cek Login
         if (!isset($_SESSION['user_id'])) {
-            header("Location: login.php");
+            header("Location: " . $this->base_url . "login");
             exit;
         }
 

@@ -51,11 +51,42 @@
                                                                 <td><?= $item['jumlah']; ?></td>
                                                                 <td><?= $item['satuan']; ?></td>
                                                                 <td>
+                                                                    <button class="btn btn-warning btn-sm" data-toggle="modal" data-target="#modalEdit<?= $key; ?>" title="Edit Jumlah">
+                                                                        <i class="fas fa-edit"></i>
+                                                                    </button>
                                                                     <a href="<?= BASE_URL ?>hapus_keranjang_item&hapus=<?= $key; ?>" class="btn btn-danger btn-sm" onclick="confirmHapus(event, this.href)">
                                                                         <i class="fas fa-trash"></i>
                                                                     </a>
                                                                 </td>
                                                             </tr>
+                                                            <div class="modal fade" id="modalEdit<?= $key; ?>" tabindex="-1">
+                                                                <div class="modal-dialog">
+                                                                    <div class="modal-content">
+                                                                        <div class="modal-header bg-warning text-white">
+                                                                            <h5 class="modal-title">Edit Jumlah Barang</h5>
+                                                                            <button class="close" data-dismiss="modal">&times;</button>
+                                                                        </div>
+                                                                        <form method="POST" action="<?= BASE_URL ?>update_keranjang">
+                                                                            <div class="modal-body">
+                                                                                <div class="form-group">
+                                                                                    <label>Nama Barang</label>
+                                                                                    <input type="text" class="form-control" value="<?= $item['nama']; ?>" readonly>
+                                                                                </div>
+                                                                                <div class="form-group">
+                                                                                    <label>Jumlah Permintaan (Max: <?= $item['stok_max']; ?>)</label>
+                                                                                    <input type="number" name="jumlah_baru" class="form-control" value="<?= $item['jumlah']; ?>" min="1" max="<?= $item['stok_max']; ?>" required>
+                                                                                </div>
+                                                                                <input type="hidden" name="index_array" value="<?= $key; ?>">
+                                                                                <input type="hidden" name="stok_max" value="<?= $item['stok_max']; ?>">
+                                                                            </div>
+                                                                            <div class="modal-footer">
+                                                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                                                                                <button type="submit" name="update_cart" class="btn btn-warning">Update</button>
+                                                                            </div>
+                                                                        </form>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
                                                         <?php endforeach; ?>
                                                     <?php endif; ?>
                                                 </tbody>
@@ -95,7 +126,7 @@
                         </div>
                     </div>
                 </div>
-            <?php require __DIR__ . '/../layout/footer.php'; ?>
+                <?php require __DIR__ . '/../layout/footer.php'; ?>
             </div>
         </div>
     </div>

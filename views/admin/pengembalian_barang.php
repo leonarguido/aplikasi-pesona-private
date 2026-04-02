@@ -88,13 +88,13 @@
                                                         <?php if ($row['status'] == 'dikembalikan'): ?>
 
                                                             <?php if ($row['file_ba_kembali']): ?>
-                                                                <a href="<?= ASSETS_URL ?>arsip/<?= $row['file_ba_kembali']; ?>" target="_blank" class="btn btn-outline-success btn-sm" title="Lihat PDF Pengembalian">
+                                                                <a href="<?= FILE_URL ?>file.php?type=arsip&file=<?= urlencode($row['file_ba_kembali']); ?>" target="_blank" class="btn btn-outline-success btn-sm" title="Lihat PDF Pengembalian">
                                                                     <i class="fas fa-file-pdf"></i> BA
                                                                 </a>
                                                             <?php endif; ?>
 
                                                             <?php if (!empty($row['foto_bukti_kembali'])): ?>
-                                                                <a href="<?= ASSETS_URL ?>arsip/<?= $row['foto_bukti_kembali']; ?>" target="_blank" class="btn btn-outline-primary btn-sm" title="Lihat Foto Bukti">
+                                                                <a href="<?= FILE_URL ?>file.php?type=arsip&file=<?= urlencode($row['foto_bukti_kembali']); ?>" target="_blank" class="btn btn-outline-primary btn-sm" title="Lihat Foto Bukti">
                                                                     <i class="fas fa-image"></i> Foto
                                                                 </a>
                                                             <?php endif; ?>

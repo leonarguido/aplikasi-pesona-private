@@ -117,7 +117,7 @@
 
                                                         <?php elseif ($row['status'] == 'selesai'): ?>
                                                             <?php if (!empty($row['file_ba_signed'])): ?>
-                                                                <a href="<?= ASSETS_URL ?>arsip/<?= $row['file_ba_signed']; ?>" target="_blank" class="btn btn-success btn-sm btn-block" title="Lihat Dokumen Asli">
+                                                                <a href="<?= FILE_URL ?>file.php?type=arsip&file=<?= urlencode($row['file_ba_signed']); ?>" target="_blank" class="btn btn-success btn-sm btn-block" title="Lihat Dokumen Asli">
                                                                     <i class="fas fa-file-pdf"></i> Berita Acara Peminjaman
                                                                 </a>
                                                             <?php else: ?>
@@ -127,13 +127,13 @@
                                                         <?php elseif ($row['status'] == 'dikembalikan'): ?>
 
                                                             <?php if (!empty($row['file_ba_signed'])): ?>
-                                                                <a href="<?= ASSETS_URL ?>arsip/<?= $row['file_ba_signed']; ?>" target="_blank" class="btn btn-outline-success btn-sm btn-block mb-2">
+                                                                <a href="<?= FILE_URL ?>file.php?type=arsip&file=<?= urlencode($row['file_ba_signed']); ?>" target="_blank" class="btn btn-outline-success btn-sm btn-block mb-2">
                                                                     <i class="fas fa-file-pdf"></i> Berita Acara Pinjam
                                                                 </a>
                                                             <?php endif; ?>
 
                                                             <?php if (!empty($row['file_ba_kembali'])): ?>
-                                                                <a href="<?= ASSETS_URL ?>arsip/<?= $row['file_ba_kembali']; ?>" target="_blank" class="btn btn-outline-info btn-sm btn-block">
+                                                                <a href="<?= FILE_URL ?>file.php?type=arsip&file=<?= urlencode($row['file_ba_kembali']); ?>" target="_blank" class="btn btn-outline-info btn-sm btn-block">
                                                                     <i class="fas fa-file-pdf"></i> Berita Acara Kembali
                                                                 </a>
                                                             <?php endif; ?>

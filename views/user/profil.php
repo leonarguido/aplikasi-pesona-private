@@ -152,7 +152,7 @@
                                             </form>
                                         <?php else: ?>
                                             <div class="mb-3">
-                                                <img src="<?= ASSETS_URL ?>img/ttd/<?= $data['paraf']; ?>" class="img-thumbnail" width="200">
+                                                <img src="<?= FILE_URL ?>file.php?type=img_ttd&file=<?= urlencode($data['paraf']); ?>" class="img-thumbnail" width="200">
                                                 <p class="small text-success mt-2"><i class="fas fa-check-circle"></i> TTD Tersedia</p>
                                             </div>
                                         <?php endif; ?>

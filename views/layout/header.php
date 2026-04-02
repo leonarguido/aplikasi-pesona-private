@@ -3,6 +3,7 @@
 define('BASE_URL', '/aplikasi-pesona-private/routes/web.php/?page='); 
 // define('BASE_URL', '/aplikasi-pesona-private/');
 define('ASSETS_URL', '/aplikasi-pesona-private/assets/');
+define('FILE_URL', '/aplikasi-pesona-private/');
 ?>
     
     <meta charset="utf-8">

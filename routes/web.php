@@ -181,6 +181,9 @@ if (isset($_GET['page'])) {
         case 'hapus_keranjang_item':
             $user->hapus_keranjang_item();
             break;
+        case 'update_keranjang':
+            $user->update_keranjang();
+            break;
         case 'checkout_keranjang':
             $user->checkout_keranjang();
             break;

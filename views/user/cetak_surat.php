@@ -298,7 +298,7 @@
                     Yang Menerima,
                 </div>
 
-                <img src="<?= ASSETS_URL ?>img/ttd/<?= $data['ttd_pemohon']; ?>" class="img-ttd">
+                <img src="<?= FILE_URL ?>file.php?type=img_ttd&file=<?= urlencode($data['ttd_pemohon']); ?>" class="img-ttd">
 
                 <strong>( <?= $data['nama_pemohon']; ?> )</strong><br>
                 NIP. <?= !empty($data['nip_pemohon']) ? $data['nip_pemohon'] : '-'; ?>
@@ -310,7 +310,7 @@
                     Admin Gudang
                 </div>
 
-                <img src="<?= ASSETS_URL ?>img/ttd/<?= $data['ttd_admin']; ?>" class="img-ttd">
+                <img src="<?= FILE_URL ?>file.php?type=img_ttd&file=<?= urlencode($data['ttd_admin']); ?>" class="img-ttd">
 
                 <strong>( <?= $data['nama_admin']; ?> )</strong><br>
                 NIP. <?= !empty($data['nip_admin']) ? $data['nip_admin'] : '-'; ?>

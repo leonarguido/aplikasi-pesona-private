@@ -11,7 +11,7 @@ class UserController
         session_start();
 
         if (!isset($_SESSION['user_id'])) {
-            header("Location: login.php");
+            header("Location: " . $this->base_url . "login");
             exit;
         }
 
@@ -91,7 +91,7 @@ class UserController
         session_start();
 
         if (!isset($_SESSION['user_id'])) {
-            header("Location: login.php");
+            header("Location: " . $this->base_url . "login");
             exit;
         }
 
@@ -121,6 +121,51 @@ class UserController
 
             header("Location: " . $this->base_url . "keranjang");
             exit;
+        }
+    }
+
+    // A. PROSES HAPUS ITEM DARI KERANJANG
+    public function update_keranjang()
+    {
+        session_start();
+
+        if (isset($_POST['update_cart'])) {
+            $index    = $_POST['index_array'];
+            $jml_baru = $_POST['jumlah_baru'];
+            $stok_max = $_POST['stok_max'];
+
+            // Validasi Stok
+            if ($jml_baru > $stok_max) {
+                // echo "<script>alert('Gagal! Jumlah melebihi stok tersedia ($stok_max).'); window.location='keranjang.php';</script>";
+                $_SESSION['alert'] = [
+                    'icon' => 'error',
+                    'title' => 'Gagal!',
+                    'text' => "Jumlah melebihi stok tersedia ($stok_max)",
+                ];
+                header("Location: " . $this->base_url . "keranjang");
+                exit;
+
+            } elseif ($jml_baru < 1) {
+                // echo "<script>alert('Jumlah minimal 1!'); window.location='keranjang.php';</script>";
+                $_SESSION['alert'] = [
+                    'icon' => 'error',
+                    'title' => 'Gagal!',
+                    'text' => 'Jumlah minimal 1!',
+                ];
+                header("Location: " . $this->base_url . "keranjang");
+                exit;
+
+            } else {
+                // Update Session
+                $_SESSION['keranjang'][$index]['jumlah'] = $jml_baru;
+                $_SESSION['alert'] = [
+                    'icon' => 'success',
+                    'title' => 'Berhasil!',
+                    'text' => 'Jumlah berhasil diperbarui!',
+                ];
+                header("Location: " . $this->base_url . "keranjang");
+                exit;
+            }
         }
     }
 
@@ -213,7 +258,7 @@ class UserController
 
         // 1. Cek Login (Hanya User/Staff)
         if (!isset($_SESSION['user_id'])) {
-            header("Location: login.php");
+            header("Location: " . $this->base_url . "login");
             exit;
         }
 
@@ -409,7 +454,7 @@ class UserController
 
         // 1. Cek Login (Hanya User/Staff)
         if (!isset($_SESSION['user_id'])) {
-            header("Location: login.php");
+            header("Location: " . $this->base_url . "login");
             exit;
         }
 
@@ -442,11 +487,13 @@ class UserController
         // Ambil Role & ID User
         $role    = $_SESSION['role'];
         $id_user = $_SESSION['user_id'];
-        $data = mysqli_fetch_assoc(mysqli_query($koneksi, 
+        $data = mysqli_fetch_assoc(mysqli_query(
+            $koneksi,
             "SELECT u.*, j.nama_jabatan
             FROM tb_user u
             JOIN tb_jabatan j ON j.id = u.jabatan_id
-            WHERE u.id = '$id_user'"));
+            WHERE u.id = '$id_user'"
+        ));
 
         require_once '../views/user/profil.php';
     }
@@ -584,7 +631,7 @@ class UserController
         session_start();
 
         if (!isset($_SESSION['user_id'])) {
-            header("Location: login.php");
+            header("Location: " . $this->base_url . "login");
             exit;
         }
 
