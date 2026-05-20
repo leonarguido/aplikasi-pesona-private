@@ -50,7 +50,7 @@ $id_user = $_SESSION['user_id'];
 
                             // 3. Disetujui Bulan Ini (Global)
                             $bulan_ini = date('m');
-                            $q_acc = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM tb_permintaan WHERE status='disetujui' AND MONTH(tanggal_disetujui) = '$bulan_ini'");
+                            $q_acc = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM tb_permintaan WHERE status='selesai' AND MONTH(tanggal_disetujui) = '$bulan_ini'");
                             $total_acc = mysqli_fetch_assoc($q_acc)['total'];
 
                             // 4. Stok Menipis
@@ -192,8 +192,14 @@ $id_user = $_SESSION['user_id'];
                                                                         <span class="badge badge-warning">Menunggu</span>
                                                                     <?php elseif ($rec['status'] == 'disetujui'): ?>
                                                                         <span class="badge badge-success">Disetujui</span>
-                                                                    <?php else: ?>
+                                                                    <?php elseif ($rec['status'] == 'ditolak'): ?>
                                                                         <span class="badge badge-danger">Ditolak</span>
+                                                                    <?php elseif ($rec['status'] == 'selesai'): ?>
+                                                                        <span class="badge badge-primary">Selesai</span>
+                                                                    <?php elseif ($rec['status'] == 'batal_otomatis'): ?>
+                                                                        <span class="badge badge-secondary">Batal Otomatis</span>
+                                                                    <?php else: ?>
+                                                                        <span class="badge badge-secondary"><?= ucfirst($rec['status']); ?></span>
                                                                     <?php endif; ?>
                                                                 </td>
                                                             </tr>
@@ -241,7 +247,7 @@ $id_user = $_SESSION['user_id'];
 
                             // 1. Total Transaksi Berhasil (Seluruh Bulan)
                             $bulan_ini = date('m');
-                            $q_semua = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM tb_permintaan WHERE status='disetujui'");
+                            $q_semua = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM tb_permintaan WHERE status='selesai'");
                             $total_semua = mysqli_fetch_assoc($q_semua)['total'];
 
                             // 2. Permintaan Menunggu (Seluruh Bulan)
@@ -250,7 +256,7 @@ $id_user = $_SESSION['user_id'];
 
                             // 3. Disetujui Bulan Ini
                             $bulan_ini = date('m');
-                            $q_acc = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM tb_permintaan WHERE status='disetujui' AND MONTH(tanggal_disetujui) = '$bulan_ini'");
+                            $q_acc = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM tb_permintaan WHERE status='selesai' AND MONTH(tanggal_disetujui) = '$bulan_ini'");
                             $total_acc = mysqli_fetch_assoc($q_acc)['total'];
 
                             ?>
@@ -356,7 +362,7 @@ $id_user = $_SESSION['user_id'];
                                                 <div class="col-auto"><i class="fas fa-file-pdf fa-2x text-gray-300"></i></div>
                                             </div>
                                             <form action="<?= BASE_URL ?>laporan_permintaan" method="POST">
-                                                <input type="hidden" name="status_permintaan" value="disetujui">
+                                                <input type="hidden" name="status_permintaan" value="selesai">
                                                 <button type="submit" class="btn btn-sm btn-success mt-2 shadow-sm btn-block">Cek Sekarang <i class="fas fa-arrow-right"></i></button>
                                             </form>
                                         </div>
@@ -391,7 +397,7 @@ $id_user = $_SESSION['user_id'];
                                             <div class="col-auto"><i class="fas fa-check-circle fa-2x text-gray-300"></i></div>
                                         </div>
                                         <form action="<?= BASE_URL ?>laporan_permintaan" method="POST">
-                                            <input type="hidden" name="status_permintaan" value="disetujui">
+                                            <input type="hidden" name="status_permintaan" value="selesai">
                                             <button type="submit" class="btn btn-sm btn-success mt-2 shadow-sm btn-block">Cek Sekarang <i class="fas fa-arrow-right"></i></button>
                                         </form>
                                     </div>
@@ -467,8 +473,14 @@ $id_user = $_SESSION['user_id'];
                                                                         <span class="badge badge-warning">Menunggu</span>
                                                                     <?php elseif ($rec['status'] == 'disetujui'): ?>
                                                                         <span class="badge badge-success">Disetujui</span>
-                                                                    <?php else: ?>
+                                                                    <?php elseif ($rec['status'] == 'ditolak'): ?>
                                                                         <span class="badge badge-danger">Ditolak</span>
+                                                                    <?php elseif ($rec['status'] == 'selesai'): ?>
+                                                                        <span class="badge badge-primary">Selesai</span>
+                                                                    <?php elseif ($rec['status'] == 'batal_otomatis'): ?>
+                                                                        <span class="badge badge-secondary">Batal Otomatis</span>
+                                                                    <?php else: ?>
+                                                                        <span class="badge badge-secondary"><?= ucfirst($rec['status']); ?></span>
                                                                     <?php endif; ?>
                                                                 </td>
                                                             </tr>
@@ -569,7 +581,7 @@ $id_user = $_SESSION['user_id'];
 
                             // 3. Disetujui Bulan Ini (Global)
                             $bulan_ini = date('m');
-                            $q_acc = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM tb_permintaan WHERE status='disetujui' AND MONTH(tanggal_disetujui) = '$bulan_ini'");
+                            $q_acc = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM tb_permintaan WHERE status='selesai' AND MONTH(tanggal_disetujui) = '$bulan_ini'");
                             $total_acc = mysqli_fetch_assoc($q_acc)['total'];
 
                             // 4. Stok Menipis
@@ -609,7 +621,7 @@ $id_user = $_SESSION['user_id'];
                                         </div>
                                     </div>
                                 </div>
-      
+
                                 <div class="col-xl-3 col-md-6 mb-4">
                                     <div class="card border-left-primary shadow h-100 py-2">
                                         <div class="card-body">
@@ -711,8 +723,14 @@ $id_user = $_SESSION['user_id'];
                                                                         <span class="badge badge-warning">Menunggu</span>
                                                                     <?php elseif ($rec['status'] == 'disetujui'): ?>
                                                                         <span class="badge badge-success">Disetujui</span>
-                                                                    <?php else: ?>
+                                                                    <?php elseif ($rec['status'] == 'ditolak'): ?>
                                                                         <span class="badge badge-danger">Ditolak</span>
+                                                                    <?php elseif ($rec['status'] == 'selesai'): ?>
+                                                                        <span class="badge badge-primary">Selesai</span>
+                                                                    <?php elseif ($rec['status'] == 'batal_otomatis'): ?>
+                                                                        <span class="badge badge-secondary">Batal Otomatis</span>
+                                                                    <?php else: ?>
+                                                                        <span class="badge badge-secondary"><?= ucfirst($rec['status']); ?></span>
                                                                     <?php endif; ?>
                                                                 </td>
                                                             </tr>

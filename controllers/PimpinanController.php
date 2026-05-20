@@ -602,7 +602,7 @@ class PimpinanController
             if ($status != "") {
                 $sql .= " WHERE p.status = '$status'";
             } else {
-                $sql .= " WHERE p.status IN ('menunggu', 'disetujui', 'ditolak')";
+                $sql .= " WHERE p.status IN ('menunggu', 'disetujui', 'ditolak', 'selesai', 'batal_otomatis')";
             }
 
             $sql .= " ORDER BY p.id DESC";
@@ -639,6 +639,10 @@ class PimpinanController
                     echo "<span class='badge badge-warning px-2 py-1'>Menunggu</span>";
                 } elseif ($hist['status'] == 'disetujui') {
                     echo "<span class='badge badge-success px-2 py-1'>Disetujui</span>";
+                } elseif ($hist['status'] == 'selesai') {
+                    echo "<span class='badge badge-info px-2 py-1'>Selesai</span>";
+                } elseif ($hist['status'] == 'batal_otomatis') {
+                    echo "<span class='badge badge-secondary px-2 py-1'>Batal Otomatis</span>";
                 } else {
                     echo "<span class='badge badge-danger px-2 py-1'>Ditolak</span>
                             <div class='small text-danger mt-1 font-italic'>'{$hist['catatan']}'</div>";
@@ -680,7 +684,7 @@ class PimpinanController
             if ($pegawai != "") {
                 $sql .= " WHERE p.user_id = '$pegawai'";
             } else {
-                $sql .= " WHERE p.status IN ('menunggu', 'disetujui', 'ditolak')";
+                $sql .= " WHERE p.status IN ('menunggu', 'disetujui', 'ditolak', 'selesai', 'batal_otomatis')";
             }
 
             $sql .= " ORDER BY p.id DESC";
@@ -716,6 +720,10 @@ class PimpinanController
                     echo "<span class='badge badge-warning px-2 py-1'>Menunggu</span>";
                 } elseif ($hist['status'] == 'disetujui') {
                     echo "<span class='badge badge-success px-2 py-1'>Disetujui</span>";
+                } elseif ($hist['status'] == 'selesai') {
+                    echo "<span class='badge badge-info px-2 py-1'>Selesai</span>";
+                } elseif ($hist['status'] == 'batal_otomatis') {
+                    echo "<span class='badge badge-secondary px-2 py-1'>Batal Otomatis</span>";
                 } else {
                     echo "<span class='badge badge-danger px-2 py-1'>Ditolak</span>
                             <div class='small text-danger mt-1 font-italic'>'{$hist['catatan']}'</div>";

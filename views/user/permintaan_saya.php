@@ -34,10 +34,10 @@
                                             <tr>
                                                 <th width="5%">No</th>
                                                 <th width="15%">Tanggal</th>
-                                                <th>Detail Barang</th>
+                                                <th width="30%">Detail Barang</th>
                                                 <th>Catatan Admin</th>
                                                 <th class="text-center" width="10%">Status</th>
-                                                <th class="text-center" width="15%">Aksi</th>
+                                                <th class="text-center" width="10%">Aksi</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -54,7 +54,7 @@
                                             ?>
                                                 <tr>
                                                     <td><?= $no++; ?></td>
-                                                    <td>
+                                                    <td class="small">
                                                         <i class="far fa-calendar-alt text-gray-400"></i> <?= date('d-m-Y', strtotime($row['tanggal_permintaan'])); ?>
                                                     </td>
 
@@ -84,12 +84,18 @@
                                                         <?php if ($row['status'] == 'menunggu'): ?>
                                                             <span class="badge badge-warning px-2 py-1">Menunggu</span>
                                                         <?php elseif ($row['status'] == 'disetujui'): ?>
-                                                            <span class="badge badge-success px-2 py-1">Disetujui</span>
+                                                            <span class="badge badge-primary px-2 py-1">Disetujui</span>
                                                             <div class="small text-muted mt-1" style="font-size: 0.75rem;">
                                                                 <?= date('d-m-Y', strtotime($row['tanggal_disetujui'])); ?>
                                                             </div>
                                                         <?php elseif ($row['status'] == 'ditolak'): ?>
                                                             <span class="badge badge-danger px-2 py-1">Ditolak</span>
+                                                        <?php elseif ($row['status'] == 'selesai'): ?>
+                                                            <span class="badge badge-success px-2 py-1">Selesai</span>
+                                                        <?php elseif ($row['status'] == 'batal_otomatis'): ?>
+                                                            <span class="badge badge-secondary px-2 py-1">Batal Otomatis</span>
+                                                        <?php else: ?>
+                                                            <span class="badge badge-secondary px-2 py-1"><?= ucfirst($row['status']); ?></span>
                                                         <?php endif; ?>
                                                     </td>
 
@@ -185,6 +191,10 @@
                                                                 <i class="fas fa-print"></i> Cetak
                                                             </a>
 
+                                                        <?php elseif ($row['status'] == 'selesai'): ?>
+                                                            <a href="<?= BASE_URL ?>cetak_surat&id=<?= $row['id']; ?>" target="_blank" class="btn btn-info btn-sm shadow-sm">
+                                                                <i class="fas fa-print"></i> Cetak
+                                                            </a>
                                                         <?php else: ?>
                                                             <button class="btn btn-secondary btn-sm" disabled><i class="fas fa-ban"></i></button>
                                                         <?php endif; ?>

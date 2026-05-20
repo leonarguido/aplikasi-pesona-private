@@ -816,6 +816,47 @@ class AdminController
             exit;
         }
 
+        // PENGECEKAN PASIF - BATAL OTOMATIS 7 HARI
+        $query_kedaluwarsa = mysqli_query($koneksi, "
+            SELECT id 
+            FROM tb_permintaan 
+            WHERE status = 'disetujui' 
+            AND DATEDIFF(CURRENT_DATE(), tanggal_disetujui) >= 7
+        ");
+
+        if (mysqli_num_rows($query_kedaluwarsa) > 0) {
+            while ($data_kdl = mysqli_fetch_assoc($query_kedaluwarsa)) {
+                $id_kdl = $data_kdl['id'];
+
+                // 1. Ambil detail barang untuk dikembalikan stoknya
+                $query_detail_kdl = mysqli_query($koneksi, "
+                    SELECT barang_id, jumlah 
+                    FROM tb_detail_permintaan 
+                    WHERE permintaan_id = '$id_kdl'
+                ");
+
+                while ($detail_kdl = mysqli_fetch_assoc($query_detail_kdl)) {
+                    $id_brg_kdl = $detail_kdl['barang_id'];
+                    $jumlah_kdl = $detail_kdl['jumlah'];
+
+                    // 2. Kembalikan stok ke tb_barang_habis_pakai
+                    mysqli_query($koneksi, "
+                        UPDATE tb_barang_habis_pakai 
+                        SET stok = stok + $jumlah_kdl 
+                        WHERE id = '$id_brg_kdl'
+                    ");
+                }
+
+                // 3. Ubah status menjadi batal_otomatis dan tambahkan catatan
+                mysqli_query($koneksi, "
+                    UPDATE tb_permintaan 
+                    SET status = 'batal_otomatis', 
+                        catatan = CONCAT(IFNULL(catatan,''), ' [Dibatalkan otomatis: Melewati batas waktu 7 hari]') 
+                    WHERE id = '$id_kdl'
+                ");
+            }
+        }
+
         require_once '../views/admin/riwayat_persetujuan.php';
     }
 
@@ -945,6 +986,37 @@ class AdminController
                     'text' => 'Error:' + mysqli_error($koneksi),
                 ];
                 header("Location: " . $this->base_url . "persetujuan");
+                exit;
+            }
+        }
+    }
+
+    // C. PROSES PENGAMBILAN
+    public function proses_pengambilan()
+    {
+        require __DIR__ . '/../config/koneksi.php';
+        session_start();
+
+        if (isset($_GET['ambil_id'])) {
+            $id_ambil = mysqli_real_escape_string($koneksi, $_GET['ambil_id']);
+            $query = "UPDATE tb_permintaan SET status = 'selesai' WHERE id = '$id_ambil'";
+
+            if (mysqli_query($koneksi, $query)) {
+                $_SESSION['alert'] = [
+                    'icon' => 'success',
+                    'title' => 'Berhasil!',
+                    'text' => 'Barang berhasil diambil! Status permintaan selesai.',
+                ];
+                header("Location: " . $this->base_url . "riwayat_persetujuan");
+                exit;
+            } else {
+                // echo "<script>alert('Error: " . mysqli_error($koneksi) . "');</script>";
+                $_SESSION['alert'] = [
+                    'icon' => 'error',
+                    'title' => 'Gagal!',
+                    'text' => 'Error:' + mysqli_error($koneksi),
+                ];
+                header("Location: " . $this->base_url . "riwayat_persetujuan");
                 exit;
             }
         }

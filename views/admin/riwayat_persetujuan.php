@@ -40,25 +40,25 @@
                                         <tbody>
                                             <?php
                                             $no = 1;
-                                            // Ambil semua riwayat (Disetujui/Ditolak)
+                                            // Ambil semua riwayat selain 'menunggu'
                                             $query_hist = "SELECT p.*, u.nama AS nama_pemohon, a.nama AS nama_admin
                                        FROM tb_permintaan p 
                                        JOIN tb_user u ON p.user_id = u.id 
                                        LEFT JOIN tb_user a ON p.admin_id = a.id
                                        WHERE p.status != 'menunggu' AND p.deleted_at IS NULL
-                                       ORDER BY p.id DESC";
+                                       ORDER BY p.tanggal_disetujui DESC, p.tanggal_ditolak DESC";
 
                                             $res_hist = mysqli_query($koneksi, $query_hist);
 
                                             while ($hist = mysqli_fetch_assoc($res_hist)):
                                                 $id_hist = $hist['id'];
 
-                                                // Tentukan Tanggal (Disetujui atau Ditolak)
-                                                $tgl_aksi = ($hist['status'] == 'disetujui') ? $hist['tanggal_disetujui'] : $hist['tanggal_ditolak'];
+                                                // Tentukan Tanggal acuan (Jika ditolak pakai tgl_ditolak, sisanya pakai tgl_disetujui)
+                                                $tgl_aksi = ($hist['status'] == 'ditolak') ? $hist['tanggal_ditolak'] : $hist['tanggal_disetujui'];
                                             ?>
                                                 <tr>
                                                     <td><?= $no++; ?></td>
-                                                    <td>
+                                                    <td class="small">
                                                         <i class="far fa-calendar-alt text-gray-400"></i> <?= date('d-m-Y', strtotime($tgl_aksi)); ?>
                                                     </td>
                                                     <td class="font-weight-bold text-primary"><?= $hist['nama_pemohon']; ?></td>
@@ -80,7 +80,12 @@
 
                                                     <td class="text-center">
                                                         <?php if ($hist['status'] == 'disetujui'): ?>
-                                                            <span class="badge badge-success px-2 py-1">Disetujui</span>
+                                                            <span class="badge badge-warning px-2 py-1 text-dark">Disetujui (Belum diambil)</span>
+                                                        <?php elseif ($hist['status'] == 'selesai'): ?>
+                                                            <span class="badge badge-success px-2 py-1">Selesai (Diambil)</span>
+                                                        <?php elseif ($hist['status'] == 'batal_otomatis'): ?>
+                                                            <span class="badge badge-secondary px-2 py-1">Batal Otomatis</span>
+                                                            <div class="small text-danger mt-1 font-italic">Hangus (Lewat 7 Hari)</div>
                                                         <?php else: ?>
                                                             <span class="badge badge-danger px-2 py-1">Ditolak</span>
                                                             <div class="small text-danger mt-1 font-italic">"<?= $hist['catatan']; ?>"</div>
@@ -93,7 +98,14 @@
 
                                                     <td class="text-center">
                                                         <?php if ($hist['status'] == 'disetujui'): ?>
-                                                            <a href="<?= BASE_URL ?>cetak_surat&id=<?= $hist['id']; ?>" target="_blank" class="btn btn-info btn-sm shadow-sm" title="Cetak Surat Jalan">
+                                                            <a href="<?= BASE_URL ?>proses_pengambilan&ambil_id=<?= $hist['id']; ?>" class="btn btn-success btn-sm shadow-sm mb-1" onclick="confirmAmbil(event, this.href)" title="Tandai Sudah Diambil">
+                                                                <i class="fas fa-check-double"></i> Diambil
+                                                            </a>
+                                                            <a href="<?= BASE_URL ?>cetak_surat&id=<?= $hist['id']; ?>" target="_blank" class="btn btn-info btn-sm shadow-sm mb-1" title="Cetak Surat">
+                                                                <i class="fas fa-print"></i> Cetak
+                                                            </a>
+                                                        <?php elseif ($hist['status'] == 'selesai'): ?>
+                                                            <a href="<?= BASE_URL ?>cetak_surat&id=<?= $hist['id']; ?>" target="_blank" class="btn btn-info btn-sm shadow-sm" title="Cetak Surat">
                                                                 <i class="fas fa-print"></i> Cetak
                                                             </a>
                                                         <?php else: ?>
@@ -109,7 +121,7 @@
                         </div>
                     </div>
                 </div>
-            <?php require __DIR__ . '/../layout/footer.php'; ?>
+                <?php require __DIR__ . '/../layout/footer.php'; ?>
             </div>
         </div>
     </div>
@@ -136,6 +148,25 @@
                 });
             }
         });
+
+        function confirmAmbil(event, url) {
+            event.preventDefault();
+
+            Swal.fire({
+                title: 'Yakin?',
+                text: 'Apakah Staf sudah mengambil barang fisik secara langsung?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Ya, sudah!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = url;
+                }
+            });
+        }
     </script>
 </body>
 

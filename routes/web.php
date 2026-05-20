@@ -31,6 +31,9 @@ if (isset($_GET['page'])) {
         case 'autentikasi':
             $autentikasi->autentikasi();
             break;
+        case 'verifikasi_2fa':
+            $autentikasi->verifikasi_2fa();
+            break;
         case 'role':
             $autentikasi->role_page();
             break;
@@ -122,6 +125,9 @@ if (isset($_GET['page'])) {
             break;
         case 'proses_penolakan':
             $admin->proses_penolakan();
+            break;
+        case 'proses_pengambilan':
+            $admin->proses_pengambilan();
             break;
 
         // DATA BARANG ASET BMN

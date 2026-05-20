@@ -75,6 +75,8 @@
                                             <option value="disetujui" ${$status==='disetujui' ? 'selected' : '' }>Disetujui</option>
                                             <option value="menunggu" ${$status==='menunggu' ? 'selected' : '' }>Menunggu</option>
                                             <option value="ditolak" ${$status==='ditolak' ? 'selected' : '' }>Ditolak</option>
+                                            <option value="selesai" ${$status==='selesai' ? 'selected' : '' }>Selesai</option>
+                                            <option value="batal_otomatis" ${$status==='batal_otomatis' ? 'selected' : '' }>Batal Otomatis</option>
                                         </select>
                                     </label>
                                     <label>

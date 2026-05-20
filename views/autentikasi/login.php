@@ -55,7 +55,7 @@
                                                     </div>
 
                                                     <button type="submit" name="login" class="btn btn-primary btn-user btn-block">
-                                                        Masuk
+                                                        Lanjut Verifikasi 2FA
                                                     </button>
                                                 </form>
 

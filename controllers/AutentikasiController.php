@@ -19,7 +19,7 @@ class AutentikasiController
             $username = mysqli_real_escape_string($koneksi, $_POST['username']);
             $password = $_POST['password'];
 
-            // CEK TABEL BARU: tb_user
+            // CEK TABEL: tb_user
             $query = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE username = '$username'");
 
             // Cek apakah username ada
@@ -29,45 +29,121 @@ class AutentikasiController
                 // VERIFIKASI PASSWORD
                 if (password_verify($password, $data['password'])) {
 
-                    $role_db = $data['role'];
+                    // JANGAN LANGSUNG MASUK!
+                    // Simpan data di Session khusus 2FA Pending
+                    $_SESSION['pending_2fa_id']       = $data['id'];
+                    $_SESSION['pending_2fa_username'] = $data['username'];
+                    $_SESSION['pending_2fa_nama']     = $data['nama'];
+                    $_SESSION['pending_2fa_role']     = $data['role'];
 
-                    // JIKA ROLE ADALAH STAF (USER BIASA) -> Langsung Set Session Utama & Masuk
-                    if ($role_db == 'staff') {
-                        $_SESSION['user_id']   = $data['id'];
-                        $_SESSION['username']  = $data['username'];
-                        $_SESSION['full_name'] = $data['nama'];
-                        $_SESSION['role']      = 'user';
-
-                        header("Location: index.php");
-                        exit;
-                    }
-                    // JIKA ROLE ADALAH ADMIN/PIMPINAN/SUPERADMIN -> Tahan di Session Sementara
-                    else {
-                        $_SESSION['temp_user_id']   = $data['id'];
-                        $_SESSION['temp_username']  = $data['username'];
-                        $_SESSION['temp_full_name'] = $data['nama'];
-
-                        // MAPPING ROLE ASLI
-                        if ($role_db == 'super admin') {
-                            $_SESSION['temp_role'] = 'super admin';
-                        } elseif ($role_db == 'admin bmn') {
-                            $_SESSION['temp_role'] = 'admin bmn';
-                        } elseif ($role_db == 'admin bhp') {
-                            $_SESSION['temp_role'] = 'admin bhp';
-                        } else {
-                            $_SESSION['temp_role'] = $role_db; // Untuk pimpinan
-                        }
-
-                        // Lempar ke halaman pilih role
-                        header("Location: " . $this->base_url . "role");
-                        exit;
-                    }
+                    // Arahkan ke halaman verifikasi Google Authenticator
+                    header("Location: " . $this->base_url . "verifikasi_2fa");
+                    exit;
                 }
             }
             // Jika username salah atau password tidak terverifikasi
             $error = true;
-            require_once __DIR__ . '/../views/autentikasi/login.php';
         }
+
+        require_once __DIR__ . '/../views/autentikasi/login.php';
+    }
+
+    public function verifikasi_2fa()
+    {
+        session_start();
+        require __DIR__ . '/../config/koneksi.php';
+        require __DIR__ . '/../config/GoogleAuthenticator.php'; // Panggil library
+
+        // Jika tidak ada session pending dari login.php, kembalikan ke login
+        if (!isset($_SESSION['pending_2fa_id'])) {
+            header("Location: " . $this->base_url . "login");
+            exit;
+        }
+
+        $pending_id       = $_SESSION['pending_2fa_id'];
+        $pending_username = $_SESSION['pending_2fa_username'];
+        $pending_nama     = $_SESSION['pending_2fa_nama'];
+        $pending_role     = $_SESSION['pending_2fa_role'];
+
+        $ga = new PHPGangsta_GoogleAuthenticator();
+
+        // Cek apakah user sudah punya secret key
+        $query = mysqli_query($koneksi, "SELECT secret_key FROM tb_user WHERE id = '$pending_id'");
+        $user_data = mysqli_fetch_assoc($query);
+
+        $is_setup = false;
+
+        if (empty($user_data['secret_key'])) {
+            // Jika belum punya, buat kunci baru dan simpan ke DB
+            $secret = $ga->createSecret();
+            mysqli_query($koneksi, "UPDATE tb_user SET secret_key = '$secret' WHERE id = '$pending_id'");
+            $is_setup = true;
+        } else {
+            // Jika sudah punya, gunakan yang ada
+            $secret = $user_data['secret_key'];
+        }
+
+        // Generate URL QR Code menggunakan API alternatif yang aktif
+        $nama_aplikasi = urlencode("Aplikasi Pesona");
+        $otpauth_url = "otpauth://totp/{$nama_aplikasi}?secret={$secret}";
+
+        // Menggunakan API dari goqr.me / qrserver
+        $qrCodeUrl = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" . urlencode($otpauth_url);
+
+        $error = false;
+
+        // PROSES JIKA TOMBOL SUBMIT OTP DITEKAN
+        if (isset($_POST['verify'])) {
+            $otp_code = $_POST['otp_code'];
+
+            // Verifikasi kode OTP (toleransi waktu 2 * 30 detik)
+            $checkResult = $ga->verifyCode($secret, $otp_code, 2);
+
+            if ($checkResult) {
+                // KODE BENAR! Jalankan logika pembagian Role dari login Anda sebelumnya
+
+                if ($pending_role == 'staff') {
+                    // LANGSUNG MASUK
+                    $_SESSION['user_id']   = $pending_id;
+                    $_SESSION['username']  = $pending_username;
+                    $_SESSION['full_name'] = $pending_nama;
+                    $_SESSION['role']      = 'user';
+
+                    // Hapus session pending
+                    unset($_SESSION['pending_2fa_id'], $_SESSION['pending_2fa_username'], $_SESSION['pending_2fa_nama'], $_SESSION['pending_2fa_role']);
+
+                    header("Location: index.php");
+                    exit;
+                } else {
+                    // TAHAN DI SESSION SEMENTARA UNTUK PILIH ROLE
+                    $_SESSION['temp_user_id']   = $pending_id;
+                    $_SESSION['temp_username']  = $pending_username;
+                    $_SESSION['temp_full_name'] = $pending_nama;
+
+                    if ($pending_role == 'super admin') {
+                        $_SESSION['temp_role'] = 'super admin';
+                    } elseif ($pending_role == 'admin bmn') {
+                        $_SESSION['temp_role'] = 'admin bmn';
+                    } elseif ($pending_role == 'admin bhp') {
+                        $_SESSION['temp_role'] = 'admin bhp';
+                    } elseif ($pending_role == 'pimpinan') {
+                        $_SESSION['temp_role'] = 'pimpinan';
+                    } else {
+                        $_SESSION['temp_role'] = $pending_role;
+                    }
+
+                    // Hapus session pending
+                    unset($_SESSION['pending_2fa_id'], $_SESSION['pending_2fa_username'], $_SESSION['pending_2fa_nama'], $_SESSION['pending_2fa_role']);
+
+                    header("Location: " . $this->base_url . "role");
+                    exit;
+                }
+            } else {
+                $error = true;
+            }
+        }
+
+        require __DIR__ . '/../views/autentikasi/verify_2fa.php';
     }
 
     public function role_page()

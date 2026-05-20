@@ -73,6 +73,7 @@ class LogBarangController
 
     public function ajax_load_log_barang_habis_pakai()
     {
+        session_start();
         require __DIR__ . '/../config/koneksi.php';
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {

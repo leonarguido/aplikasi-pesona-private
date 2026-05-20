@@ -391,7 +391,6 @@ class UserController
             header("Location: index.php");
             exit;
         }
-
         $id_permintaan = $_GET['id'];
 
         $query_header = "SELECT p.*, 
@@ -407,8 +406,8 @@ class UserController
         // var_dump($data);
         // exit;
 
-        // Validasi: Hanya bisa dicetak jika sudah DISETUJUI
-        if ($data['status'] != 'disetujui') {
+        // Validasi: Hanya bisa dicetak jika sudah DISETUJUI atau SELESAI
+        if ($data['status'] != 'disetujui' && $data['status'] != 'selesai') {
             // echo "<script>alert('Surat belum bisa dicetak karena status belum disetujui!'); window.close();</script>";
             $_SESSION['alert'] = [
                 'icon' => 'error',
