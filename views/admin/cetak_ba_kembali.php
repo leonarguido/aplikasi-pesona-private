@@ -7,6 +7,7 @@
     <?php
     define('BASE_URL', '/aplikasi-pesona-private/routes/web.php/?page=');
     define('ASSETS_URL', '/aplikasi-pesona-private/assets/');
+    define('FILE_URL', '/aplikasi-pesona-private/');
     ?>
     <style>
         /* CSS LAYAR UTAMA */
@@ -200,7 +201,7 @@
         }
 
         .ttd-space {
-            height: 60px;
+            height: 80px;
         }
 
         .ttd-center {
@@ -326,7 +327,7 @@
             <p style="margin-top: 5px;">Mengembalikan barang (BMN) berupa :</p>
             <div class="indent">
                 <p>
-                    - 1 (satu) unit <b><?= $data['nama_barang']; ?></b>, merk <b><?= $data['merek']; ?></b>, S/N: ............................................... yang diadakan melalui BPMP Prov Bali Tahun <b><?= $data['tahun_perolehan']; ?></b> dengan kodefikasi <b>(<?= $data['kode_barang']; ?> / NUP: <?= $data['nup']; ?>)</b>.
+                    - 1 (satu) unit <b><?= $data['nama_barang']; ?></b>, merk <b><?= $data['merek_barang']; ?></b>, S/N: ............................................... yang diadakan melalui BPMP Prov Bali Tahun <b><?= $data['tahun_perolehan']; ?></b> dengan kodefikasi <b>(<?= $data['kode_barang']; ?> / NUP: <?= $data['nup']; ?>)</b>.
                 </p>
             </div>
 
@@ -351,14 +352,18 @@
             <div class="ttd-row">
                 <div class="ttd-col">
                     PIHAK KEDUA,<br>
-                    <div class="ttd-space"></div>
+                    <div class="ttd-space">
+                        <img src="<?= FILE_URL ?>file.php?type=img_ttd&file=<?= urlencode($data['paraf_user']); ?>" class="img-ttd">
+                    </div>
                     <b><?= $data['nama_user']; ?></b><br>
                     NIP. <?= $data['nip_user']; ?>
                 </div>
 
                 <div class="ttd-col">
                     PIHAK PERTAMA,<br>
-                    <div class="ttd-space"></div>
+                    <div class="ttd-space">
+                        <img src="<?= FILE_URL ?>file.php?type=img_ttd&file=<?= urlencode($data['paraf_admin']); ?>" class="img-ttd">
+                    </div>
                     <b><?= $data['nama_admin']; ?></b><br>
                     NIP. <?= $data['nip_admin']; ?>
                 </div>
@@ -369,7 +374,6 @@
             Mengetahui/Menyetujui :<br>
             Kasubbag Umum BPMP Prov Bali,<br>
             <div class="ttd-space">
-                <!-- <img src="<?= FILE_URL ?>file.php?type=img_ttd&file=<?= urlencode($data['paraf_user']); ?>" class="img-ttd"> -->
                 <div class="ttd-space"></div>
                 <b><?= $nama_kasubbag; ?></b><br>
                 NIP. <?= $nip_kasubbag; ?>

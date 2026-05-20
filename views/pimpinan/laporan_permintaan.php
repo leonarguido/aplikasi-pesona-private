@@ -4,6 +4,25 @@
 <head>
     <?php require __DIR__ . '/../layout/header.php'; ?>
     <?php $judul_halaman = "Laporan Permintaan"; ?>
+
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <style>
+        .select2-container .select2-selection--single {
+            font-size: 0.875rem;
+            height: 32px !important;
+            border: 1px solid #d1d3e2;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            font-size: 0.875rem;
+            line-height: 32px !important;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            font-size: 0.875rem;
+            height: 32px !important;
+        }
+    </style>
 </head>
 
 <body id="page-top">
@@ -49,6 +68,27 @@
                                 <!-- <button onclick="window.print()" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
                                     <i class="fas fa-print fa-sm text-white-50"></i> Cetak / Simpan PDF
                                 </button> -->
+                                <div>
+                                    <label>
+                                        <select name="status" id="selectStatusFilter" class="form-control form-control-sm select2-status">
+                                            <option value="">Semua Status</option>
+                                            <option value="disetujui" ${$status==='disetujui' ? 'selected' : '' }>Disetujui</option>
+                                            <option value="menunggu" ${$status==='menunggu' ? 'selected' : '' }>Menunggu</option>
+                                            <option value="ditolak" ${$status==='ditolak' ? 'selected' : '' }>Ditolak</option>
+                                        </select>
+                                    </label>
+                                    <label>
+                                        <select name="pegawai" id="selectPegawaiFilter" class="form-control form-control-lg select2-pegawai">
+                                            <option value="">Semua Pegawai</option>
+                                            <?php $query_pegawai = mysqli_query($koneksi, "SELECT * FROM tb_user"); ?>
+                                            <?php while ($row_pegawai = mysqli_fetch_assoc($query_pegawai)): ?>
+                                                <option value="<?= $row_pegawai['id']; ?>" <?= (isset($_POST['pegawai']) && $_POST['pegawai'] == $row_pegawai['id']) ? 'selected' : ''; ?>>
+                                                    <?= $row_pegawai['nama']; ?>
+                                                </option>
+                                            <?php endwhile; ?>
+                                        </select>
+                                    </label>
+                                </div>
                             </div>
                             <div class="card-body">
                                 <div class="table-responsive">
@@ -79,12 +119,26 @@
     </div>
 
     <script>
-        function load_laporan_permintaan($status_permintaan) {
+        $(document).ready(function() {
+            $('.select2-pegawai').select2({
+                dropdownParent: $('#selectPegawaiFilter').parent()
+            });
+            $('.select2-status').select2({
+                dropdownParent: $('#selectStatusFilter').parent()
+            });
+        });
+
+        // load awal page
+        load_laporan_permintaan_pegawai(<?= json_encode($pegawai) ?>);
+
+        function load_laporan_permintaan_status($status) {
+            $('select[name="pegawai"]').val('');
+            $('#selectPegawaiFilter').val('').trigger('change.select2');
             $.ajax({
-                url: '<?= BASE_URL ?>ajax_load_laporan_permintaan',
+                url: '<?= BASE_URL ?>ajax_load_laporan_permintaan_status',
                 type: 'POST',
                 data: {
-                    status_permintaan_post: $status_permintaan,
+                    status_post: $status
                 },
                 success: function(res) {
                     $('#dataTable').DataTable().destroy();
@@ -93,7 +147,7 @@
                         $('#tabel_laporan_permintaan').html(res);
                         $('#dataTable').DataTable({
                             "language": {
-                                "search": "Cari Permintaan:",
+                                "search": "Cari:",
                                 "lengthMenu": "Tampilkan _MENU_ antrian",
                                 "zeroRecords": "Tidak ada permintaan yang cocok",
                                 "info": "Menampilkan _PAGE_ dari _PAGES_",
@@ -107,29 +161,54 @@
                                 }
                             }
                         });
-
-                        $('#dataTable_filter').append(`
-                        Filter:
-                            <label>
-                                <select name="status_permintaan" class="form-control form-control-sm">
-                                    <option value="" ${$status_permintaan === '' ? 'selected' : ''}>Disetujui</option>
-                                    <option value="menunggu" ${$status_permintaan === 'menunggu' ? 'selected' : ''}>Menunggu</option>
-                                    <option value="ditolak" ${$status_permintaan === 'ditolak' ? 'selected' : ''}>Ditolak</option>
-                                </select>
-                            </label>
-                        `);
                     }
-
                 }
             });
         }
 
-        // load awal page
-        load_laporan_permintaan(<?= json_encode($status_permintaan) ?>);
+        $(document).on('change', 'select[name="status"]', function() {
+            $status = this.value;
+            load_laporan_permintaan_status($status);
+        });
 
-        $(document).on('change', 'select[name="status_permintaan"]', function() {
-            $status_permintaan = this.value;
-            load_laporan_permintaan($status_permintaan);
+        function load_laporan_permintaan_pegawai($pegawai) {
+            $('select[name="status"]').val('');
+            $('#selectStatusFilter').val('').trigger('change.select2');
+            $.ajax({
+                url: '<?= BASE_URL ?>ajax_load_laporan_permintaan_pegawai',
+                type: 'POST',
+                data: {
+                    pegawai_post: $pegawai
+                },
+                success: function(res) {
+                    $('#dataTable').DataTable().destroy();
+
+                    if (!$.fn.DataTable.isDataTable('#dataTable')) {
+                        $('#tabel_laporan_permintaan').html(res);
+                        $('#dataTable').DataTable({
+                            "language": {
+                                "search": "Cari:",
+                                "lengthMenu": "Tampilkan _MENU_ antrian",
+                                "zeroRecords": "Tidak ada permintaan yang cocok",
+                                "info": "Menampilkan _PAGE_ dari _PAGES_",
+                                "infoEmpty": "Tidak ada data",
+                                "infoFiltered": "(difilter dari _MAX_ total data)",
+                                "paginate": {
+                                    "first": "Awal",
+                                    "last": "Akhir",
+                                    "next": "Lanjut",
+                                    "previous": "Kembali"
+                                }
+                            }
+                        });
+                    }
+                }
+            });
+        }
+
+        $(document).on('change', 'select[name="pegawai"]', function() {
+            $pegawai = this.value;
+            load_laporan_permintaan_pegawai($pegawai);
         });
     </script>
 </body>

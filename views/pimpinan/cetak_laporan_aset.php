@@ -243,8 +243,9 @@
                     <?php
                     $no = 1;
                     $query = mysqli_query($koneksi, "
-                            SELECT p.*, u.nama AS nama_peminjam, u.nip AS nip_peminjam
+                            SELECT p.*, b.nama_barang, b.kode_barang, b.merek_barang, b.tahun_perolehan, b.nup, u.nama AS nama_peminjam, u.nip AS nip_peminjam
                             FROM tb_peminjaman p
+                            JOIN tb_aset_bmn b ON p.bmn_id = b.id
                             JOIN tb_user u ON p.user_id = u.id
                             WHERE p.deleted_at IS NULL
                             ORDER BY p.id DESC
@@ -256,7 +257,7 @@
                             <td style="text-align: center;"><?= $no++; ?></td>
                             <td>
                                 <b><?= $row['nama_barang']; ?></b> <br>
-                                <small class="text-muted"><?= $row['merek']; ?> - <?= $row['nup']; ?></small>
+                                <small class="text-muted"><?= $row['merek_barang']; ?> - <?= $row['nup']; ?></small>
                             </td>
                             <td>
                                 <?= $row['nama_peminjam']; ?> <br>

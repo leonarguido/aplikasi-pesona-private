@@ -7,6 +7,7 @@
     <?php
     define('BASE_URL', '/aplikasi-pesona-private/routes/web.php/?page=');
     define('ASSETS_URL', '/aplikasi-pesona-private/assets/');
+    define('FILE_URL', '/aplikasi-pesona-private/');
     ?>
     <style>
         /* UTAMA */

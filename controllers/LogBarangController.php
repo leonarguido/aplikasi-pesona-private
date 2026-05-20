@@ -14,7 +14,7 @@ class LogBarangController
             header("Location: " . $this->base_url . "login");
             exit;
         }
-        if ($_SESSION['role'] != 'pimpinan') {
+        if ($_SESSION['role'] != 'pimpinan' AND $_SESSION['role'] != 'super admin') {
             // echo "<script>alert('Akses Ditolak!'); window.location='index.php';</script>";
             $_SESSION['alert'] = [
                 'icon' => 'error',
@@ -80,6 +80,12 @@ class LogBarangController
             $bulan = $_POST['bulan_angka_post'];
             $tahun = $_POST['tahun_angka_post'];
 
+            if ($_SESSION['role'] == 'super admin') {
+                $kondisi_status = "AND l.aksi = 'tambah stok'";
+            } else {
+                $kondisi_status = "";
+            }
+
             $query = mysqli_query($koneksi, "
                 SELECT 
                     l.id,
@@ -95,7 +101,7 @@ class LogBarangController
                 FROM tb_log_barang_habis_pakai l
                 JOIN tb_user u ON l.admin_id = u.id
                 JOIN tb_barang_habis_pakai b ON l.barang_id = b.id
-                WHERE MONTH(l.tanggal) = '$bulan' AND YEAR(l.tanggal) = '$tahun'
+                WHERE MONTH(l.tanggal) = '$bulan' AND YEAR(l.tanggal) = '$tahun' {$kondisi_status}
             ");
 
             $no = 1;
@@ -129,9 +135,9 @@ class LogBarangController
                         {$aksi}
                     </td>
                 ";
-                if ($row['stok'] != null && $row['stok'] > 0 && $row['deleted_at'] == null) {
+                if ($row['stok'] != null && $row['stok'] > 0 && $row['deleted_at'] == null && $_SESSION['role'] == 'super admin') {
                     echo "
-                    <td>penambahan stok sebesar {$row['stok']} dengan keterangan {$row['keterangan']}
+                    <td>penambahan stok sebesar <strong>{$row['stok']}</strong> dengan keterangan {$row['keterangan']}
                         <button 
                             class='btn btn-info btn-sm btn-circle btn-edit'
                             data-id='{$row['id']}'
@@ -146,7 +152,7 @@ class LogBarangController
                     </tr>
                     ";
                 } elseif ($row['stok'] != null && $row['stok'] > 0 && $row['deleted_at'] == null) {
-                    echo "<td>penambahan stok sebesar {$row['stok']} dengan keterangan {$row['keterangan']}</td>
+                    echo "<td>penambahan stok sebesar <strong>{$row['stok']}</strong> dengan keterangan {$row['keterangan']}</td>
                     </tr>";
                 } else {
                     echo "<td>{$row['keterangan']}</td>
@@ -233,7 +239,7 @@ class LogBarangController
             header("Location: " . $this->base_url . "login");
             exit;
         }
-        if ($_SESSION['role'] != 'pimpinan') {
+        if ($_SESSION['role'] != 'pimpinan' AND $_SESSION['role'] != 'super admin') {
             // echo "<script>alert('Akses Ditolak!'); window.location='index.php';</script>";
             $_SESSION['alert'] = [
                 'icon' => 'error',
@@ -257,15 +263,54 @@ class LogBarangController
         require_once '../views/pimpinan/log_aset_bmn.php';
     }
 
+    public function edit_log_stok_bmn()
+    {
+        require __DIR__ . '/../config/koneksi.php';
+        session_start();
+
+        if (isset($_POST['edit_log'])) {
+            $id     = $_POST['id'];
+            $kode   = $_POST['kode_barang'];
+            $stok_lama   = $_POST['stok_lama'];
+            $stok_baru   = $_POST['stok_baru'];
+            $desc   = $_POST['keterangan'];
+
+            if ($stok_baru < $stok_lama) {
+                $selisih = $stok_lama - $stok_baru;
+                mysqli_query($koneksi, "UPDATE tb_aset_bmn SET stok= stok-'$selisih' WHERE kode_barang='$kode' AND deleted_at is null");
+            } else {
+                $selisih = $stok_baru - $stok_lama;
+                mysqli_query($koneksi, "UPDATE tb_aset_bmn SET stok= stok+'$selisih' WHERE kode_barang='$kode' AND deleted_at is null");
+            }
+
+            $query = "UPDATE tb_log_aset_bmn SET stok= '$stok_baru', keterangan='$desc' WHERE id='$id'";
+            if (mysqli_query($koneksi, $query)) {
+                $_SESSION['alert'] = [
+                    'icon' => 'success',
+                    'title' => 'Berhasil!',
+                    'text' => 'Data log barang berhasil diupdate!',
+                ];
+                header("Location: " . $this->base_url . "log_aset_bmn");
+                exit;
+            }
+        }
+    }
 
     public function ajax_load_log_aset_bmn()
     {
+        session_start();
         require __DIR__ . '/../config/koneksi.php';
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $bulan = $_POST['bulan_angka_post'];
             $tahun = $_POST['tahun_angka_post'];
+
+            if ($_SESSION['role'] == 'super admin') {
+                $kondisi_status = "AND l.aksi = 'tambah stok'";
+            } else {
+                $kondisi_status = "";
+            }
 
             $query = mysqli_query($koneksi, "
                 SELECT 
@@ -275,26 +320,36 @@ class LogBarangController
                     u.nama,
                     b.kode_barang,
                     b.nama_barang,
-                    l.aksi
+                    b.deleted_at,
+                    l.aksi,
+                    l.stok,
+                    l.keterangan
                 FROM tb_log_aset_bmn l
                 JOIN tb_user u ON l.admin_id = u.id
-                JOIN tb_aset_bmn b ON l.aset_bmn_id = b.id
+                JOIN tb_aset_bmn b ON l.barang_id = b.id
                 WHERE MONTH(l.tanggal) = '$bulan' AND YEAR(l.tanggal) = '$tahun'
+                {$kondisi_status}
             ");
 
             $no = 1;
             while ($row = mysqli_fetch_assoc($query)) {
                 $aksi = "";
                 $class_aksi = "";
-                if ($row['aksi'] == "hapus") {
-                    $aksi = "<span class='badge badge-danger'>Hapus</span>";
+                if ($row['aksi'] == "hapus barang") {
+                    $aksi = "<span class='badge badge-danger'>Hapus Barang</span>";
                     $class_aksi = "color: red; font-weight: bold;";
-                } elseif ($row['aksi'] == "edit") {
-                    $aksi = "<span class='badge badge-warning'>Edit</span>";
+                } elseif ($row['aksi'] == "edit barang") {
+                    $aksi = "<span class='badge badge-warning'>Edit Barang</span>";
                     $class_aksi = "color: orange; font-weight: bold;";
+                } elseif ($row['aksi'] == "tambah barang") {
+                    $aksi = "<span class='badge badge-success'>Tambah barang</span>";
+                    $class_aksi = "color: blue; font-weight: bold;";
+                } elseif ($row['aksi'] == "tambah stok") {
+                    $aksi = "<span class='badge badge-info'>Tambah Stok</span>";
+                    $class_aksi = "color: blue; font-weight: bold;";
                 } else {
-                    $aksi = "<span class='badge badge-success'>Tambah</span>";
-                    $class_aksi = "color: green; font-weight: bold;";
+                    $aksi = "<span class='badge badge-secondary'>Tidak ada aksi</span>";
+                    $class_aksi = "color: gray; font-weight: bold;";
                 }
 
                 echo "
@@ -306,7 +361,30 @@ class LogBarangController
                     <td style='text-align:center; font-size: 1.1em; {$class_aksi}'>
                         {$aksi}
                     </td>
-                </tr>";
+                ";
+                if ($row['stok'] != null && $row['stok'] > 0 && $row['deleted_at'] == null && $_SESSION['role'] == 'super admin') {
+                    echo "
+                    <td>penambahan stok sebesar <strong>{$row['stok']}</strong> dengan keterangan {$row['keterangan']}
+                        <button 
+                            class='btn btn-info btn-sm btn-circle btn-edit'
+                            data-id='{$row['id']}'
+                            data-kode='{$row['kode_barang']}'
+                            data-stok='{$row['stok']}'
+                            data-keterangan='{$row['keterangan']}'
+                            data-toggle='modal'
+                            data-target='#modalEdit'>
+                            <i class='fas fa-edit'></i>
+                        </button>
+                    </td>
+                    </tr>
+                    ";
+                } elseif ($row['stok'] != null && $row['stok'] > 0 && $row['deleted_at'] == null) {
+                    echo "<td>penambahan stok sebesar <strong>{$row['stok']}</strong> dengan keterangan {$row['keterangan']}</td>
+                    </tr>";
+                } else {
+                    echo "<td>{$row['keterangan']}</td>
+                    </tr>";
+                }
                 $no++;
                 // Melakukan <i {$class_aksi}>{$aksi}</i>
             }
@@ -315,14 +393,64 @@ class LogBarangController
     }
 
     // PROSES LOG DATA BARANG
-    public function proses_log_aset_bmn($id_admin, $id_barang, $aksi)
+    public function proses_log_aset_bmn($id_admin, $data, $aksi)
     {
         require __DIR__ . '/../config/koneksi.php';
-        session_start();
 
-        if ($id_barang != null && $aksi != null) {
-            $query = "INSERT INTO tb_log_aset_bmn (admin_id, aset_bmn_id, tanggal, aksi) 
-                  VALUES ('$id_admin', '$id_barang', NOW(), '$aksi')";
+        if ($aksi == "tambah barang") {
+            $id_barang = $data['id_barang'];
+            $data_baru = $data['data_baru'];
+            $log = "data {$data_baru['nama_barang']} telah ditambahkan oleh admin";
+
+            $query = "INSERT INTO tb_log_aset_bmn (admin_id, barang_id, aksi, keterangan, tanggal) 
+                      VALUES ('$id_admin', '$id_barang', '$aksi', '$log', NOW())";
+
+            mysqli_query($koneksi, $query);
+        } elseif ($aksi == "edit barang" || $aksi == "tambah stok") {
+            $id_barang = $data['id_barang'];
+            $kolom = $data['kolom'];
+            $data_baru = $data['data_baru'];
+            $data_lama = $data['data_lama'];
+
+            if (in_array('stok', $kolom)) {
+                $query = "INSERT INTO tb_log_aset_bmn (admin_id, barang_id, aksi, stok, keterangan, tanggal) 
+                      VALUES ('$id_admin', '$id_barang', '$aksi', '$data_baru[stok]', '$data_baru[keterangan]', NOW())";
+
+                mysqli_query($koneksi, $query);
+            } else {
+
+                $data_baru = array_intersect_key($data_baru, array_flip($kolom));
+                $data_lama = array_intersect_key($data_lama, array_flip($kolom));
+
+                $perubahan = [];
+                foreach ($data_baru as $kolom => $nilai_baru) {
+                    $nilai_lama = $data_lama[$kolom];
+
+                    if ($nilai_lama != $nilai_baru) {
+                        $kolom = str_replace('_', ' ', $kolom);
+                        if ($nilai_baru == '' || $nilai_baru == null) {
+                            $perubahan[] = "$kolom berubah dari $nilai_lama menjadi kosong/dihapus";
+                        } elseif ($nilai_lama == '' || $nilai_lama == null) {
+                            $perubahan[] = "$kolom berubah dari kosong menjadi $nilai_baru";
+                        } else {
+                            $perubahan[] = "$kolom berubah dari $nilai_lama menjadi $nilai_baru";
+                        }
+                    }
+                }
+                $log = implode(', ', $perubahan);
+
+                $query = "INSERT INTO tb_log_aset_bmn (admin_id, barang_id, aksi, keterangan, tanggal) 
+                      VALUES ('$id_admin', '$id_barang', '$aksi', '$log', NOW())";
+
+                mysqli_query($koneksi, $query);
+            }
+        } else {
+            $id_barang = $data['id_barang'];
+            $data_lama = $data['data_lama'];
+            $log = "data {$data_lama['nama_barang']} telah dihapus oleh admin";
+
+            $query = "INSERT INTO tb_log_aset_bmn (admin_id, barang_id, aksi, keterangan, tanggal) 
+                      VALUES ('$id_admin', '$id_barang', '$aksi', '$log', NOW())";
 
             mysqli_query($koneksi, $query);
         }

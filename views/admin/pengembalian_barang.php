@@ -34,7 +34,7 @@
                                                 <th>Peminjam</th>
                                                 <th>Target Kembali</th>
                                                 <th>Status Pengembalian</th>
-                                                <th>Arsip</th> 
+                                                <th>Arsip</th>
                                                 <th>Aksi</th>
                                             </tr>
                                         </thead>
@@ -43,8 +43,9 @@
                                             $no = 1;
                                             // HANYA AMBIL YANG STATUSNYA SELESAI (Sedang Dipinjam) ATAU DIKEMBALIKAN
                                             $query = mysqli_query($koneksi, "
-                            SELECT p.*, u.nama AS nama_peminjam, u.nip AS nip_peminjam
+                            SELECT p.*, b.nama_barang, b.kode_barang, b.merek_barang, b.tahun_perolehan, b.nup, u.nama AS nama_peminjam, u.nip AS nip_peminjam
                             FROM tb_peminjaman p
+                            JOIN tb_aset_bmn b ON p.bmn_id = b.id
                             JOIN tb_user u ON p.user_id = u.id
                             WHERE p.status IN ('selesai', 'dikembalikan') 
                             AND p.deleted_at IS NULL
@@ -55,15 +56,15 @@
                                             ?>
                                                 <tr>
                                                     <td><?= $no++; ?></td>
-                                                    <td>
+                                                    <td data-toggle="modal" data-target="#modalDetail<?= $row['id']; ?>" title="Detail Pengajuan">
                                                         <b><?= $row['nama_barang']; ?></b> <br>
-                                                        <small class="text-muted"><?= $row['merek']; ?> - NUP: <?= $row['nup']; ?></small>
+                                                        <small class="text-muted"><?= $row['merek_barang']; ?> - NUP: <?= $row['nup']; ?></small>
                                                     </td>
-                                                    <td>
+                                                    <td data-toggle="modal" data-target="#modalDetail<?= $row['id']; ?>" title="Detail Pengajuan">
                                                         <?= $row['nama_peminjam']; ?> <br>
                                                         <small>NIP: <?= $row['nip_peminjam']; ?></small>
                                                     </td>
-                                                    <td>
+                                                    <td data-toggle="modal" data-target="#modalDetail<?= $row['id']; ?>" title="Detail Pengajuan">
                                                         <?php if (isset($row['tgl_kembali']) && $row['tgl_kembali'] != null) { ?>
                                                             <span class="<?= (strtotime($row['tgl_kembali']) < time() && $row['status'] == 'selesai') ? 'text-danger font-weight-bold' : ''; ?>">
                                                                 <?= date('d/m/Y', strtotime($row['tgl_kembali'])); ?>
@@ -72,7 +73,7 @@
                                                             echo '-';
                                                         } ?>
                                                     </td>
-                                                    <td class="text-center">
+                                                    <td class="text-center" data-toggle="modal" data-target="#modalDetail<?= $row['id']; ?>" title="Detail Pengajuan">
                                                         <?php if ($row['status'] == 'selesai' && empty($row['kondisi_kembali'])): ?>
                                                             <span class="badge badge-warning">Sedang Dipinjam</span>
 
@@ -140,6 +141,106 @@
 
                                                     </td>
                                                 </tr>
+
+                                                <div class="modal fade" id="modalDetail<?= $row['id']; ?>">
+                                                    <div class="modal-dialog modal-lg">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header bg-warning text-white">
+                                                                <h5 class="modal-title">Detail Pengajuan Barang</h5>
+                                                                <button class="close text-white" data-dismiss="modal">&times;</button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <input type="hidden" name="id_edit" value="<?= $row['id']; ?>">
+                                                                <div class="row">
+                                                                    <div class="col-md-6 border-right">
+                                                                        <h6 class="font-weight-bold text-primary mb-3">Data Barang</h6>
+                                                                        <div class="form-group">
+                                                                            <label>Nama Barang</label>
+                                                                            <input type="text" name="nama_barang" class="form-control" value="<?= $row['nama_barang']; ?>" readonly>
+                                                                        </div>
+                                                                        <div class="form-group">
+                                                                            <label>Merek</label>
+                                                                            <input type="text" name="merek_barang" class="form-control" value="<?= $row['merek_barang']; ?>" readonly>
+                                                                        </div>
+                                                                        <div class="row">
+                                                                            <div class="col-6">
+                                                                                <div class="form-group">
+                                                                                    <label>Kode Barang</label>
+                                                                                    <input type="text" name="kode_barang" class="form-control" value="<?= $row['kode_barang']; ?>" readonly>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-6">
+                                                                                <div class="form-group">
+                                                                                    <label>NUP</label>
+                                                                                    <input type="text" name="nup" class="form-control" value="<?= $row['nup']; ?>" readonly>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="form-group">
+                                                                            <label>Tahun Perolehan</label>
+                                                                            <input type="number" name="tahun_perolehan" class="form-control" value="<?= $row['tahun_perolehan']; ?>" readonly>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div class="col-md-6">
+                                                                        <h6 class="font-weight-bold text-primary mb-3">Data Peminjaman</h6>
+
+                                                                        <div class="form-group">
+                                                                            <label>Yang Menerima (Staf)</label>
+                                                                            <select name="id_penerima" class="form-control" style="width: 100%" disabled>
+                                                                                <option value="">-- Pilih Staf --</option>
+                                                                                <?php foreach ($list_pegawai as $pgw): ?>
+                                                                                    <option value="<?= $pgw['id']; ?>" <?= ($pgw['id'] == $row['user_id']) ? 'selected' : ''; ?>>
+                                                                                        <?= $pgw['nama']; ?> (NIP: <?= $pgw['nip']; ?>)
+                                                                                    </option>
+                                                                                <?php endforeach; ?>
+                                                                            </select>
+                                                                        </div>
+
+                                                                        <div class="form-group">
+                                                                            <label>Tanggal Serah Terima</label>
+                                                                            <input type="text" name="tgl_serah_terima" class="form-control" value="<?= date('d/m/Y', strtotime($row['tgl_serah_terima'])); ?>" readonly>
+                                                                        </div>
+
+                                                                        <div class="form-group bg-light p-2 rounded border">
+                                                                            <label>Tanggal Kembali</label>
+                                                                            <div class="custom-control custom-checkbox mb-2">
+                                                                                <input type="checkbox" class="custom-control-input" id="checkEdit<?= $row['id']; ?>" name="jangka_panjang" value="1" <?= ($row['tgl_kembali'] == NULL) ? 'checked' : ''; ?> disabled>
+                                                                                <label class="custom-control-label small text-primary font-weight-bold" for="checkEdit<?= $row['id']; ?>">
+                                                                                    Peminjaman Jangka Panjang
+                                                                                </label>
+                                                                            </div>
+                                                                            <input type="text" name="tgl_kembali" id="inputTglEdit<?= $row['id']; ?>" class="form-control" value="<?= ($row['tgl_kembali']) ? date('d/m/Y', strtotime($row['tgl_kembali'])) : '-'; ?>" <?= ($row['tgl_kembali'] == NULL) ? 'disabled' : ''; ?> readonly>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                                            </div>
+
+                                                            <script>
+                                                                document.addEventListener("DOMContentLoaded", function() {
+                                                                    const check = document.getElementById('checkEdit<?= $row['id']; ?>');
+                                                                    const input = document.getElementById('inputTglEdit<?= $row['id']; ?>');
+
+                                                                    if (check && input) {
+                                                                        check.addEventListener('change', function() {
+                                                                            if (this.checked) {
+                                                                                input.value = '';
+                                                                                input.disabled = true;
+                                                                                input.removeAttribute('required');
+                                                                            } else {
+                                                                                input.disabled = false;
+                                                                                input.setAttribute('required', '');
+                                                                            }
+                                                                        });
+                                                                    }
+                                                                });
+                                                            </script>
+                                                        </div>
+                                                    </div>
+                                                </div>
 
                                                 <div class="modal fade" id="modalKembali<?= $row['id']; ?>">
                                                     <div class="modal-dialog">

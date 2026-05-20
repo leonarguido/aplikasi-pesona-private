@@ -257,7 +257,7 @@ class AdminController
                         $desc   = mysqli_real_escape_string($koneksi, $data[5]);
 
                         // Cek Duplikat Kode Barang
-                        $cek = mysqli_query($koneksi, "SELECT kode_barang FROM tb_barang_habis_pakai WHERE kode_barang = '$kode'");
+                        $cek = mysqli_query($koneksi, "SELECT kode_barang FROM tb_barang_habis_pakai WHERE kode_barang = '$kode' AND deleted_at is null");
 
                         if (mysqli_num_rows($cek) == 0 && !empty($kode)) {
                             // Jika kode belum ada, Insert Baru
@@ -285,6 +285,301 @@ class AdminController
                     'text' => 'Pilih file terlebih dahulu!',
                 ];
                 header("Location: " . $this->base_url . "data_barang");
+                exit;
+            }
+        }
+    }
+
+    // MASUK HALAMAN DATA BMN
+    public function data_bmn_page()
+    {
+        $log_barang = new LogBarangController();
+        require __DIR__ . '/../config/koneksi.php';
+        session_start();
+
+        // Cek Login & Role
+        if (!isset($_SESSION['user_id']) || ($_SESSION['role'] != 'admin bmn' && $_SESSION['role'] != 'super admin')) {
+            header("Location: " . $this->base_url . "login");
+            exit;
+        }
+        if ($_SESSION['role'] == 'user' || $_SESSION['role'] == 'staff' || $_SESSION['role'] == 'pimpinan') {
+            $_SESSION['alert'] = [
+                'icon' => 'error',
+                'title' => 'Gagal!',
+                'text' => 'Akses Ditolak!',
+            ];
+            header("Location: index.php");
+            exit;
+        }
+
+        require_once '../views/admin/data_bmn.php';
+    }
+
+    // A. PROSES TAMBAH DATA BARANG
+    public function tambah_data_bmn()
+    {
+        $log_barang = new LogBarangController();
+        require __DIR__ . '/../config/koneksi.php';
+        session_start();
+
+        if (isset($_POST['tambah'])) {
+            $kode   = $_POST['kode_barang'];
+            $merek  = $_POST['merek_barang'];
+            $nama   = $_POST['nama_barang'];
+            $satuan = $_POST['satuan'];
+            $tahun_perolehan = $_POST['tahun_perolehan'];
+            $nup    = $_POST['nup'];
+            $status = $_POST['status_barang'];
+            $desc   = $_POST['keterangan'];
+            $stok   = $_POST['stok'];
+
+            $cek = mysqli_query($koneksi, "SELECT * FROM tb_aset_bmn WHERE deleted_at is null AND kode_barang = '$kode'");
+            if (mysqli_num_rows($cek) > 0) {
+                // echo "<script>alert('Kode Barang sudah ada!'); window.location='" . $this->base_url . "data_bmn';</script>";
+                $_SESSION['alert'] = [
+                    'icon' => 'error',
+                    'title' => 'Gagal!',
+                    'text' => 'Kode Barang sudah ada!',
+                ];
+                header("Location: " . $this->base_url . "data_bmn");
+                exit;
+            } else {
+                $query = "INSERT INTO tb_aset_bmn (kode_barang, merek_barang, nama_barang, satuan, keterangan, stok, tahun_perolehan, nup, status_barang) 
+                  VALUES ('$kode', '$merek', '$nama', '$satuan', '$desc', '$stok', '$tahun_perolehan', '$nup', '$status')";
+
+                if (mysqli_query($koneksi, $query)) {
+                    // LOG BARANG DILAKUKAN SETELAH EKSEKUSI
+                    $id_admin = $_SESSION['user_id'];
+                    $id_barang = mysqli_insert_id($koneksi);
+                    $q = mysqli_query($koneksi, "SELECT nama_barang FROM tb_aset_bmn WHERE id='$id_barang'");
+                    $data_baru = mysqli_fetch_assoc($q);
+
+                    $data = [
+                        'id_barang' => $id_barang,
+                        'data_baru' => $data_baru
+                    ];
+                    $log_barang->proses_log_aset_bmn($id_admin, $data, "tambah barang");
+
+                    $_SESSION['alert'] = [
+                        'icon' => 'success',
+                        'title' => 'Berhasil!',
+                        'text' => 'Barang berhasil ditambahkan!',
+                    ];
+                    header("Location: " . $this->base_url . "data_bmn");
+                    exit;
+                } else {
+                    // echo "<script>alert('Gagal: " . mysqli_error($koneksi) . "');</script>";
+                    $_SESSION['alert'] = [
+                        'icon' => 'error',
+                        'title' => 'Gagal!',
+                        'text' => 'Gagal menambahkan barang: ' . mysqli_error($koneksi),
+                    ];
+                    header("Location: " . $this->base_url . "data_bmn");
+                    exit;
+                }
+            }
+        }
+    }
+
+
+    // B. PROSES EDIT DATA BARANG
+    public function edit_data_bmn()
+    {
+        $log_barang = new LogBarangController();
+        require __DIR__ . '/../config/koneksi.php';
+        session_start();
+
+        if (isset($_POST['edit'])) {
+            $id     = $_POST['id'];
+            $nama   = $_POST['nama_barang'];
+            $merek   = $_POST['merek_barang'];
+            $satuan = $_POST['satuan'];
+            $status = $_POST['status_barang'];
+            $desc   = $_POST['keterangan'];
+            $tahun_perolehan = $_POST['tahun_perolehan'];
+            $nup = $_POST['nup'];
+
+            // KEBUTUHAN LOG BARANG
+            $kolom = ['nama_barang', 'merek_barang', 'satuan', 'keterangan', 'tahun_perolehan', 'nup', 'status_barang'];
+            $data_baru = $_POST;
+            $q = mysqli_query($koneksi, "SELECT * FROM tb_aset_bmn WHERE id='$id'");
+            $data_lama = mysqli_fetch_assoc($q);
+
+            $query = "UPDATE tb_aset_bmn SET merek_barang='$merek', nama_barang='$nama', satuan='$satuan', keterangan='$desc', tahun_perolehan='$tahun_perolehan', nup='$nup', status_barang='$status' WHERE id='$id'";
+            if (mysqli_query($koneksi, $query)) {
+                // LOG BARANG DILAKUKAN SETELAH EKSEKUSI
+                $id_admin = $_SESSION['user_id'];
+                $data = [
+                    'id_barang' => $id,
+                    'kolom' => $kolom,
+                    'data_baru' => $data_baru,
+                    'data_lama' => $data_lama
+                ];
+                $log_barang->proses_log_aset_bmn($id_admin, $data, "edit barang");
+
+                $_SESSION['alert'] = [
+                    'icon' => 'success',
+                    'title' => 'Berhasil!',
+                    'text' => 'Data barang berhasil diupdate!',
+                ];
+                header("Location: " . $this->base_url . "data_bmn");
+                exit;
+            }
+        }
+    }
+
+    // C. PROSES EDIT DATA STOK
+    public function edit_data_stok_bmn()
+    {
+        $log_barang = new LogBarangController();
+        require __DIR__ . '/../config/koneksi.php';
+        session_start();
+
+        if (isset($_POST['edit_stok'])) {
+            $id     = $_POST['id'];
+            $stok   = $_POST['stok'];
+            $desc   = $_POST['keterangan'];
+
+            // KEBUTUHAN LOG BARANG
+            $kolom = ['stok', 'keterangan'];
+            $data_baru = $_POST;
+            $data_lama = '';
+
+            $query = "UPDATE tb_aset_bmn SET stok= stok+'$stok' WHERE id='$id'";
+            if (mysqli_query($koneksi, $query)) {
+                // LOG BARANG DILAKUKAN SETELAH EKSEKUSI
+                $id_admin = $_SESSION['user_id'];
+                $data = [
+                    'id_barang' => $id,
+                    'kolom' => $kolom,
+                    'data_baru' => $data_baru,
+                    'data_lama' => $data_lama
+                ];
+                $log_barang->proses_log_aset_bmn($id_admin, $data, "tambah stok");
+
+                $_SESSION['alert'] = [
+                    'icon' => 'success',
+                    'title' => 'Berhasil!',
+                    'text' => 'Data barang berhasil diupdate!',
+                ];
+                header("Location: " . $this->base_url . "data_bmn");
+                exit;
+            }
+        }
+    }
+
+    // C. PROSES HAPUS DATA BARANG
+    public function hapus_data_bmn()
+    {
+        $log_barang = new LogBarangController();
+        require __DIR__ . '/../config/koneksi.php';
+        session_start();
+
+        if (isset($_GET['id'])) {
+            $id = $_GET['id'];
+            $query = "UPDATE tb_aset_bmn SET deleted_at=NOW() WHERE id = '$id'";
+            if (mysqli_query($koneksi, $query)) {
+                // LOG BARANG DILAKUKAN SETELAH EKSEKUSI
+                $id_admin = $_SESSION['user_id'];
+                $q = mysqli_query($koneksi, "SELECT nama_barang FROM tb_aset_bmn WHERE id='$id'");
+                $data_lama = mysqli_fetch_assoc($q);
+
+                $data = [
+                    'id_barang' => $id,
+                    'data_lama' => $data_lama
+                ];
+                $log_barang->proses_log_aset_bmn($id_admin, $data, "hapus barang");
+
+                $_SESSION['alert'] = [
+                    'icon' => 'success',
+                    'title' => 'Berhasil!',
+                    'text' => 'Barang berhasil dihapus!',
+                ];
+                header("Location: " . $this->base_url . "data_bmn");
+                exit;
+            }
+        }
+    }
+
+    // D. DOWNLOAD TEMPLATE EXCEL/CSV
+    public function template_bmn()
+    {
+        require_once '../views/admin/template_bmn.php';
+    }
+
+    // E. PROSES INPUT DATA DARI EXCEL/CSV
+    public function import_excel_data_bmn()
+    {
+        require __DIR__ . '/../config/koneksi.php';
+        session_start();
+
+        if (isset($_POST['import_excel'])) {
+            // Cek apakah file diupload
+            if (isset($_FILES['file_excel']['name']) && $_FILES['file_excel']['name'] != "") {
+
+                $filename = $_FILES['file_excel']['tmp_name'];
+                $ext = pathinfo($_FILES['file_excel']['name'], PATHINFO_EXTENSION);
+
+                // Validasi Ekstensi harus CSV
+                if ($ext != 'csv') {
+                    // echo "<script>alert('Format file harus .CSV (Comma Separated Values)!');</script>";
+                    $_SESSION['alert'] = [
+                        'icon' => 'error',
+                        'title' => 'Gagal!',
+                        'text' => 'Format file harus .CSV (Comma Separated Values)!',
+                    ];
+                    var_dump($_SESSION);
+                    header("Location: " . $this->base_url . "data_bmn");
+                    exit;
+                } else {
+                    $file = fopen($filename, "r");
+                    $count = 0; // Hitung data sukses
+
+                    // Lewati baris pertama (Header Judul) agar tidak ikut ter-input
+                    fgetcsv($file);
+
+                    while (($data = fgetcsv($file, 10000, ",")) !== FALSE) {
+                        // Mapping Data dari Excel/CSV ke Variabel
+                        // Kolom 0: Kode,  1: Nama, 2: Merek, 3: Satuan, 4: Stok, 5: Ket
+                        $kode   = mysqli_real_escape_string($koneksi, $data[0]);
+                        $nama   = mysqli_real_escape_string($koneksi, $data[1]);
+                        $merek   = mysqli_real_escape_string($koneksi, $data[2]);
+                        $satuan = mysqli_real_escape_string($koneksi, $data[3]);
+                        $stok   = (int) $data[4];
+                        $tahun_perolehan = mysqli_real_escape_string($koneksi, $data[5]);
+                        $nup    = mysqli_real_escape_string($koneksi, $data[6]);
+                        $status = mysqli_real_escape_string($koneksi, $data[7]);
+                        $desc   = mysqli_real_escape_string($koneksi, $data[8]);
+
+                        // Cek Duplikat Kode Barang
+                        $cek = mysqli_query($koneksi, "SELECT kode_barang FROM tb_aset_bmn WHERE kode_barang = '$kode' AND deleted_at is null");
+
+                        if (mysqli_num_rows($cek) == 0 && !empty($kode)) {
+                            // Jika kode belum ada, Insert Baru
+                            $query = "INSERT INTO tb_aset_bmn (kode_barang, merek_barang, nama_barang, satuan, stok, tahun_perolehan, nup, status_barang, keterangan) 
+                              VALUES ('$kode', '$merek', '$nama', '$satuan', '$stok', '$tahun_perolehan', '$nup', '$status', '$desc')";
+                            mysqli_query($koneksi, $query);
+                            $count++;
+                        }
+                    }
+                    fclose($file);
+                    // echo "<script>alert('Berhasil mengimpor $count data barang!'); window.location='" . $this->base_url . "data_bmn';</script>";
+                    $_SESSION['alert'] = [
+                        'icon' => 'success',
+                        'title' => 'Berhasil!',
+                        'text' => "Berhasil mengimpor $count data barang!",
+                    ];
+                    header("Location: " . $this->base_url . "data_bmn");
+                    exit;
+                }
+            } else {
+                // echo "<script>alert('Pilih file terlebih dahulu!');</script>";
+                $_SESSION['alert'] = [
+                    'icon' => 'error',
+                    'title' => 'Gagal!',
+                    'text' => 'Pilih file terlebih dahulu!',
+                ];
+                header("Location: " . $this->base_url . "data_bmn");
                 exit;
             }
         }
@@ -322,152 +617,153 @@ class AdminController
         require_once '../views/admin/data_aset_bmn.php';
     }
 
-    // A. PROSES TAMBAH DATA BARANG
-    public function tambah_data_aset_bmn()
-    {
-        $log_barang = new LogBarangController();
-        require __DIR__ . '/../config/koneksi.php';
-        session_start();
+    // // A. PROSES TAMBAH DATA BARANG
+    // public function tambah_data_aset_bmn()
+    // {
+    //     $log_barang = new LogBarangController();
+    //     require __DIR__ . '/../config/koneksi.php';
+    //     session_start();
 
-        if (isset($_POST['tambah'])) {
-            $nip    = mysqli_real_escape_string($koneksi, $_POST['nip']);
-            $nama   = mysqli_real_escape_string($koneksi, $_POST['nama_barang']);
-            $kode   = mysqli_real_escape_string($koneksi, $_POST['kode_barang']);
-            $merek   = mysqli_real_escape_string($koneksi, $_POST['merek_barang']);
-            $satuan = $_POST['satuan'];
-            $jumlah = $_POST['jumlah'];
-            $ket    = mysqli_real_escape_string($koneksi, $_POST['keterangan']);
+    //     if (isset($_POST['tambah'])) {
+    //         $nip    = mysqli_real_escape_string($koneksi, $_POST['nip']);
+    //         $nama   = mysqli_real_escape_string($koneksi, $_POST['nama_barang']);
+    //         $kode   = mysqli_real_escape_string($koneksi, $_POST['kode_barang']);
+    //         $merek   = mysqli_real_escape_string($koneksi, $_POST['merek_barang']);
+    //         $satuan = $_POST['satuan'];
+    //         $jumlah = $_POST['jumlah'];
+    //         $status = mysqli_real_escape_string($koneksi, $_POST['status_barang']);
+    //         $ket    = mysqli_real_escape_string($koneksi, $_POST['keterangan']);
 
-            $nama_file = null;
-            if (!empty($_FILES['berkas']['name'])) {
-                $file_tmp  = $_FILES['berkas']['tmp_name'];
-                $nama_modifikasi = $this->perbaiki_nama_file($_FILES['berkas']['name']);
-                $file_name = time() . "_" . $nama_modifikasi;
-                if (!is_dir($this->assets_path . "berkas/")) {
-                    mkdir($this->assets_path . "berkas/", 0777, true);
-                }
-                move_uploaded_file($file_tmp, $this->assets_path . "berkas/" . $file_name);
-                $nama_file = $file_name;
-            }
+    //         $nama_file = null;
+    //         if (!empty($_FILES['berkas']['name'])) {
+    //             $file_tmp  = $_FILES['berkas']['tmp_name'];
+    //             $nama_modifikasi = $this->perbaiki_nama_file($_FILES['berkas']['name']);
+    //             $file_name = time() . "_" . $nama_modifikasi;
+    //             if (!is_dir($this->assets_path . "berkas/")) {
+    //                 mkdir($this->assets_path . "berkas/", 0777, true);
+    //             }
+    //             move_uploaded_file($file_tmp, $this->assets_path . "berkas/" . $file_name);
+    //             $nama_file = $file_name;
+    //         }
 
-            $row = mysqli_query($koneksi, "SELECT id FROM tb_user WHERE nip = '$nip'");
-            $data_user = mysqli_fetch_assoc($row);
-            $id_user = $data_user['id'];
+    //         $row = mysqli_query($koneksi, "SELECT id FROM tb_user WHERE nip = '$nip'");
+    //         $data_user = mysqli_fetch_assoc($row);
+    //         $id_user = $data_user['id'];
 
-            $q = "INSERT INTO tb_aset_bmn (user_id, nip, nama_barang, kode_barang, merek_barang, satuan, jumlah, keterangan, berkas) 
-            VALUES ('$id_user', '$nip', '$nama', '$kode', '$merek', '$satuan', '$jumlah', '$ket', '$nama_file')";
+    //         $q = "INSERT INTO tb_aset_bmn (user_id, nip, nama_barang, kode_barang, merek_barang, satuan, jumlah, status_barang, keterangan, berkas) 
+    //         VALUES ('$id_user', '$nip', '$nama', '$kode', '$merek', '$satuan', '$jumlah', '$status', '$ket', '$nama_file')";
 
-            if (mysqli_query($koneksi, $q)) {
-                // LOG BARANG DILAKUKAN SETELAH EKSEKUSI
-                $id_admin = $_SESSION['user_id'];
-                $id_barang = mysqli_insert_id($koneksi);
-                $log_barang->proses_log_aset_bmn($id_admin, $id_barang, "tambah barang");
+    //         if (mysqli_query($koneksi, $q)) {
+    //             // LOG BARANG DILAKUKAN SETELAH EKSEKUSI
+    //             $id_admin = $_SESSION['user_id'];
+    //             $id_barang = mysqli_insert_id($koneksi);
+    //             $log_barang->proses_log_aset_bmn($id_admin, $id_barang, "tambah barang");
 
-                // echo "<script>alert('Data Berhasil Ditambahkan!'); window.location='aset_bmn.php';</script>";
-                $_SESSION['alert'] = [
-                    'icon' => 'success',
-                    'title' => 'Berhasil!',
-                    'text' => 'Data berhasil ditambahkan!',
-                ];
-                header("Location: " . $this->base_url . "data_aset_bmn");
-                exit;
-            } else {
-                // echo "<script>alert('Gagal: " . mysqli_error($koneksi) . "');</script>";
-                $_SESSION['alert'] = [
-                    'icon' => 'error',
-                    'title' => 'Gagal!',
-                    'text' => 'Gagal:' + mysqli_error($koneksi),
-                ];
-                header("Location: " . $this->base_url . "data_aset_bmn");
-                exit;
-            }
-        }
-    }
+    //             // echo "<script>alert('Data Berhasil Ditambahkan!'); window.location='aset_bmn.php';</script>";
+    //             $_SESSION['alert'] = [
+    //                 'icon' => 'success',
+    //                 'title' => 'Berhasil!',
+    //                 'text' => 'Data berhasil ditambahkan!',
+    //             ];
+    //             header("Location: " . $this->base_url . "data_aset_bmn");
+    //             exit;
+    //         } else {
+    //             // echo "<script>alert('Gagal: " . mysqli_error($koneksi) . "');</script>";
+    //             $_SESSION['alert'] = [
+    //                 'icon' => 'error',
+    //                 'title' => 'Gagal!',
+    //                 'text' => 'Gagal:' + mysqli_error($koneksi),
+    //             ];
+    //             header("Location: " . $this->base_url . "data_aset_bmn");
+    //             exit;
+    //         }
+    //     }
+    // }
 
+    // // B. PROSES EDIT DATA BARANG
+    // public function edit_data_aset_bmn()
+    // {
+    //     $log_barang = new LogBarangController();
+    //     require __DIR__ . '/../config/koneksi.php';
+    //     session_start();
 
-    // B. PROSES EDIT DATA BARANG
-    public function edit_data_aset_bmn()
-    {
-        $log_barang = new LogBarangController();
-        require __DIR__ . '/../config/koneksi.php';
-        session_start();
+    //     if (isset($_POST['edit'])) {
+    //         $id     = $_POST['id'];
+    //         $nip    = mysqli_real_escape_string($koneksi, $_POST['nip']);
+    //         $nama   = mysqli_real_escape_string($koneksi, $_POST['nama_barang']);
+    //         $kode   = mysqli_real_escape_string($koneksi, $_POST['kode_barang']);
+    //         $merek   = mysqli_real_escape_string($koneksi, $_POST['merek_barang']);
+    //         $satuan = $_POST['satuan'];
+    //         $jumlah = $_POST['jumlah'];
+    //         $status = mysqli_real_escape_string($koneksi, $_POST['status_barang']);
+    //         $ket    = mysqli_real_escape_string($koneksi, $_POST['keterangan']);
 
-        if (isset($_POST['edit'])) {
-            $id     = $_POST['id'];
-            $nip    = mysqli_real_escape_string($koneksi, $_POST['nip']);
-            $nama   = mysqli_real_escape_string($koneksi, $_POST['nama_barang']);
-            $kode   = mysqli_real_escape_string($koneksi, $_POST['kode_barang']);
-            $merek   = mysqli_real_escape_string($koneksi, $_POST['merek_barang']);
-            $satuan = $_POST['satuan'];
-            $jumlah = $_POST['jumlah'];
-            $ket    = mysqli_real_escape_string($koneksi, $_POST['keterangan']);
+    //         $query_file = "";
+    //         if (!empty($_FILES['berkas']['name'])) {
+    //             $file_tmp  = $_FILES['berkas']['tmp_name'];
+    //             $nama_modifikasi = $this->perbaiki_nama_file($_FILES['berkas']['name']);
+    //             $file_name = time() . "_" . $nama_modifikasi;
+    //             move_uploaded_file($file_tmp, $this->assets_path . "berkas/" . $file_name);
+    //             $query_file = ", berkas='$file_name'";
+    //         }
 
-            $query_file = "";
-            if (!empty($_FILES['berkas']['name'])) {
-                $file_tmp  = $_FILES['berkas']['tmp_name'];
-                $nama_modifikasi = $this->perbaiki_nama_file($_FILES['berkas']['name']);
-                $file_name = time() . "_" . $nama_modifikasi;
-                move_uploaded_file($file_tmp, $this->assets_path . "berkas/" . $file_name);
-                $query_file = ", berkas='$file_name'";
-            }
+    //         $row = mysqli_query($koneksi, "SELECT id FROM tb_user WHERE nip = '$nip'");
+    //         $data_user = mysqli_fetch_assoc($row);
+    //         $id_user = $data_user['id'];
 
-            $row = mysqli_query($koneksi, "SELECT id FROM tb_user WHERE nip = '$nip'");
-            $data_user = mysqli_fetch_assoc($row);
-            $id_user = $data_user['id'];
+    //         $q = "UPDATE tb_aset_bmn SET 
+    //         user_id='$id_user', nip='$nip', nama_barang='$nama', kode_barang='$kode', merek_barang='$merek', 
+    //         satuan='$satuan', jumlah='$jumlah', status_barang='$status', keterangan='$ket' $query_file 
+    //         WHERE id='$id'";
 
-            $q = "UPDATE tb_aset_bmn SET 
-            user_id='$id_user', nip='$nip', nama_barang='$nama', kode_barang='$kode', merek_barang='$merek', 
-            satuan='$satuan', jumlah='$jumlah', keterangan='$ket' $query_file 
-            WHERE id='$id'";
+    //         if (mysqli_query($koneksi, $q)) {
+    //             // LOG BARANG DILAKUKAN SETELAH EKSEKUSI
+    //             $id_admin = $_SESSION['user_id'];
+    //             $id_barang = $id;
+    //             $log_barang->proses_log_aset_bmn($id_admin, $id_barang, "edit barang");
 
-            if (mysqli_query($koneksi, $q)) {
-                // LOG BARANG DILAKUKAN SETELAH EKSEKUSI
-                $id_admin = $_SESSION['user_id'];
-                $id_barang = $id;
-                $log_barang->proses_log_aset_bmn($id_admin, $id_barang, "edit barang");
+    //             // echo "<script>alert('Data Berhasil Diupdate!'); window.location='aset_bmn.php';</script>";
+    //             $_SESSION['alert'] = [
+    //                 'icon' => 'success',
+    //                 'title' => 'Berhasil!',
+    //                 'text' => 'Data berhasil diupdate!',
+    //             ];
+    //             header("Location: " . $this->base_url . "data_aset_bmn");
+    //             exit;
+    //         }
+    //     }
+    // }
 
-                // echo "<script>alert('Data Berhasil Diupdate!'); window.location='aset_bmn.php';</script>";
-                $_SESSION['alert'] = [
-                    'icon' => 'success',
-                    'title' => 'Berhasil!',
-                    'text' => 'Data berhasil diupdate!',
-                ];
-                header("Location: " . $this->base_url . "data_aset_bmn");
-                exit;
-            }
-        }
-    }
+    // // C. PROSES HAPUS DATA BARANG
+    // public function hapus_data_aset_bmn()
+    // {
+    //     $log_barang = new LogBarangController();
+    //     require __DIR__ . '/../config/koneksi.php';
+    //     session_start();
 
-    // C. PROSES HAPUS DATA BARANG
-    public function hapus_data_aset_bmn()
-    {
-        $log_barang = new LogBarangController();
-        require __DIR__ . '/../config/koneksi.php';
-        session_start();
+    //     if (isset($_GET['hapus'])) {
+    //         $id = $_GET['hapus'];
+    //         $q_cek = mysqli_query($koneksi, "SELECT berkas FROM tb_aset_bmn WHERE id='$id'");
+    //         $d_cek = mysqli_fetch_assoc($q_cek);
+    //         if ($d_cek['berkas'] && file_exists($this->assets_path . "berkas/" . $d_cek['berkas'])) {
+    //             unlink($this->assets_path . "berkas/" . $d_cek['berkas']);
+    //         }
+    //         // mysqli_query($koneksi, "DELETE FROM tb_aset_bmn WHERE id='$id'");
+    //         mysqli_query($koneksi, "UPDATE tb_aset_bmn SET deleted_at=NOW() WHERE id = '$id'");
+    //         // LOG BARANG DILAKUKAN SETELAH EKSEKUSI
+    //         $id_admin = $_SESSION['user_id'];
+    //         $id_barang = $id;
+    //         $log_barang->proses_log_aset_bmn($id_admin, $id_barang, "hapus barang");
 
-        if (isset($_GET['hapus'])) {
-            $id = $_GET['hapus'];
-            $q_cek = mysqli_query($koneksi, "SELECT berkas FROM tb_aset_bmn WHERE id='$id'");
-            $d_cek = mysqli_fetch_assoc($q_cek);
-            if ($d_cek['berkas'] && file_exists($this->assets_path . "berkas/" . $d_cek['berkas'])) {
-                unlink($this->assets_path . "berkas/" . $d_cek['berkas']);
-            }
-            // mysqli_query($koneksi, "DELETE FROM tb_aset_bmn WHERE id='$id'");
-            mysqli_query($koneksi, "UPDATE tb_aset_bmn SET deleted_at=NOW() WHERE id = '$id'");
-            // LOG BARANG DILAKUKAN SETELAH EKSEKUSI
-            $id_admin = $_SESSION['user_id'];
-            $id_barang = $id;
-            $log_barang->proses_log_aset_bmn($id_admin, $id_barang, "hapus barang");
-
-            $_SESSION['alert'] = [
-                'icon' => 'success',
-                'title' => 'Berhasil!',
-                'text' => 'Data berhasil dihapus!',
-            ];
-            header("Location: " . $this->base_url . "data_aset_bmn");
-            exit;
-        }
-    }
+    //         $_SESSION['alert'] = [
+    //             'icon' => 'success',
+    //             'title' => 'Berhasil!',
+    //             'text' => 'Data berhasil dihapus!',
+    //         ];
+    //         header("Location: " . $this->base_url . "data_aset_bmn");
+    //         exit;
+    //     }
+    // }
 
     public function perbaiki_nama_file($nama_file)
     {
@@ -678,6 +974,13 @@ class AdminController
             $list_pegawai[] = $p;
         }
 
+        // 2. AMBIL DATA BARANG ASET BMN (Untuk Dropdown Barang)
+        $list_barang = [];
+        $q_barang = mysqli_query($koneksi, "SELECT * FROM tb_aset_bmn WHERE deleted_at IS NULL ORDER BY nama_barang ASC");
+        while ($b = mysqli_fetch_assoc($q_barang)) {
+            $list_barang[] = $b;
+        }
+
         require_once '../views/admin/input_peminjaman_barang.php';
     }
 
@@ -689,11 +992,12 @@ class AdminController
         $id_admin_login = $_SESSION['user_id'];
 
         if (isset($_POST['ajukan_pinjam'])) {
-            $nama_barang    = mysqli_real_escape_string($koneksi, $_POST['nama_barang']);
-            $merek          = mysqli_real_escape_string($koneksi, $_POST['merek']);
-            $kode_barang    = mysqli_real_escape_string($koneksi, $_POST['kode_barang']);
-            $nup            = mysqli_real_escape_string($koneksi, $_POST['nup']);
-            $tahun_perolehan = mysqli_real_escape_string($koneksi, $_POST['tahun_perolehan']);
+            $id_bmn      = $_POST['id_bmn'];
+            // $nama_barang    = mysqli_real_escape_string($koneksi, $_POST['nama_barang']);
+            // $merek          = mysqli_real_escape_string($koneksi, $_POST['merek']);
+            // $kode_barang    = mysqli_real_escape_string($koneksi, $_POST['kode_barang']);
+            // $nup            = mysqli_real_escape_string($koneksi, $_POST['nup']);
+            // $tahun_perolehan = mysqli_real_escape_string($koneksi, $_POST['tahun_perolehan']);
 
             $id_penerima    = $_POST['id_penerima']; // ID Staf
             $tgl_serah      = $_POST['tgl_serah_terima'];
@@ -706,7 +1010,7 @@ class AdminController
                 $tgl_kembali_sql = "'$tgl_kembali_input'";
             }
 
-            if (empty($id_penerima) || empty($nama_barang)) {
+            if (empty($id_penerima) || empty($id_bmn)) {
                 $_SESSION['alert'] = [
                     'icon' => 'error',
                     'title' => 'Gagal!',
@@ -715,10 +1019,14 @@ class AdminController
                 header("Location: " . $this->base_url . "input_peminjaman_barang");
                 exit;
             } else {
+                // $query = "INSERT INTO tb_peminjaman 
+                //   (admin_id, user_id, nama_barang, merek, kode_barang, nup, tahun_perolehan, tgl_serah_terima, tgl_kembali, status)
+                //   VALUES 
+                //   ('$id_admin_login', '$id_penerima', '$nama_barang', '$merek', '$kode_barang', '$nup', '$tahun_perolehan', '$tgl_serah', $tgl_kembali_sql, 'menunggu_persetujuan')";
                 $query = "INSERT INTO tb_peminjaman 
-                  (admin_id, user_id, nama_barang, merek, kode_barang, nup, tahun_perolehan, tgl_serah_terima, tgl_kembali, status)
+                  (admin_id, user_id, bmn_id, tgl_serah_terima, tgl_kembali, status)
                   VALUES 
-                  ('$id_admin_login', '$id_penerima', '$nama_barang', '$merek', '$kode_barang', '$nup', '$tahun_perolehan', '$tgl_serah', $tgl_kembali_sql, 'menunggu_persetujuan')";
+                  ('$id_admin_login', '$id_penerima', '$id_bmn', '$tgl_serah', $tgl_kembali_sql, 'menunggu_persetujuan')";
 
                 if (mysqli_query($koneksi, $query)) {
                     $_SESSION['alert'] = [
@@ -746,14 +1054,17 @@ class AdminController
     {
         require __DIR__ . '/../config/koneksi.php';
         session_start();
+        // var_dump($_POST);
+        // exit;
 
         if (isset($_POST['update_pinjam'])) {
             $id_edit        = $_POST['id_edit'];
-            $nama_barang    = mysqli_real_escape_string($koneksi, $_POST['nama_barang']);
-            $merek          = mysqli_real_escape_string($koneksi, $_POST['merek']);
-            $kode_barang    = mysqli_real_escape_string($koneksi, $_POST['kode_barang']);
-            $nup            = mysqli_real_escape_string($koneksi, $_POST['nup']);
-            $tahun_perolehan = mysqli_real_escape_string($koneksi, $_POST['tahun_perolehan']);
+            $id_bmn         = $_POST['id_bmn'];
+            // $nama_barang    = mysqli_real_escape_string($koneksi, $_POST['nama_barang']);
+            // $merek          = mysqli_real_escape_string($koneksi, $_POST['merek']);
+            // $kode_barang    = mysqli_real_escape_string($koneksi, $_POST['kode_barang']);
+            // $nup            = mysqli_real_escape_string($koneksi, $_POST['nup']);
+            // $tahun_perolehan = mysqli_real_escape_string($koneksi, $_POST['tahun_perolehan']);
 
             $id_penerima    = $_POST['id_penerima'];
             $tgl_serah      = $_POST['tgl_serah_terima'];
@@ -768,11 +1079,12 @@ class AdminController
 
             $query_update = "UPDATE tb_peminjaman SET 
                      user_id='$id_penerima', 
-                     nama_barang='$nama_barang', 
-                     merek='$merek', 
-                     kode_barang='$kode_barang', 
-                     nup='$nup', 
-                     tahun_perolehan='$tahun_perolehan', 
+                     bmn_id='$id_bmn',
+                    --  nama_barang='$nama_barang', 
+                    --  merek='$merek', 
+                    --  kode_barang='$kode_barang', 
+                    --  nup='$nup', 
+                    --  tahun_perolehan='$tahun_perolehan', 
                      tgl_serah_terima='$tgl_serah', 
                      tgl_kembali=$tgl_kembali_sql 
                      WHERE id='$id_edit'";
@@ -843,10 +1155,11 @@ class AdminController
         // ============================================
         // 1. AMBIL DATA PEMINJAMAN
         // ============================================
-        $query = "SELECT p.*, 
-          u_admin.nama AS nama_admin, u_admin.nip AS nip_admin, j_admin.nama_jabatan as jabatan_admin,
+        $query = "SELECT p.*, b.nama_barang, b.kode_barang, b.merek_barang, b.tahun_perolehan, b.nup, 
+          u_admin.nama AS nama_admin, u_admin.nip AS nip_admin, j_admin.nama_jabatan as jabatan_admin, u_admin.paraf AS paraf_admin,
           u_user.nama AS nama_user, u_user.nip AS nip_user, j_user.nama_jabatan as jabatan_user, u_user.paraf AS paraf_user
           FROM tb_peminjaman p
+          JOIN tb_aset_bmn b ON p.bmn_id = b.id
           LEFT JOIN tb_user u_admin ON p.admin_id = u_admin.id
           LEFT JOIN tb_user u_user ON p.user_id = u_user.id
           JOIN tb_jabatan j_admin ON j_admin.id = u_admin.jabatan_id
@@ -863,11 +1176,13 @@ class AdminController
         // ============================================
         // 2. DATA PIMPINAN
         // ============================================
-        $q_pimpinan = mysqli_query($koneksi, "SELECT nama, nip FROM tb_user WHERE role='pimpinan' LIMIT 1");
+        $q_pimpinan = mysqli_query($koneksi, "SELECT nama, nip FROM tb_user u JOIN tb_jabatan j ON u.jabatan_id = j.id WHERE u.role='pimpinan' AND j.id = 18 LIMIT 1");
         $pimpinan = mysqli_fetch_assoc($q_pimpinan);
 
-        $nama_kasubbag = $pimpinan ? $pimpinan['nama'] : "........................................";
-        $nip_kasubbag  = $pimpinan ? $pimpinan['nip'] : ".......................";
+        // $nama_kasubbag = $pimpinan ? $pimpinan['nama'] : "........................................";
+        // $nip_kasubbag  = $pimpinan ? $pimpinan['nip'] : ".......................";
+        $nama_kasubbag = "Roni Karsidi, SH.,M.Si";
+        $nip_kasubbag = "197608052005011002";
 
         // ============================================
         // 3. FUNGSI TANGGAL
@@ -1031,10 +1346,11 @@ class AdminController
         // ============================================
         // 1. AMBIL DATA PEMINJAMAN
         // ============================================
-        $query = "SELECT p.*, 
-          u_admin.nama AS nama_admin, u_admin.nip AS nip_admin, j_admin.nama_jabatan as jabatan_admin,
+        $query = "SELECT p.*, b.nama_barang, b.kode_barang, b.merek_barang, b.tahun_perolehan, b.nup,
+          u_admin.nama AS nama_admin, u_admin.nip AS nip_admin, j_admin.nama_jabatan as jabatan_admin, u_admin.paraf AS paraf_admin,
           u_user.nama AS nama_user, u_user.nip AS nip_user, j_user.nama_jabatan as jabatan_user, u_user.paraf AS paraf_user
           FROM tb_peminjaman p
+          JOIN tb_aset_bmn b ON p.bmn_id = b.id
           LEFT JOIN tb_user u_admin ON p.admin_id = u_admin.id
           LEFT JOIN tb_user u_user ON p.user_id = u_user.id
           JOIN tb_jabatan j_admin ON j_admin.id = u_admin.jabatan_id
@@ -1054,8 +1370,10 @@ class AdminController
         $q_pimpinan = mysqli_query($koneksi, "SELECT nama, nip FROM tb_user WHERE role='pimpinan' LIMIT 1");
         $pimpinan = mysqli_fetch_assoc($q_pimpinan);
 
-        $nama_kasubbag = $pimpinan ? $pimpinan['nama'] : "........................................";
-        $nip_kasubbag  = $pimpinan ? $pimpinan['nip'] : ".......................";
+        // $nama_kasubbag = $pimpinan ? $pimpinan['nama'] : "........................................";
+        // $nip_kasubbag  = $pimpinan ? $pimpinan['nip'] : ".......................";
+        $nama_kasubbag = "Roni Karsidi, SH.,M.Si";
+        $nip_kasubbag = "197608052005011002";
 
         // ============================================
         // 3. FUNGSI TANGGAL
@@ -1160,7 +1478,7 @@ class AdminController
     {
         require __DIR__ . '/../config/koneksi.php';
         session_start();
-        
+
         if (isset($_GET['hapus'])) {
             $id = $_GET['hapus'];
 

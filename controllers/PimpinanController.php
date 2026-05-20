@@ -567,25 +567,31 @@ class PimpinanController
             exit;
         }
 
-        if (isset($_POST['status_permintaan'])) {
-            $status_permintaan = $_POST['status_permintaan'];
+        if (isset($_POST['status'])) {
+            $status = $_POST['status'];
         } else {
-            $status_permintaan = '';
+            $status = '';
+        }
+
+        if (isset($_POST['pegawai'])) {
+            $pegawai = $_POST['pegawai'];
+        } else {
+            $pegawai = '';
         }
 
         require_once '../views/pimpinan/laporan_permintaan.php';
     }
 
-    public function ajax_load_laporan_permintaan()
+    public function ajax_load_laporan_permintaan_status()
     {
         require __DIR__ . '/../config/koneksi.php';
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-            if (isset($_POST['status_permintaan_post'])) {
-                $status_permintaan = $_POST['status_permintaan_post'];
+            if (isset($_POST['status_post'])) {
+                $status = $_POST['status_post'];
             } else {
-                $status_permintaan = '';
+                $status = '';
             }
 
             $sql = "SELECT p.*, u.nama AS nama_pemohon, a.nama AS nama_admin
@@ -593,10 +599,10 @@ class PimpinanController
                     JOIN tb_user u ON p.user_id = u.id
                     LEFT JOIN tb_user a ON p.admin_id = a.id";
 
-            if ($status_permintaan != "") {
-                $sql .= " WHERE p.status = '$status_permintaan'";
-                } else {
-                $sql .= " WHERE p.status = 'disetujui'";
+            if ($status != "") {
+                $sql .= " WHERE p.status = '$status'";
+            } else {
+                $sql .= " WHERE p.status IN ('menunggu', 'disetujui', 'ditolak')";
             }
 
             $sql .= " ORDER BY p.id DESC";
@@ -637,6 +643,84 @@ class PimpinanController
                     echo "<span class='badge badge-danger px-2 py-1'>Ditolak</span>
                             <div class='small text-danger mt-1 font-italic'>'{$hist['catatan']}'</div>";
                 }
+                echo "
+                    </td>
+                    <td class='small text-muted'>";
+                if ($hist['status'] == 'menunggu') {
+                    echo "<div style='text-align:center;'>-</div>";
+                } else {
+                    echo "<i class='fas fa-user-shield'></i> {$hist['nama_admin']}";
+                }
+                echo "
+                    </td>
+                </tr>";
+                $no++;
+            }
+            exit;
+        }
+    }
+
+    public function ajax_load_laporan_permintaan_pegawai()
+    {
+        require __DIR__ . '/../config/koneksi.php';
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+            if (isset($_POST['pegawai_post'])) {
+                $pegawai = $_POST['pegawai_post'];
+            } else {
+                $pegawai = '';
+            }
+
+            $sql = "SELECT p.*, u.nama AS nama_pemohon, a.nama AS nama_admin
+                    FROM tb_permintaan p
+                    JOIN tb_user u ON p.user_id = u.id
+                    LEFT JOIN tb_user a ON p.admin_id = a.id";
+
+            if ($pegawai != "") {
+                $sql .= " WHERE p.user_id = '$pegawai'";
+            } else {
+                $sql .= " WHERE p.status IN ('menunggu', 'disetujui', 'ditolak')";
+            }
+
+            $sql .= " ORDER BY p.id DESC";
+
+            $query = mysqli_query($koneksi, $sql);
+            $no = 1;
+            while ($hist = mysqli_fetch_assoc($query)) {
+                $id_hist = $hist['id'];
+
+                echo "
+                <tr>
+                    <td style='text-align:center;'>{$no}</td>
+                    <td>{$hist['tanggal_permintaan']}</td>
+                    <td class='font-weight-bold text-primary'>{$hist['nama_pemohon']}</td>
+                    <td>
+                        <ul class='pl-3 mb-0' style='font-size: 0.9rem;'>
+                            ";
+                $q_detail_hist = mysqli_query($koneksi, "SELECT d.jumlah, d.satuan, b.nama_barang, b.satuan, b.merek_barang
+                                                    FROM tb_detail_permintaan d 
+                                                    JOIN tb_barang_habis_pakai b ON d.barang_id = b.id 
+                                                    WHERE d.permintaan_id = '$id_hist'");
+
+                while ($dh = mysqli_fetch_assoc($q_detail_hist)) {
+                    echo "<li class='mb-1'>{$dh['nama_barang']} ({$dh['merek_barang']}) : <b>{$dh['jumlah']} {$dh['satuan']}</b></li>";
+                };
+                echo "
+                        </ul>
+                    </td>
+
+                    <td class='text-center'>
+                    ";
+                if ($hist['status'] == 'menunggu') {
+                    echo "<span class='badge badge-warning px-2 py-1'>Menunggu</span>";
+                } elseif ($hist['status'] == 'disetujui') {
+                    echo "<span class='badge badge-success px-2 py-1'>Disetujui</span>";
+                } else {
+                    echo "<span class='badge badge-danger px-2 py-1'>Ditolak</span>
+                            <div class='small text-danger mt-1 font-italic'>'{$hist['catatan']}'</div>";
+                }
+
                 echo "
                     </td>
                     <td class='small text-muted'>";

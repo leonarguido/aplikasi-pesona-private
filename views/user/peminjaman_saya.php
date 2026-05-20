@@ -54,8 +54,9 @@
                                             <?php
                                             $no = 1;
                                             $query = mysqli_query($koneksi, "
-                                            SELECT p.*, u.nama AS nama_admin, u.nip AS nip_admin
+                                            SELECT p.*, b.nama_barang, b.kode_barang, b.merek_barang, b.tahun_perolehan, b.nup, u.nama AS nama_admin, u.nip AS nip_admin
                                             FROM tb_peminjaman p
+                                            JOIN tb_aset_bmn b ON p.bmn_id = b.id
                                             LEFT JOIN tb_user u ON p.admin_id = u.id
                                             WHERE p.user_id = '$id_staf_login' AND p.deleted_at IS NULL
                                             ORDER BY p.id DESC
@@ -67,7 +68,7 @@
                                                     <td><?= $no++; ?></td>
                                                     <td>
                                                         <b><?= $row['nama_barang']; ?></b> <br>
-                                                        <span class="badge badge-secondary"><?= $row['merek']; ?></span>
+                                                        <span class="badge badge-secondary"><?= $row['merek_barang']; ?></span>
                                                         <small class="text-muted d-block mt-1">
                                                             Kode: <?= $row['kode_barang']; ?><br>
                                                             NUP: <?= $row['nup']; ?>

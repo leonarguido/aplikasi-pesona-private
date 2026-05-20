@@ -3,7 +3,26 @@
 
 <head>
     <?php require __DIR__ . '/../layout/header.php'; ?>
-    <?php $judul_halaman = "Log Barang Tidak bergerak"; ?>
+    <?php $judul_halaman = "Log Aset BMN"; ?>
+    
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <style>
+        .select2-container .select2-selection--single {
+            font-size: 0.875rem;
+            height: 32px !important;
+            border: 1px solid #d1d3e2;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            font-size: 0.875rem;
+            line-height: 32px !important;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            font-size: 0.875rem;
+            height: 32px !important;
+        }
+    </style>
 </head>
 
 <body id="page-top">
@@ -30,7 +49,18 @@
                                             </h6>
                                             <button id="bulan_depan_log" class="btn btn-sm btn-outline-primary ml-2">&raquo;</button>
                                         </div>
-                                        <input type="text" name="kalender" id="kalender_log" value="<?= $tahun_angka ?>-<?= $bulan_angka ?>" class="d-none d-sm-inline-block btn btn-sm btn-outline-primary shadow-sm" readonly>
+                                        <div>
+                                            <input type="text" name="kalender" id="kalender_log" value="<?= $tahun_angka ?>-<?= $bulan_angka ?>" class="d-none d-sm-inline-block btn btn-sm btn-outline-primary shadow-sm" readonly>
+                                            <label>
+                                                <select name="status" id="selectStatusFilter" class="form-control form-control-sm select2-status">
+                                                    <option value="">Semua Status</option>
+                                                    <option value="Tambah Barang">Tambah Barang</option>
+                                                    <option value="Tambah Stok">Tambah Stok</option>
+                                                    <option value="Edit Barang">Edit Barang</option>
+                                                    <option value="Hapus Barang">Hapus Barang</option>
+                                                </select>
+                                            </label>
+                                        </div>
                                     </div>
                                     <div class="card-body">
                                         <div class="table-responsive">
@@ -40,8 +70,9 @@
                                                         <th width="10%">Tanggal</th>
                                                         <th width="10%">Admin</th>
                                                         <th width="10%">Kode Barang</th>
-                                                        <th width="20%">Nama Barang</th>
+                                                        <th width="10%" style="text-align:center;">Nama Barang</th>
                                                         <th width="10%" style="text-align:center;">Histori Aksi</th>
+                                                        <th width="20%" style="text-align:center;">Keterangan</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="tabel_log">
@@ -49,25 +80,75 @@
                                             </table>
                                         </div>
                                     </div>
+
+                                    <div class="modal fade" id="modalEdit" tabindex="-1">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title">Edit Log Stok Barang</h5>
+                                                    <button class="close" data-dismiss="modal">&times;</button>
+                                                </div>
+                                                <form method="POST" id="formEdit" action="">
+                                                    <div class="modal-body">
+                                                        <input type="hidden" name="id" id="editId">
+                                                        <input type="hidden" name="stok_lama" id="stokLama">
+                                                        <input type="hidden" name="kode_barang" id="editKode">
+
+                                                        <div class="form-group">
+                                                            <label>Stok</label>
+                                                            <input type="number" class="form-control" name="stok_baru" min="1" id="editStok">
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label>Keterangan</label>
+                                                            <textarea class="form-control" name="keterangan" id="editKet"></textarea>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                                                        <button type="submit" name="edit_log" class="btn btn-primary">Simpan</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                 </div>
                             </div>
                         </div>
 
                     </div>
                 </div>
-            <?php require __DIR__ . '/../layout/footer.php'; ?>
+                <?php require __DIR__ . '/../layout/footer.php'; ?>
             </div>
         </div>
     </div>
 
     <script>
+        $(document).ready(function() {
+            $('.select2-status').select2({
+                dropdownParent: $('#selectStatusFilter').parent()
+            });
+        });
+
+        // filter berdasarkan status
+        $(document).on('change', '#selectStatusFilter', function() {
+            let selectedStatus = $(this).val();
+            if (selectedStatus) {
+                // console.log("Filtering log dengan status: " + selectedStatus);
+                $('#dataTableLog').DataTable().column(4).search('^' + selectedStatus + '$', true, false).draw();
+            } else {
+                // console.log("Menampilkan semua log tanpa filter status");
+                $('#dataTableLog').DataTable().column(4).search('').draw();
+            }
+        });
+
         // ==========================================
-        // LOG BARANG
+        // LOG ASET BMN
         // ==========================================
 
-        // 1. LOAD LOG BARANG OTOMATIS (AJAX)
+        // 1. LOAD LOG ASET BMN OTOMATIS (AJAX)
         function load_log($bulan_angka, $tahun_angka) {
-            // console.log("Loading LOG BARANG untuk bulan: " + $bulan_angka + ", tahun: " + $tahun_angka);
+            // console.log("Loading LOG ASET BMN untuk bulan: " + $bulan_angka + ", tahun: " + $tahun_angka);
             $.ajax({
                 url: '<?= BASE_URL ?>ajax_load_log_aset_bmn',
                 type: 'POST',
@@ -117,7 +198,7 @@
         });
 
         function load_bulan_log($bulan_angka, $tahun_angka) {
-            $('#bulan_ini_log').text('Log Barang Tidak Bergerak per Bulan: ' + new Date($tahun_angka, $bulan_angka - 1).toLocaleString('id-ID', {
+            $('#bulan_ini_log').text('Log Barang Habis Pakai per Bulan: ' + new Date($tahun_angka, $bulan_angka - 1).toLocaleString('id-ID', {
                 month: 'long'
             }) + ' ' + $tahun_angka);
 
@@ -172,6 +253,23 @@
             }
             load_log($bulan_angka, $tahun_angka);
             load_bulan_log($bulan_angka, $tahun_angka);
+        });
+
+
+        // MODAL EDIT STOK ASET BMN
+        $(document).on('click', '.btn-edit', function() {
+            let id = $(this).data('id');
+            let kode = $(this).data('kode');
+            let stok = $(this).data('stok');
+            let ket = $(this).data('keterangan');
+
+            $('#editId').val(id);
+            $('#editKode').val(kode);
+            $('#stokLama').val(stok);
+            $('#editStok').val(stok);
+            $('#editKet').val(ket);
+
+            $('#formEdit').attr('action', '<?= $this->base_url ?>edit_log_stok_bmn&id=' + id);
         });
     </script>
 </body>

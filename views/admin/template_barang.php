@@ -10,8 +10,8 @@ $output = fopen('php://output', 'w');
 fputcsv($output, array('Kode Barang', 'Nama Barang', 'Merek Barang', 'Satuan', 'Stok', 'Keterangan'));
 
 // 2. Tulis Contoh Data (Dummy) sebagai panduan user
-fputcsv($output, array('BRG-001', 'Contoh Laptop ASUS', 'Toshiba', 'Unit', '10', 'Laptop Admin'));
-fputcsv($output, array('BRG-002', 'Contoh Kertas A4', 'Sidu', 'Rim', '50', 'Kertas Paperone 80gr'));
+fputcsv($output, array('BRG-001', 'Contoh Sabun', 'Viar', 'Pcs', '10', 'Sabun Cuci Tangan'));
+fputcsv($output, array('BRG-002', 'Contoh Kertas A4', 'Sidu', 'Rim', '5', '80gr'));
 fputcsv($output, array('BRG-003', 'Contoh Spidol', 'Snowman', 'Pcs', '25', 'Warna Hitam'));
 
 // Tutup file

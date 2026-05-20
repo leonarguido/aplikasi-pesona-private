@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <?php require __DIR__ . '/../layout/header.php'; ?>
+    <?php $judul_halaman = "Data Barang Milik Negara"; ?>
+</head>
+
+<body id="page-top">
+    <div id="wrapper">
+        <?php require __DIR__ . '/../layout/sidebar.php'; ?>
+        <div id="content-wrapper" class="d-flex flex-column">
+            <div id="content">
+                <div class="row">
+                    <div class="col-md-12">
+                        <?php require __DIR__ . '/../layout/topbar.php'; ?>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="container-fluid mt-4">
+
+                        <!-- <h1 class="h3 mb-2 text-gray-800">Data Barang Bergerak</h1>
+                    <p class="mb-4">Kelola stok barang, tambah manual, atau import via Excel.</p> -->
+
+                        <div class="card shadow mb-4">
+                            <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                                <div>
+                                    <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#tambahModal">
+                                        <i class="fas fa-plus"></i> Tambah Manual
+                                    </button>
+                                    <button class="btn btn-success btn-sm ml-2" data-toggle="modal" data-target="#importModal">
+                                        <i class="fas fa-file-excel"></i> Import Excel
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-hover" id="dataTable" width="100%" cellspacing="0">
+                                        <thead class="thead-light">
+                                            <tr>
+                                                <th width="5%">No</th>
+                                                <th>Kode</th>
+                                                <th>Merek Barang</th>
+                                                <th>Nama Barang</th>
+                                                <th class="text-center">Stok</th>
+                                                <th>Tahun Perolehan</th>
+                                                <th>NUP</th>
+                                                <th>Status</th>
+                                                <th>Keterangan</th>
+                                                <th width="15%">Aksi</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php
+                                            $no = 1;
+                                            $query = "SELECT * FROM tb_aset_bmn WHERE deleted_at is null ORDER BY nama_barang ASC";
+                                            $data = mysqli_query($koneksi, $query);
+
+                                            while ($row = mysqli_fetch_assoc($data)):
+                                            ?>
+                                                <tr>
+                                                    <td><?= $no++; ?></td>
+                                                    <td><span class="badge badge-secondary"><?= $row['kode_barang']; ?></span></td>
+                                                    <td class="font-weight-bold"><?= $row['merek_barang']; ?></td>
+                                                    <td class="font-weight-bold"><?= $row['nama_barang']; ?></td>
+                                                    <td class="text-center">
+                                                        <?php if ($row['stok'] > 0): ?>
+                                                            <span class="badge badge-success" style="font-size: 1rem;"><?= $row['stok']; ?></span>
+                                                        <?php else: ?>
+                                                            <span class="badge badge-danger">Habis</span>
+                                                        <?php endif; ?>
+                                                    </td>
+                                                    <td><?= ($row['tahun_perolehan']) ? $row['tahun_perolehan'] : '-'; ?></td>
+                                                    <td><?= ($row['nup']) ? $row['nup'] : '-'; ?></td>
+                                                    <td><small><?= ($row['status_barang']) ? $row['status_barang'] : '-'; ?></small></td>
+                                                    <td><small><?= $row['keterangan']; ?></small></td>
+                                                    <td class="text-center">
+                                                        <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#editStokModal<?= $row['id']; ?>">
+                                                            <i class="fas fa-plus"></i>
+                                                        </button>
+                                                        <button class="btn btn-warning btn-sm" data-toggle="modal" data-target="#editModal<?= $row['id']; ?>">
+                                                            <i class="fas fa-edit"></i>
+                                                        </button>
+                                                        <a href="<?= BASE_URL ?>hapus_data_bmn&id=<?= $row['id']; ?>" class="btn btn-danger btn-sm" onclick="confirmHapus(event, this.href)">
+                                                            <i class="fas fa-trash"></i>
+                                                        </a>
+                                                        <!-- <a href="data_bmn.php?hapus=row[id]" class="btn btn-danger btn-sm" onclick="return confirm('Hapus barang ini?');"> -->
+                                                        <!-- <i class="fas fa-trash"></i> -->
+                                                        <!-- </a> -->
+                                                    </td>
+                                                </tr>
+
+                                                <div class="modal fade" id="editStokModal<?= $row['id']; ?>" tabindex="-1">
+                                                    <div class="modal-dialog">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title">Tambah Stok Barang</h5>
+                                                                <button class="close" data-dismiss="modal">&times;</button>
+                                                            </div>
+                                                            <form method="POST" action="<?= BASE_URL ?>edit_data_stok_bmn">
+                                                                <div class="modal-body">
+                                                                    <input type="hidden" name="id" value="<?= $row['id']; ?>">
+                                                                    <div class="form-group">
+                                                                        <div class="row">
+                                                                            <div class="col">
+                                                                                <label>Stok Saat Ini</label>
+                                                                                <input type="number" class="form-control" value="<?= $row['stok']; ?>" readonly>
+                                                                            </div>
+                                                                            <div class="col">
+                                                                                <label>Tambah Stok <span class="text-danger">*</span></label>
+                                                                                <input type="number" name="stok" min="1" class="form-control" required>
+                                                                            </div>
+                                                                            <!-- <div class="col" id="tambahStokDiv">
+                                                                            <label>Tambah Stok</label>
+                                                                            <input type="number" name="stok" min="0" class="form-control" required>
+                                                                        </div>
+                                                                        <div class="col" id="kurangiStokDiv">
+                                                                            <label>Kurangi Stok</label>
+                                                                            <input type="number" name="stok" max="0" class="form-control" required>
+                                                                        </div> -->
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="form-group">
+                                                                        <label>Keterangan <span class="text-danger">*</span></label>
+                                                                        <textarea name="keterangan" class="form-control" required></textarea>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                                                                    <button type="submit" name="edit_stok" class="btn btn-primary">Simpan</button>
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="modal fade" id="editModal<?= $row['id']; ?>" tabindex="-1">
+                                                    <div class="modal-dialog">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title">Edit Barang</h5>
+                                                                <button class="close" data-dismiss="modal">&times;</button>
+                                                            </div>
+                                                            <form method="POST" action="<?= BASE_URL ?>edit_data_bmn">
+                                                                <div class="modal-body">
+                                                                    <input type="hidden" name="id" value="<?= $row['id']; ?>">
+                                                                    <div class="form-group">
+                                                                        <label>Nama Barang <span class="text-danger">*</span></label>
+                                                                        <input type="text" name="nama_barang" class="form-control" value="<?= $row['nama_barang']; ?>" required>
+                                                                    </div>
+                                                                    <div class="form-group">
+                                                                        <label>Merek Barang <span class="text-danger">*</span></label>
+                                                                        <input type="text" name="merek_barang" class="form-control" value="<?= $row['merek_barang']; ?>" required>
+                                                                    </div>
+                                                                    <div class="form-group">
+                                                                        <label>Satuan <span class="text-danger">*</span></label>
+                                                                        <select name="satuan" class="form-control">
+                                                                            <option value="Unit" <?= ($row['satuan'] == 'Unit') ? 'selected' : ''; ?>>Unit</option>
+                                                                            <option value="Pcs" <?= ($row['satuan'] == 'Pcs') ? 'selected' : ''; ?>>Pcs</option>
+                                                                            <option value="Buah" <?= ($row['satuan'] == 'Buah') ? 'selected' : ''; ?>>Buah</option>
+                                                                            <option value="Rim" <?= ($row['satuan'] == 'Rim') ? 'selected' : ''; ?>>Rim</option>
+                                                                            <option value="Box" <?= ($row['satuan'] == 'Box') ? 'selected' : ''; ?>>Box</option>
+                                                                        </select>
+                                                                    </div>
+                                                                    <div class="form-group">
+                                                                        <label>Stok</label>
+                                                                        <input type="number" name="stok" class="form-control" value="<?= $row['stok']; ?>" readonly>
+                                                                    </div>
+                                                                    <div class="form-group">
+                                                                        <label>Tahun Perolehan <span class="text-danger">*</span></label>
+                                                                        <input type="number" name="tahun_perolehan" class="form-control" value="<?= $row['tahun_perolehan']; ?>" placeholder="Cth: 2020" required>
+                                                                    </div>
+                                                                    <div class="form-group">
+                                                                        <label>NUP <span class="text-danger">*</span></label>
+                                                                        <input type="number" name="nup" class="form-control" value="<?= $row['nup']; ?>" placeholder="Cth: 123456" required>
+                                                                    </div>
+                                                                    <div class="form-group">
+                                                                        <label>Status <span class="text-danger">*</span></label>
+                                                                        <select name="status_barang" class="form-control" required>
+                                                                            <option value="">-- Pilih Kondisi --</option>
+                                                                            <option value="Baik dan Lengkap">Baik dan Lengkap</option>
+                                                                            <option value="Rusak Ringan">Rusak Ringan (Bisa Diperbaiki)</option>
+                                                                            <option value="Rusak Berat">Rusak Berat</option>
+                                                                            <option value="Hilang / Tidak Lengkap">Hilang / Tidak Lengkap</option>
+                                                                        </select>
+                                                                    </div>
+                                                                    <div class="form-group">
+                                                                        <label>Keterangan</label>
+                                                                        <textarea name="keterangan" class="form-control"><?= $row['keterangan']; ?></textarea>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                                                                    <button type="submit" name="edit" class="btn btn-primary">Simpan</button>
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            <?php endwhile; ?>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal fade" id="importModal" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header bg-success text-white">
+                                <h5 class="modal-title">Import Data Aset BMN</h5>
+                                <button class="close text-white" data-dismiss="modal">&times;</button>
+                            </div>
+                            <form method="POST" enctype="multipart/form-data" action="<?= BASE_URL ?>import_excel_data_bmn">
+                                <div class="modal-body">
+                                    <div class="alert alert-info">
+                                        <strong>Cara Penggunaan:</strong>
+                                        <ol class="pl-3 mb-0 small">
+                                            <li>Download template Excel (CSV).</li>
+                                            <li>Isi data tanpa mengubah judul kolom.</li>
+                                            <li>Simpan sebagai <strong>.CSV</strong>.</li>
+                                        </ol>
+                                        <a href="<?= BASE_URL ?>template_bmn" class="btn btn-sm btn-light mt-2 text-success font-weight-bold"><i class="fas fa-download"></i> Download Template</a>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Pilih File CSV <span class="text-danger">*</span></label>
+                                        <input type="file" name="file_excel" class="form-control-file" required accept=".csv">
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                                    <button type="submit" name="import_excel" class="btn btn-success">Upload</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal fade" id="tambahModal" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Tambah Barang Baru</h5>
+                                <button class="close" data-dismiss="modal">&times;</button>
+                            </div>
+                            <form method="POST" action="<?= BASE_URL ?>tambah_data_bmn">
+                                <div class="modal-body">
+                                    <div class="form-group">
+                                        <label>Kode Barang (Unik) <span class="text-danger">*</span></label>
+                                        <input type="text" name="kode_barang" class="form-control" placeholder="Cth: KTS-001" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Nama Barang <span class="text-danger">*</span></label>
+                                        <input type="text" name="nama_barang" class="form-control" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Merek Barang <span class="text-danger">*</span></label>
+                                        <input type="text" name="merek_barang" class="form-control" placeholder="Cth: Bola Dunia, Snowman, Sidu, Toshiba, dll" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Satuan <span class="text-danger">*</span></label>
+                                        <select name="satuan" class="form-control">
+                                            <option value="Pcs">Pcs</option>
+                                            <option value="Unit">Unit</option>
+                                            <option value="Rim">Rim</option>
+                                            <option value="Box">Box</option>
+                                            <option value="Buah">Buah</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Stok Awal <span class="text-danger">*</span></label>
+                                        <input type="number" name="stok" class="form-control" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Tahun Perolehan <span class="text-danger">*</span></label>
+                                        <input type="number" name="tahun_perolehan" class="form-control" placeholder="Cth: 2020" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>NUP <span class="text-danger">*</span></label>
+                                        <input type="number" name="nup" class="form-control" placeholder="Cth: 123456" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Status <span class="text-danger">*</span></label>
+                                        <select name="status_barang" class="form-control" required>
+                                            <option value="">-- Pilih Kondisi --</option>
+                                            <option value="Baik dan Lengkap">Baik dan Lengkap</option>
+                                            <option value="Rusak Ringan">Rusak Ringan (Bisa Diperbaiki)</option>
+                                            <option value="Rusak Berat">Rusak Berat</option>
+                                            <option value="Hilang / Tidak Lengkap">Hilang / Tidak Lengkap</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Keterangan</label>
+                                        <textarea name="keterangan" class="form-control"></textarea>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="submit" name="tambah" class="btn btn-primary">Simpan</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <?php require __DIR__ . '/../layout/footer.php'; ?>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            if (!$.fn.DataTable.isDataTable('#dataTable')) {
+                $('#dataTable').DataTable({
+                    "language": {
+                        "search": "Cari Barang:",
+                        "lengthMenu": "Tampilkan _MENU_ antrian",
+                        "zeroRecords": "Tidak ada barang yang cocok",
+                        "info": "Menampilkan _PAGE_ dari _PAGES_",
+                        "infoEmpty": "Tidak ada data",
+                        "infoFiltered": "(difilter dari _MAX_ total data)",
+                        "paginate": {
+                            "first": "Awal",
+                            "last": "Akhir",
+                            "next": "Lanjut",
+                            "previous": "Kembali"
+                        }
+                    }
+                });
+            }
+        });
+
+        $(document).ready(function() {
+            $('#fiturKhusus').change(function() {
+                if ($(this).is(':checked')) {
+                    $('#tambahStokDiv').hide();
+                    $('#kurangiStokDiv').show();
+                } else {
+                    $('#tambahStokDiv').show();
+                    $('#kurangiStokDiv').hide();
+                }
+            });
+
+            // Inisialisasi tampilan awal
+            $('#fiturKhusus').trigger('change');
+        });
+
+
+        function confirmHapus(event, url) {
+            event.preventDefault();
+
+            Swal.fire({
+                title: 'Yakin?',
+                text: 'Barang akan dihapus permanen!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Ya, hapus!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = url;
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>

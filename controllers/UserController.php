@@ -404,6 +404,8 @@ class UserController
 
         $result_header = mysqli_query($koneksi, $query_header);
         $data = mysqli_fetch_assoc($result_header);
+        // var_dump($data);
+        // exit;
 
         // Validasi: Hanya bisa dicetak jika sudah DISETUJUI
         if ($data['status'] != 'disetujui') {

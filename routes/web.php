@@ -74,7 +74,29 @@ if (isset($_GET['page'])) {
             $admin->hapus_data_barang();
             break;
 
-        // DATA BARANG ASET BMN
+        // DATA ASET BMN
+        case 'data_bmn':
+            $admin->data_bmn_page();
+            break;
+        case 'template_bmn':
+            $admin->template_bmn();
+            break;
+        case 'import_excel_data_bmn':
+            $admin->import_excel_data_bmn();
+            break;
+        case 'tambah_data_bmn':
+            $admin->tambah_data_bmn();
+            break;
+        case 'edit_data_bmn':
+            $admin->edit_data_bmn();
+            break;
+        case 'edit_data_stok_bmn':
+            $admin->edit_data_stok_bmn();
+            break;
+        case 'hapus_data_bmn':
+            $admin->hapus_data_bmn();
+            break;
+
         case 'data_aset_bmn':
             $admin->data_aset_bmn();
             break;
@@ -254,8 +276,11 @@ if (isset($_GET['page'])) {
         case 'laporan_permintaan':
             $pimpinan->laporan_permintaan_page();
             break;
-        case 'ajax_load_laporan_permintaan':
-            $pimpinan->ajax_load_laporan_permintaan();
+        case 'ajax_load_laporan_permintaan_status':
+            $pimpinan->ajax_load_laporan_permintaan_status();
+            break;
+        case 'ajax_load_laporan_permintaan_pegawai':
+            $pimpinan->ajax_load_laporan_permintaan_pegawai();
             break;
 
         case 'laporan_persediaan':
@@ -294,6 +319,9 @@ if (isset($_GET['page'])) {
             break;
         case 'log_aset_bmn':
             $logBarang->log_aset_bmn();
+            break;
+        case 'edit_log_stok_bmn':
+            $logBarang->edit_log_stok_bmn();
             break;
         case 'ajax_load_log_aset_bmn':
             $logBarang->ajax_load_log_aset_bmn();

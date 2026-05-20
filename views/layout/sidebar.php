@@ -37,6 +37,11 @@
             <div class="sidebar-heading">Aset BMN</div>
 
             <li class="nav-item">
+                <a class="nav-link" href="<?= BASE_URL ?>data_bmn">
+                    <i class="fas fa-fw fa-dolly"></i> <span>Data Barang Milik Negara</span></a>
+            </li>
+
+            <li class="nav-item">
                 <a class="nav-link" href="<?= BASE_URL ?>input_peminjaman_barang">
                     <i class="fas fa-fw fa-file-alt"></i> <span>Input Peminjaman Barang</span></a>
             </li>
@@ -88,11 +93,28 @@
                     </div>
                 </div>
             </li>
+
+            <li class="nav-item">
+                <a class="nav-link" href="<?= BASE_URL ?>log_barang">
+                    <i class="fas fa-fw fa-boxes"></i>
+                    <span>Log Barang</span></a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" href="<?= BASE_URL ?>log_aset_bmn">
+                    <i class="fas fa-fw fa-boxes"></i>
+                    <span>Log Aset BMN</span></a>
+            </li>
         <?php endif; ?>
 
         <?php if ($_SESSION['role'] == 'admin bmn'): ?>
 
             <div class="sidebar-heading">Aset BMN</div>
+
+            <li class="nav-item">
+                <a class="nav-link" href="<?= BASE_URL ?>data_bmn">
+                    <i class="fas fa-fw fa-dolly"></i> <span>Data Barang Milik Negara</span></a>
+            </li>
 
             <li class="nav-item">
                 <a class="nav-link" href="<?= BASE_URL ?>input_peminjaman_barang">
@@ -229,6 +251,12 @@
                 <a class="nav-link" href="<?= BASE_URL ?>log_barang">
                     <i class="fas fa-fw fa-boxes"></i>
                     <span>Log Barang</span></a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" href="<?= BASE_URL ?>log_aset_bmn">
+                    <i class="fas fa-fw fa-boxes"></i>
+                    <span>Log Aset BMN</span></a>
             </li>
         <?php endif; ?>
 

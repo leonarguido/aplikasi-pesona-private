@@ -3,6 +3,7 @@ session_start();
 
 // 1. Cek login
 if (!isset($_SESSION['user_id'])) {
+    
     http_response_code(403);
     include 'views/error/403.php';
     exit();
