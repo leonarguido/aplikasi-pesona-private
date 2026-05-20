@@ -12,7 +12,7 @@ if (isset($_POST['login'])) {
     $username = mysqli_real_escape_string($koneksi, $_POST['username']);
     $password = $_POST['password'];
 
-    // CEK TABEL BARU: tb_user
+    // CEK TABEL: tb_user
     $query = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE username = '$username'");
 
     // Cek apakah username ada
@@ -22,37 +22,16 @@ if (isset($_POST['login'])) {
         // VERIFIKASI PASSWORD
         if (password_verify($password, $data['password'])) {
             
-            $role_db = $data['role'];
+            // JANGAN LANGSUNG MASUK!
+            // Simpan data di Session khusus 2FA Pending
+            $_SESSION['pending_2fa_id']       = $data['id'];
+            $_SESSION['pending_2fa_username'] = $data['username'];
+            $_SESSION['pending_2fa_nama']     = $data['nama'];
+            $_SESSION['pending_2fa_role']     = $data['role'];
 
-            // JIKA ROLE ADALAH STAF (USER BIASA) -> Langsung Set Session Utama & Masuk
-            if ($role_db == 'staff') {
-                $_SESSION['user_id']   = $data['id'];
-                $_SESSION['username']  = $data['username'];
-                $_SESSION['full_name'] = $data['nama']; 
-                $_SESSION['role']      = 'user'; 
-                
-                header("Location: index.php");
-                exit;
-            } 
-            // JIKA ROLE ADALAH ADMIN/PIMPINAN/SUPERADMIN -> Tahan di Session Sementara
-            else {
-                $_SESSION['temp_user_id']   = $data['id'];
-                $_SESSION['temp_username']  = $data['username'];
-                $_SESSION['temp_full_name'] = $data['nama'];
-                
-                // MAPPING ROLE ASLI
-                if ($role_db == 'super admin') {
-                    $_SESSION['temp_role'] = 'super_admin';
-                } elseif ($role_db == 'admin gudang') {
-                    $_SESSION['temp_role'] = 'admin';
-                } else {
-                    $_SESSION['temp_role'] = $role_db; // Untuk pimpinan
-                }
-
-                // Lempar ke halaman pilih role
-                header("Location: pilih_role.php");
-                exit;
-            }
+            // Arahkan ke halaman verifikasi Google Authenticator
+            header("Location: verify_2fa.php");
+            exit;
         }
     }
     // Jika username salah atau password tidak terverifikasi
@@ -161,7 +140,7 @@ if (isset($_POST['login'])) {
                 </div>
 
                 <button type="submit" name="login" class="btn btn-primary btn-block btn-login shadow-sm">
-                    Masuk
+                    Lanjut Verifikasi 2FA
                 </button>
                 
             </form>

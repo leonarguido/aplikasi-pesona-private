@@ -12,14 +12,68 @@ if ($_SESSION['role'] == 'staff' || $_SESSION['role'] == 'user') {
     exit;
 }
 
+// =============================================================
+// AKSI MANUAL: TANDAI BARANG SUDAH DIAMBIL (STATUS -> SELESAI)
+// =============================================================
+if (isset($_GET['ambil_id'])) {
+    $id_ambil = mysqli_real_escape_string($koneksi, $_GET['ambil_id']);
+    mysqli_query($koneksi, "UPDATE tb_permintaan SET status = 'selesai' WHERE id = '$id_ambil'");
+    
+    // Refresh halaman agar bersih dari parameter URL
+    echo "<script>window.location='riwayat_persetujuan.php';</script>";
+    exit;
+}
+
+// =============================================================
+// PENGECEKAN PASIF (LAZY EVALUATION) - BATAL OTOMATIS 7 HARI
+// =============================================================
+$query_kedaluwarsa = mysqli_query($koneksi, "
+    SELECT id 
+    FROM tb_permintaan 
+    WHERE status = 'disetujui' 
+    AND DATEDIFF(CURRENT_DATE(), tanggal_disetujui) >= 7
+");
+
+if (mysqli_num_rows($query_kedaluwarsa) > 0) {
+    while ($data_kdl = mysqli_fetch_assoc($query_kedaluwarsa)) {
+        $id_kdl = $data_kdl['id'];
+        
+        // 1. Ambil detail barang untuk dikembalikan stoknya
+        $query_detail_kdl = mysqli_query($koneksi, "
+            SELECT barang_id, jumlah 
+            FROM tb_detail_permintaan 
+            WHERE permintaan_id = '$id_kdl'
+        ");
+        
+        while ($detail_kdl = mysqli_fetch_assoc($query_detail_kdl)) {
+            $id_brg_kdl = $detail_kdl['barang_id'];
+            $jumlah_kdl = $detail_kdl['jumlah'];
+            
+            // 2. Kembalikan stok ke tb_barang_bergerak
+            mysqli_query($koneksi, "
+                UPDATE tb_barang_bergerak 
+                SET stok = stok + $jumlah_kdl 
+                WHERE id = '$id_brg_kdl'
+            ");
+        }
+        
+        // 3. Ubah status menjadi batal_otomatis dan tambahkan catatan
+        mysqli_query($koneksi, "
+            UPDATE tb_permintaan 
+            SET status = 'batal_otomatis', 
+                catatan = CONCAT(IFNULL(catatan,''), ' [Dibatalkan otomatis: Melewati batas waktu 7 hari]') 
+            WHERE id = '$id_kdl'
+        ");
+    }
+}
+// =============================================================
+
 require 'layout/header.php';
 require 'layout/sidebar.php';
 
-// =============================================================
-// SET JUDUL KE TOPBAR (Agar muncul di kotak merah atas)
-// =============================================================
+// SET JUDUL KE TOPBAR
 $judul_halaman = "Riwayat Persetujuan";
-$deskripsi_halaman = "Log riwayat permintaan yang telah disetujui atau ditolak.";
+$deskripsi_halaman = "Log riwayat permintaan yang telah disetujui, selesai, ditolak, atau batal otomatis.";
 
 require 'layout/topbar.php'; 
 ?>
@@ -38,14 +92,14 @@ require 'layout/topbar.php';
                             <th width="15%">Tanggal</th>
                             <th>Pemohon</th>
                             <th>Rincian Barang (Final)</th>
-                            <th class="text-center" width="10%">Status</th>
+                            <th class="text-center" width="12%">Status</th>
                             <th>Admin Eksekutor</th>
-                            <th class="text-center" width="10%">Aksi</th>
+                            <th class="text-center" width="15%">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php
-                        // Ambil semua riwayat (Disetujui/Ditolak)
+                        // Ambil semua riwayat selain 'menunggu'
                         $query_hist = "SELECT p.*, u.nama AS nama_pemohon, a.nama AS nama_admin
                                        FROM tb_permintaan p 
                                        JOIN tb_user u ON p.user_id = u.id 
@@ -58,8 +112,8 @@ require 'layout/topbar.php';
                         while($hist = mysqli_fetch_assoc($res_hist)):
                             $id_hist = $hist['id'];
                             
-                            // Tentukan Tanggal (Disetujui atau Ditolak)
-                            $tgl_aksi = ($hist['status'] == 'disetujui') ? $hist['tanggal_disetujui'] : $hist['tanggal_ditolak'];
+                            // Tentukan Tanggal acuan (Jika ditolak pakai tgl_ditolak, sisanya pakai tgl_disetujui)
+                            $tgl_aksi = ($hist['status'] == 'ditolak') ? $hist['tanggal_ditolak'] : $hist['tanggal_disetujui'];
                         ?>
                         <tr>
                             <td>
@@ -83,8 +137,13 @@ require 'layout/topbar.php';
                             </td>
 
                             <td class="text-center">
-                                <?php if($hist['status']=='disetujui'): ?>
-                                    <span class="badge badge-success px-2 py-1">Disetujui</span>
+                                <?php if($hist['status'] == 'disetujui'): ?>
+                                    <span class="badge badge-warning px-2 py-1 text-dark">Disetujui (Belum diambil)</span>
+                                <?php elseif($hist['status'] == 'selesai'): ?>
+                                    <span class="badge badge-success px-2 py-1">Selesai (Diambil)</span>
+                                <?php elseif($hist['status'] == 'batal_otomatis'): ?>
+                                    <span class="badge badge-secondary px-2 py-1">Batal Otomatis</span>
+                                    <div class="small text-danger mt-1 font-italic">Hangus (Lewat 7 Hari)</div>
                                 <?php else: ?>
                                     <span class="badge badge-danger px-2 py-1">Ditolak</span>
                                     <div class="small text-danger mt-1 font-italic">"<?= $hist['catatan']; ?>"</div>
@@ -96,7 +155,14 @@ require 'layout/topbar.php';
                             </td>
                             
                             <td class="text-center">
-                                <?php if($hist['status']=='disetujui'): ?>
+                                <?php if($hist['status'] == 'disetujui'): ?>
+                                    <a href="riwayat_persetujuan.php?ambil_id=<?= $hist['id']; ?>" class="btn btn-success btn-sm shadow-sm mb-1" onclick="return confirm('Konfirmasi: Apakah Staf sudah mengambil barang fisik secara langsung?');" title="Tandai Sudah Diambil">
+                                        <i class="fas fa-check-double"></i> Diambil
+                                    </a>
+                                    <a href="cetak_surat.php?id=<?= $hist['id']; ?>" target="_blank" class="btn btn-info btn-sm shadow-sm mb-1" title="Cetak Surat Jalan">
+                                        <i class="fas fa-print"></i> Cetak
+                                    </a>
+                                <?php elseif($hist['status'] == 'selesai'): ?>
                                     <a href="cetak_surat.php?id=<?= $hist['id']; ?>" target="_blank" class="btn btn-info btn-sm shadow-sm" title="Cetak Surat Jalan">
                                         <i class="fas fa-print"></i> Cetak
                                     </a>
