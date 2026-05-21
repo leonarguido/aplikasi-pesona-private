@@ -51,11 +51,11 @@
                                                 <th>No</th>
                                                 <th>Nama Lengkap</th>
                                                 <th>NIP</th>
-                                                <th>Username</th>
                                                 <th>Role</th>
                                                 <th>Jabatan</th>
                                                 <th class="text-center">Tanda Tangan</th>
-                                                <th class="text-center">Aksi</th>
+                                                <!-- ukuran kolom lebih lebar -->
+                                                <th class="text-center" style="width: 80px;">Aksi</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -74,7 +74,6 @@
                                                     <td><?= $no++; ?></td>
                                                     <td><?= $row['nama']; ?></td>
                                                     <td><?= !empty($row['nip']) ? $row['nip'] : '-'; ?></td>
-                                                    <td><?= $row['username']; ?></td>
                                                     <td>
                                                         <?php if ($row['role'] == 'super_admin' || $row['role'] == 'super admin'): ?>
                                                             <span class="badge badge-danger">Super Admin</span>
@@ -97,10 +96,13 @@
                                                         <?php endif; ?>
                                                     </td>
                                                     <td class="text-center">
+                                                        <a href="<?= BASE_URL ?>reset_qr_code&user_id=<?= $row['id']; ?>" class="btn btn-info btn-sm btn-circle" title="Reset QR Code" onclick="confirmResetQR(event, this.href)">
+                                                            <i class="fas fa-qrcode"></i>
+                                                        </a>
                                                         <button class="btn btn-warning btn-sm btn-circle" data-toggle="modal" data-target="#modalEdit<?= $row['id']; ?>" title="Edit">
                                                             <i class="fas fa-edit"></i>
                                                         </button>
-                                                        <a href="<?= BASE_URL ?>hapus_data_pengguna&hapus=<?= $row['id']; ?>" class="btn btn-danger btn-sm btn-circle" onclick="confirmHapus(event, this.href)">
+                                                        <a href="<?= BASE_URL ?>hapus_data_pengguna&hapus=<?= $row['id']; ?>" class="btn btn-danger btn-sm btn-circle" onclick="confirmHapus(event, this.href)" title="Hapus">
                                                             <i class="fas fa-trash"></i>
                                                         </a>
                                                     </td>
@@ -291,6 +293,24 @@
                 confirmButtonColor: '#d33',
                 cancelButtonColor: '#3085d6',
                 confirmButtonText: 'Ya, hapus!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = url;
+                }
+            });
+        }
+
+        function confirmResetQR(event, url) {
+            event.preventDefault();
+            Swal.fire({
+                title: 'Yakin Reset QR Code?',
+                text: 'Semua perangkat yang terhubung dengan QR Code lama akan kehilangan akses. Pastikan pengguna mengetahui bahwa mereka harus memindai QR Code baru yang akan muncul saat login berikutnya.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Ya, reset!',
                 cancelButtonText: 'Batal'
             }).then((result) => {
                 if (result.isConfirmed) {

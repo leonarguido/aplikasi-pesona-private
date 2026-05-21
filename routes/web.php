@@ -178,6 +178,9 @@ if (isset($_GET['page'])) {
         case 'hapus_data_pengguna':
             $admin->hapus_data_pengguna();
             break;
+        case 'reset_qr_code':
+            $admin->reset_qr_code();
+            break;
 
         case 'data_jabatan':
             $admin->data_jabatan_page();

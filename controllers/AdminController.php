@@ -1838,6 +1838,63 @@ class AdminController
         }
     }
 
+    public function reset_qr_code()
+    {
+        session_start();
+        require __DIR__ . '/../config/koneksi.php';
+        require __DIR__ . '/../config/GoogleAuthenticator.php'; // Panggil library
+
+        // 1. Cek Login & Akses
+        if (!isset($_SESSION['user_id'])) {
+            header("Location: " . $this->base_url . "login");
+            exit;
+        }
+
+        // Hanya Super Admin yang boleh akses halaman ini
+        if ($_SESSION['role'] != 'super admin') {
+            $_SESSION['alert'] = [
+                'icon' => 'error',
+                'title' => 'Gagal!',
+                'text' => 'Akses Ditolak!',
+            ];
+            header("Location: " . $this->base_url);
+            exit;
+        }
+
+        // 2. Reset QR Code (Secret Key)
+        if (!isset($_GET['user_id'])) {
+            $_SESSION['alert'] = [
+                'icon' => 'error',
+                'title' => 'Gagal!',
+                'text' => 'User ID tidak ditemukan!',
+            ];
+            header("Location: " . $this->base_url . "data_pengguna");
+            exit;
+        }
+
+        $user_id = $_GET['user_id'];
+
+        $ga = new PHPGangsta_GoogleAuthenticator();
+        $new_secret = $ga->createSecret();
+
+        mysqli_query($koneksi, "UPDATE tb_user SET secret_key = '$new_secret', is_2fa_verified = 0 WHERE id = '$user_id'");
+
+        if ($_SESSION['user_id'] == $user_id && $_SESSION['role'] == 'super admin') {
+            // Jika yang di-reset adalah user yang sedang login, logout paksa
+            session_destroy();
+            header("Location: " . $this->base_url . "login");
+            exit;
+        } else {
+            $_SESSION['alert'] = [
+                'icon' => 'success',
+                'title' => 'Berhasil!',
+                'text' => 'QR Code berhasil direset!',
+            ];
+            header("Location: " . $this->base_url . "data_pengguna");
+            exit;
+        }
+    }
+
     // MASUK KE HALAMAN JABATAN
     public function data_jabatan_page()
     {
