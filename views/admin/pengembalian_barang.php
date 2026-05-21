@@ -43,14 +43,14 @@
                                             $no = 1;
                                             // HANYA AMBIL YANG STATUSNYA SELESAI (Sedang Dipinjam) ATAU DIKEMBALIKAN
                                             $query = mysqli_query($koneksi, "
-                            SELECT p.*, b.nama_barang, b.kode_barang, b.merek_barang, b.tahun_perolehan, b.nup, u.nama AS nama_peminjam, u.nip AS nip_peminjam
-                            FROM tb_peminjaman p
-                            JOIN tb_aset_bmn b ON p.bmn_id = b.id
-                            JOIN tb_user u ON p.user_id = u.id
-                            WHERE p.status IN ('selesai', 'dikembalikan') 
-                            AND p.deleted_at IS NULL
-                            ORDER BY p.id DESC
-                        ");
+                                                SELECT p.*, b.nama_barang, b.kode_barang, b.merek_barang, b.tahun_perolehan, b.nup, u.nama AS nama_peminjam, u.nip AS nip_peminjam
+                                                FROM tb_peminjaman p
+                                                JOIN tb_aset_bmn b ON p.bmn_id = b.id
+                                                JOIN tb_user u ON p.user_id = u.id
+                                                WHERE p.status IN ('selesai', 'dikembalikan') 
+                                                AND p.deleted_at IS NULL
+                                                ORDER BY p.id DESC
+                                            ");
 
                                             while ($row = mysqli_fetch_assoc($query)):
                                             ?>

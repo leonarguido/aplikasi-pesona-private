@@ -67,55 +67,49 @@ class AutentikasiController
 
         $ga = new PHPGangsta_GoogleAuthenticator();
 
-        // Cek apakah user sudah punya secret key
-        $query = mysqli_query($koneksi, "SELECT secret_key FROM tb_user WHERE id = '$pending_id'");
+        // Ambil data user, termasuk status verifikasi
+        $query = mysqli_query($koneksi, "SELECT secret_key, is_2fa_verified FROM tb_user WHERE id = '$pending_id'");
         $user_data = mysqli_fetch_assoc($query);
 
-        $is_setup = false;
+        $secret = $user_data['secret_key'];
+        $is_first_time = false;
 
-        if (empty($user_data['secret_key'])) {
-            // Jika belum punya, buat kunci baru dan simpan ke DB
-            $secret = $ga->createSecret();
-            mysqli_query($koneksi, "UPDATE tb_user SET secret_key = '$secret' WHERE id = '$pending_id'");
-            $is_setup = true;
-        } else {
-            // Jika sudah punya, gunakan yang ada
-            $secret = $user_data['secret_key'];
+        // LOGIKA BARU: Jika secret kosong ATAU sudah punya tapi belum pernah diverifikasi sukses
+        if (empty($secret) || $user_data['is_2fa_verified'] == 0) {
+            if (empty($secret)) {
+                $secret = $ga->createSecret();
+                mysqli_query($koneksi, "UPDATE tb_user SET secret_key = '$secret' WHERE id = '$pending_id'");
+            }
+            $is_first_time = true;
         }
 
-        // Generate URL QR Code menggunakan API alternatif yang aktif
+        // Generate URL QR Code
         $nama_aplikasi = urlencode("Aplikasi Pesona");
         $otpauth_url = "otpauth://totp/{$nama_aplikasi}?secret={$secret}";
-
-        // Menggunakan API dari goqr.me / qrserver
         $qrCodeUrl = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" . urlencode($otpauth_url);
 
         $error = false;
 
-        // PROSES JIKA TOMBOL SUBMIT OTP DITEKAN
+        // PROSES VERIFIKASI
         if (isset($_POST['verify'])) {
-            $otp_code = $_POST['otp_code'];
-
-            // Verifikasi kode OTP (toleransi waktu 2 * 30 detik)
+            $otp_code = $_POST['kode_2fa'];
             $checkResult = $ga->verifyCode($secret, $otp_code, 2);
 
             if ($checkResult) {
-                // KODE BENAR! Jalankan logika pembagian Role dari login Anda sebelumnya
+                // TANDAI SUDAH TERVERIFIKASI PERMANEN
+                mysqli_query($koneksi, "UPDATE tb_user SET is_2fa_verified = 1 WHERE id = '$pending_id'");
 
+                // Logika Role
                 if ($pending_role == 'staff') {
-                    // LANGSUNG MASUK
                     $_SESSION['user_id']   = $pending_id;
                     $_SESSION['username']  = $pending_username;
                     $_SESSION['full_name'] = $pending_nama;
                     $_SESSION['role']      = 'user';
-
-                    // Hapus session pending
                     unset($_SESSION['pending_2fa_id'], $_SESSION['pending_2fa_username'], $_SESSION['pending_2fa_nama'], $_SESSION['pending_2fa_role']);
 
                     header("Location: index.php");
-                    exit;
+
                 } else {
-                    // TAHAN DI SESSION SEMENTARA UNTUK PILIH ROLE
                     $_SESSION['temp_user_id']   = $pending_id;
                     $_SESSION['temp_username']  = $pending_username;
                     $_SESSION['temp_full_name'] = $pending_nama;
@@ -131,13 +125,11 @@ class AutentikasiController
                     } else {
                         $_SESSION['temp_role'] = $pending_role;
                     }
-
-                    // Hapus session pending
                     unset($_SESSION['pending_2fa_id'], $_SESSION['pending_2fa_username'], $_SESSION['pending_2fa_nama'], $_SESSION['pending_2fa_role']);
-
+                    
                     header("Location: " . $this->base_url . "role");
-                    exit;
                 }
+                exit;
             } else {
                 $error = true;
             }

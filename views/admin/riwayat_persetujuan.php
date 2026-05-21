@@ -46,7 +46,7 @@
                                        JOIN tb_user u ON p.user_id = u.id 
                                        LEFT JOIN tb_user a ON p.admin_id = a.id
                                        WHERE p.status != 'menunggu' AND p.deleted_at IS NULL
-                                       ORDER BY p.tanggal_disetujui DESC, p.tanggal_ditolak DESC";
+                                       ORDER BY p.updated_at DESC";
 
                                             $res_hist = mysqli_query($koneksi, $query_hist);
 
