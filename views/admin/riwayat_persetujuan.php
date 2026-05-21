@@ -29,7 +29,7 @@
                                         <thead class="thead-light">
                                             <tr>
                                                 <th>No</th>
-                                                <th width="15%">Tanggal</th>
+                                                <th width="12%">Tanggal</th>
                                                 <th>Pemohon</th>
                                                 <th>Rincian Barang (Final)</th>
                                                 <th class="text-center" width="10%">Status</th>
@@ -46,7 +46,7 @@
                                        JOIN tb_user u ON p.user_id = u.id 
                                        LEFT JOIN tb_user a ON p.admin_id = a.id
                                        WHERE p.status != 'menunggu' AND p.deleted_at IS NULL
-                                       ORDER BY p.updated_at DESC";
+                                       ORDER BY p.status = 'disetujui' DESC, p.updated_at DESC";
 
                                             $res_hist = mysqli_query($koneksi, $query_hist);
 
@@ -61,7 +61,7 @@
                                                     <td class="small">
                                                         <i class="far fa-calendar-alt text-gray-400"></i> <?= date('d-m-Y', strtotime($tgl_aksi)); ?>
                                                     </td>
-                                                    <td class="font-weight-bold text-primary"><?= $hist['nama_pemohon']; ?></td>
+                                                    <td class="small font-weight-bold text-primary"><?= $hist['nama_pemohon']; ?></td>
 
                                                     <td>
                                                         <ul class="pl-3 mb-0" style="font-size: 0.9rem;">
@@ -144,7 +144,7 @@
                             "previous": "Kembali"
                         }
                     },
-                    "ordering": false // Matikan sorting otomatis agar urutan tanggal DESC tetap terjaga
+                    // "ordering": false // Matikan sorting otomatis agar urutan tanggal DESC tetap terjaga
                 });
             }
         });
