@@ -41,10 +41,11 @@
                                             <?php
                                             $no = 1;
                                             // Ambil semua riwayat selain 'menunggu'
-                                            $query_hist = "SELECT p.*, u.nama AS nama_pemohon, a.nama AS nama_admin
+                                            $query_hist = "SELECT p.*, u.nama AS nama_pemohon, a.nama AS nama_admin_1, b.nama AS nama_admin_2
                                        FROM tb_permintaan p 
                                        JOIN tb_user u ON p.user_id = u.id 
                                        LEFT JOIN tb_user a ON p.admin_id = a.id
+                                       LEFT JOIN tb_user b ON p.admin2_id = b.id
                                        WHERE p.status != 'menunggu' AND p.deleted_at IS NULL
                                        ORDER BY p.status = 'disetujui' DESC, p.updated_at DESC";
 
@@ -93,7 +94,7 @@
                                                     </td>
 
                                                     <td class="small text-muted">
-                                                        <i class="fas fa-user-shield"></i> <?= $hist['nama_admin']; ?>
+                                                        <?= ($hist['nama_admin_2']) ? "<i class='fas fa-user-shield'></i> {$hist['nama_admin_2']}" : "<i class='fas fa-user-shield'></i> {$hist['nama_admin_1']}"; ?>
                                                     </td>
 
                                                     <td class="text-center">

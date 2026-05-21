@@ -999,7 +999,9 @@ class AdminController
 
         if (isset($_GET['ambil_id'])) {
             $id_ambil = mysqli_real_escape_string($koneksi, $_GET['ambil_id']);
-            $query = "UPDATE tb_permintaan SET status = 'selesai' WHERE id = '$id_ambil'";
+            $admin_id = $_SESSION['user_id'];
+            $tanggal_ambil = date('Y-m-d');
+            $query = "UPDATE tb_permintaan SET tanggal_diambil = '$tanggal_ambil', admin2_id = '$admin_id', status = 'selesai' WHERE id = '$id_ambil'";
 
             if (mysqli_query($koneksi, $query)) {
                 $_SESSION['alert'] = [
